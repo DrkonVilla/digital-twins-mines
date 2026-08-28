@@ -9,6 +9,9 @@ async_session = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
 )
 
+# Alias so other modules can import either name
+async_session_maker = async_session
+
 Base = declarative_base()
 
 async def get_db():

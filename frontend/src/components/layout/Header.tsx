@@ -16,11 +16,12 @@ export function Header() {
         <ThemeToggle />
         <div className="flex items-center gap-4">
           <div className="text-sm text-right">
-          <p className="font-medium text-foreground">{user?.email || 'Usuario'}</p>
-          <p className="text-xs text-muted-foreground">{user?.role || 'Operador'}</p>
-        </div>
-        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-          {user?.email?.charAt(0).toUpperCase() || 'U'}
+            <p className="font-medium text-foreground">{user?.email || 'Usuario'}</p>
+            <p className="text-xs text-muted-foreground">{user?.role || 'Operador'}</p>
+          </div>
+          <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+            {user?.email?.charAt(0).toUpperCase() || 'U'}
+          </div>
         </div>
       </div>
     </header>

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import jwt
 from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 from app.core.config import settings
@@ -25,3 +26,11 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
+
+# Re-export get_current_user from deps to allow importing from either location
+def get_current_user():
+    from app.api.deps import get_current_user as _get_current_user
+    return _get_current_user
+
+# For use as Depends()
+from app.api.deps import get_current_user

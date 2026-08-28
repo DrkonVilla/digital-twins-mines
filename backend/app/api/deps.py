@@ -4,14 +4,14 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import async_session
+from app.db.session import async_session_maker
 from app.core.config import settings
 from app.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session() as session:
+    async with async_session_maker() as session:
         yield session
 
 async def get_current_user(
