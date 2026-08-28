@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Truck, Bell, Activity, LogOut, Cuboid } from 'lucide-react';
+import { LayoutDashboard, Users, Truck, Bell, Activity, LogOut, Cuboid, FileText } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 
@@ -13,6 +13,7 @@ const navItems = [
   { name: 'Maquinaria', href: '/monitoreo/maquinaria', icon: Truck },
   { name: 'Alertas', href: '/alertas', icon: Bell },
   { name: 'Historial', href: '/historial', icon: Activity },
+  { name: 'Reportes & IA', href: '/reportes', icon: FileText },
 ];
 
 export function Sidebar() {
