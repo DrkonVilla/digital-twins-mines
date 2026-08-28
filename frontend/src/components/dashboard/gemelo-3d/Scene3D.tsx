@@ -1,19 +1,26 @@
 'use client';
 
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, Grid, Stats } from '@react-three/drei';
+import { OrbitControls, Environment, Grid } from '@react-three/drei';
+import { PCFShadowMap } from 'three';
 import TunnelGeometry from './TunnelGeometry';
 import WorkerAvatar from './WorkerAvatar';
 import MachineModel from './MachineModel';
 import RestrictedZone from './RestrictedZone';
 import InfoPanel3D from './InfoPanel3D';
 import { useAlertStore } from '@/store/alertStore';
-import { Suspense } from 'react';
+import { Suspense, useCallback } from 'react';
+import { useWebSocket } from '@/hooks/useWebSocket';
+
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/api/v1/alerts/ws';
 
 export default function Scene3D() {
-  // We will get the active alerts to determine the risk level of the worker/machine
   const alerts = useAlertStore((state) => state.alerts);
+  const addAlert = useAlertStore((state) => state.addAlert);
   const activeAlert = alerts.length > 0 ? alerts[0] : null;
+
+  const handleWsMessage = useCallback((data: any) => addAlert(data), [addAlert]);
+  useWebSocket(WS_URL, handleWsMessage);
 
   // Derive risk levels for our mock entities
   const workerRisk = activeAlert?.worker_id === 1 ? activeAlert.risk_level : 'BAJO';
@@ -22,61 +29,63 @@ export default function Scene3D() {
   return (
     <>
       <Canvas
-        camera={{ position: [10, 10, 10], fov: 50 }}
-        shadows
+        camera={{ position: [10, 8, 10], fov: 50 }}
+        shadows={{ type: PCFShadowMap }}
         className="w-full h-full"
+        gl={{ antialias: true }}
       >
-        <color attach="background" args={['#1a1a1a']} />
-        
-        {/* Luces */}
-        <ambientLight intensity={0.5} />
-        <directionalLight 
-          position={[10, 20, 10]} 
-          intensity={1} 
-          castShadow 
-          shadow-mapSize={[1024, 1024]}
-        />
-        <pointLight position={[0, 5, 0]} intensity={0.8} color="#fff" />
+        <color attach="background" args={['#111827']} />
 
-        {/* Entorno base */}
+        {/* Luces */}
+        <ambientLight intensity={0.4} />
+        <directionalLight
+          position={[12, 20, 10]}
+          intensity={1.2}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-camera-far={80}
+          shadow-camera-left={-20}
+          shadow-camera-right={20}
+          shadow-camera-top={20}
+          shadow-camera-bottom={-20}
+        />
+        <pointLight position={[0, 6, 0]} intensity={0.5} color="#ffe4b5" />
+
+        {/* Entorno y grilla */}
         <Suspense fallback={null}>
           <Environment preset="city" />
-          <Grid 
-            infiniteGrid 
-            fadeDistance={50} 
-            sectionColor="#4a4a4a" 
-            cellColor="#2b2b2b" 
-            position={[0, -0.01, 0]} 
+          <Grid
+            infiniteGrid
+            fadeDistance={60}
+            sectionColor="#374151"
+            cellColor="#1f2937"
+            position={[0, -0.01, 0]}
           />
-          
+
           {/* El Túnel */}
           <TunnelGeometry />
 
-          {/* Zona Restringida (Mock 1) */}
+          {/* Zona Restringida */}
           <RestrictedZone position={[5, 0, -5]} size={[10, 4, 10]} name="Zona Carguío" />
 
-          {/* Trabajador (Mock ID 1) */}
+          {/* Trabajadores */}
           <WorkerAvatar position={[0, 0, 0]} riskLevel={workerRisk} label="W-001 (Juan)" />
-          
-          {/* Trabajador (Mock ID 2 - Seguro) */}
           <WorkerAvatar position={[-5, 0, 8]} riskLevel="BAJO" label="W-002 (Ana)" />
 
-          {/* Maquinaria (Mock ID 1) */}
+          {/* Maquinaria */}
           <MachineModel position={[4, 0, 0]} riskLevel={machineRisk} label="M-001 (LHD)" />
-
         </Suspense>
 
         {/* Controles de cámara */}
-        <OrbitControls 
+        <OrbitControls
           makeDefault
-          maxPolarAngle={Math.PI / 2 - 0.05} // No bajar más allá del piso
+          maxPolarAngle={Math.PI / 2 - 0.05}
           minDistance={2}
           maxDistance={40}
         />
-        
-        {/* Métricas de rendimiento (Solo desarrollo) */}
-        <Stats />
       </Canvas>
+
       <InfoPanel3D activeAlert={activeAlert} />
     </>
   );
