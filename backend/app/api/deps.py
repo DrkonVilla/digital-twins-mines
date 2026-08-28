@@ -30,11 +30,12 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
     
-    # Normally we'd query the DB here. For now, we mock an admin user.
-    # We will connect this to the DB once we have user creation implemented.
-    if username != "admin@example.com":
+    from sqlalchemy import select
+    result = await db.execute(select(User).filter(User.email == username))
+    user = result.scalars().first()
+    if not user:
         raise credentials_exception
-    
-    # Mock user since we haven't created the seeder yet.
-    user = User(id=1, email="admin@example.com", role="ADMIN", is_active=True)
+    if not user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+        
     return user
