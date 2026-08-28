@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Truck, Bell, Activity, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Truck, Bell, Activity, LogOut, Cuboid } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Gemelo Digital 3D', href: '/gemelo-digital', icon: Cuboid },
   { name: 'Trabajadores', href: '/monitoreo/trabajadores', icon: Users },
   { name: 'Maquinaria', href: '/monitoreo/maquinaria', icon: Truck },
   { name: 'Alertas', href: '/alertas', icon: Bell },

@@ -2,6 +2,8 @@
 
 import { useAuthStore } from '@/store/authStore';
 
+import { ThemeToggle } from '@/components/ThemeToggle';
+
 export function Header() {
   const user = useAuthStore((state) => state.user);
 
@@ -10,8 +12,10 @@ export function Header() {
       <div className="flex-1">
         {/* Espacio para breadcrumbs o búsqueda futura */}
       </div>
-      <div className="flex items-center gap-4">
-        <div className="text-sm text-right">
+      <div className="flex items-center gap-6">
+        <ThemeToggle />
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-right">
           <p className="font-medium text-foreground">{user?.email || 'Usuario'}</p>
           <p className="text-xs text-muted-foreground">{user?.role || 'Operador'}</p>
         </div>
