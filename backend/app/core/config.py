@@ -6,11 +6,11 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Database
-    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_SERVER: str = "127.0.0.1"
     POSTGRES_USER: str = "m11_user"
     POSTGRES_PASSWORD: str = "m11_password"
     POSTGRES_DB: str = "m11_db"
-    POSTGRES_PORT: str = "5432"
+    POSTGRES_PORT: str = "5433"
     
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
