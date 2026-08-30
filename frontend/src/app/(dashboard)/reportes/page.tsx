@@ -23,11 +23,11 @@ export default function ReportesPage() {
     { role: 'bot', text: 'Hola, soy M-11 AI. Pregúntame sobre normativas de seguridad minera, procedimientos en frentes de extracción o cómo interpretar alertas de riesgo.' }
   ]);
 
-  const handleGenerateReport = async () => {
+  const handleGenerateReport = async (format: string = 'pdf') => {
     setGenerating(true);
     setGeneratedFile(null);
     try {
-      const res = await api.post('/reports');
+      const res = await api.post(`/reports?format=${format}`);
       setGeneratedFile(res.data.filename);
     } catch (err) {
       console.error('Error generando reporte:', err);
@@ -88,23 +88,46 @@ export default function ReportesPage() {
               </ul>
             </div>
 
-            <Button
-              onClick={handleGenerateReport}
-              disabled={generating}
-              className="w-full"
-            >
-              {generating ? (
-                <>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => handleGenerateReport('pdf')}
+                disabled={generating}
+                className="w-full flex-1"
+              >
+                {generating ? (
                   <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                  Generando...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Generar Reporte PDF
-                </>
-              )}
-            </Button>
+                ) : (
+                  <FileText className="mr-2 h-4 w-4" />
+                )}
+                PDF
+              </Button>
+              <Button
+                onClick={() => handleGenerateReport('excel')}
+                disabled={generating}
+                className="w-full flex-1"
+                variant="outline"
+              >
+                {generating ? (
+                  <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                ) : (
+                  <FileText className="mr-2 h-4 w-4 text-green-600" />
+                )}
+                Excel
+              </Button>
+              <Button
+                onClick={() => handleGenerateReport('word')}
+                disabled={generating}
+                className="w-full flex-1"
+                variant="outline"
+              >
+                {generating ? (
+                  <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                ) : (
+                  <FileText className="mr-2 h-4 w-4 text-blue-600" />
+                )}
+                Word
+              </Button>
+            </div>
 
             {generatedFile && (
               <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
