@@ -2,17 +2,21 @@ import os
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-load_dotenv()
-api_key = os.getenv('GEMINI_API_KEY')
+def run_test():
+    load_dotenv()
+    api_key = os.getenv('GEMINI_API_KEY')
 
-if not api_key:
-    print('No API key found in environment variables')
-    exit(1)
+    if not api_key:
+        print('No API key found in environment variables')
+        return
 
-try:
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content('Say "Hello World!"')
-    print('SUCCESS:', response.text)
-except Exception as e:
-    print('ERROR:', str(e))
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content('Say "Hello World!"')
+        print('SUCCESS:', response.text)
+    except Exception as e:
+        print('ERROR:', str(e))
+
+if __name__ == "__main__":
+    run_test()

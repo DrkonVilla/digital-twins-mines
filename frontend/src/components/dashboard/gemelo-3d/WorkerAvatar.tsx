@@ -9,9 +9,11 @@ interface WorkerProps {
   position: [number, number, number];
   riskLevel: string; // 'BAJO', 'MEDIO', 'ALTO'
   label: string;
+  bpm?: number;
+  fatigueIndex?: number;
 }
 
-export default function WorkerAvatar({ position, riskLevel, label }: WorkerProps) {
+export default function WorkerAvatar({ position, riskLevel, label, bpm = 85, fatigueIndex = 0.2 }: WorkerProps) {
   const haloRef = useRef<Mesh>(null);
 
   // Color mapping
@@ -28,6 +30,8 @@ export default function WorkerAvatar({ position, riskLevel, label }: WorkerProps
       (haloRef.current.material as any).opacity = 0.5 + pulse * 0.3;
     }
   });
+
+  const isFatigued = fatigueIndex > 0.5;
 
   return (
     <group position={position}>
@@ -46,13 +50,13 @@ export default function WorkerAvatar({ position, riskLevel, label }: WorkerProps
       {/* Head */}
       <mesh position={[0, 1.3, 0]} castShadow>
         <sphereGeometry args={[0.22, 16, 16]} />
-        <meshStandardMaterial color="#f5cba7" roughness={0.8} />
+        <meshStandardMaterial color={isFatigued ? "#f87171" : "#f5cba7"} roughness={0.8} />
       </mesh>
 
       {/* Helmet */}
       <mesh position={[0, 1.46, 0]} castShadow>
         <sphereGeometry args={[0.24, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshStandardMaterial color="#facc15" roughness={0.3} />
+        <meshStandardMaterial color={isFatigued ? "#ef4444" : "#facc15"} roughness={0.3} />
       </mesh>
 
       {/* Left arm */}
@@ -79,16 +83,20 @@ export default function WorkerAvatar({ position, riskLevel, label }: WorkerProps
         <meshStandardMaterial color="#374151" roughness={0.8} />
       </mesh>
 
-      {/* Label */}
+      {/* Label with Biometrics */}
       <Html position={[0, 1.9, 0]} center distanceFactor={8}>
-        <div className={`px-2 py-1 rounded text-xs font-bold text-white shadow-lg whitespace-nowrap ${
+        <div className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded text-xs font-bold text-white shadow-lg whitespace-nowrap ${
           riskLevel === 'ALTO' ? 'bg-red-600' :
           riskLevel === 'MEDIO' ? 'bg-amber-500 text-black' :
           'bg-emerald-600'
         }`}>
-          {label}
+          <div>{label}</div>
+          <div className="text-[10px] font-normal opacity-90">
+            ❤️ {Math.round(bpm)} BPM {isFatigued ? '⚠️ FATIGA' : ''}
+          </div>
         </div>
       </Html>
     </group>
   );
 }
+

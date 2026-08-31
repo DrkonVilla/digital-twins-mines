@@ -1,5 +1,5 @@
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
-from sqlalchemy.sql import func
 from app.db.session import Base
 
 class User(Base):
@@ -10,4 +10,4 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     role = Column(String, default="OPERADOR")
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)

@@ -59,6 +59,15 @@ def download_and_process():
     ttc = np.where(relative_speed > 0.1, distance_3d / relative_speed, 300.0)
     in_restricted_zone = (distance_3d < 15.0).astype(int)
 
+    # 4. Enriquecimiento con Biometría, IMU Operacional y Variables Ambientales (Tema 3)
+    worker_bpm = np.clip(np.random.normal(85, 18, n), 55, 165)
+    fatigue_index = np.clip(np.random.beta(2, 5, n), 0.0, 1.0) # PERCLOS index 0 (alerta) - 1 (fatiga alta)
+    vibration_rms = np.clip(np.random.gamma(2, 1.5, n), 0.1, 12.0) # m/s2
+    acceleration_z = np.clip(np.random.normal(9.81, 1.2, n), 6.0, 15.0) # IMU Z m/s2
+    gas_co_ppm = np.clip(np.random.exponential(15, n), 0.0, 150.0) # CO en ppm
+    dust_density_mg_m3 = np.clip(np.random.exponential(2.0, n), 0.1, 15.0) # polvo mg/m3
+    ambient_light_lux = np.clip(np.random.normal(45, 15, n), 5.0, 120.0) # luxes en galería
+
     df['worker_x'] = worker_x
     df['worker_y'] = worker_y
     df['worker_z'] = worker_z
@@ -75,12 +84,22 @@ def download_and_process():
     df['in_restricted_zone'] = in_restricted_zone
     df['machine_status'] = np.random.choice([0, 1, 2, 3], size=n, p=[0.2, 0.5, 0.1, 0.2])
 
+    df['worker_bpm'] = worker_bpm
+    df['fatigue_index'] = fatigue_index
+    df['vibration_rms'] = vibration_rms
+    df['acceleration_z'] = acceleration_z
+    df['gas_co_ppm'] = gas_co_ppm
+    df['dust_density_mg_m3'] = dust_density_mg_m3
+    df['ambient_light_lux'] = ambient_light_lux
+
     # Target multi-clase: 0: BAJO, 1: MEDIO, 2: ALTO
     risk_level = np.zeros(n, dtype=int)
     for i in range(n):
-        if distance_3d[i] <= 5.0 or ttc[i] <= 5.0 or df['failure_flag'].iloc[i] == 1:
+        if (distance_3d[i] <= 5.0 or ttc[i] <= 5.0 or df['failure_flag'].iloc[i] == 1 or 
+            fatigue_index[i] > 0.75 or gas_co_ppm[i] > 50.0):
             risk_level[i] = 2
-        elif distance_3d[i] <= 15.0 or ttc[i] <= 15.0 or in_restricted_zone[i] == 1:
+        elif (distance_3d[i] <= 15.0 or ttc[i] <= 15.0 or in_restricted_zone[i] == 1 or 
+              fatigue_index[i] > 0.4 or worker_bpm[i] > 115):
             risk_level[i] = 1
         else:
             risk_level[i] = 0
@@ -95,3 +114,4 @@ def download_and_process():
 
 if __name__ == "__main__":
     download_and_process()
+

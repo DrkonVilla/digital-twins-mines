@@ -20,6 +20,14 @@ class InteractionBase(BaseModel):
     relative_speed: float
     in_restricted_zone: int
     machine_status: int
+    # Biometric, IMU, and Environmental Telemetry (Tema 3)
+    worker_bpm: Optional[float] = 85.0
+    fatigue_index: Optional[float] = 0.2
+    vibration_rms: Optional[float] = 1.5
+    acceleration_z: Optional[float] = 9.81
+    gas_co_ppm: Optional[float] = 10.0
+    dust_density_mg_m3: Optional[float] = 1.5
+    ambient_light_lux: Optional[float] = 45.0
 
 class InteractionCreate(InteractionBase):
     pass

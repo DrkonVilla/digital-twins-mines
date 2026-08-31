@@ -55,7 +55,7 @@ export default function AlertasPage() {
                 <div className="text-sm">
                   <p><span className="font-semibold">Trabajador:</span> {alert.worker_id}</p>
                   <p><span className="font-semibold">Maquinaria:</span> {alert.machine_id}</p>
-                  <p><span className="font-semibold">Probabilidad (Score):</span> {(alert.risk_score * 100).toFixed(1)}%</p>
+                  <p><span className="font-semibold">Probabilidad (Score):</span> {(alert.risk_score > 1 ? alert.risk_score : alert.risk_score * 100).toFixed(1)}%</p>
                 </div>
               </CardContent>
             </Card>
