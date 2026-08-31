@@ -9,9 +9,10 @@ class ParticleFilter3DPredictor:
     Estado de cada partícula: [x, y, z, vx, vy, vz]
     """
 
-    def __init__(self, n_particles: int = 500):
+    def __init__(self, n_particles: int = 500, collision_threshold: float = 7.0):
         self.n_particles = n_particles
         self.dt_horizon = 30.0 # Horizonte de predicción futura en segundos
+        self.collision_threshold = collision_threshold
 
     def predict_future_risk(self, telemetry: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -69,7 +70,24 @@ class ParticleFilter3DPredictor:
         future_machine_y = m_p_y + m_p_vy * self.dt_horizon + np.random.normal(0, 2.0, self.n_particles)
         future_machine_z = m_p_z + np.random.normal(0, 0.5, self.n_particles)
 
-        # 4. Cálculo de Distancias Futuras en 30s
+        # 4. Cálculo de Distancias en la Ventana Futura [0, 30s] (Mínima distancia en el horizonte)
+        rx0 = m_p_x - p_x
+        ry0 = m_p_y - p_y
+        rz0 = m_p_z - p_z
+
+        rvx = m_p_vx - p_vx
+        rvy = m_p_vy - p_vy
+
+        v2 = rvx**2 + rvy**2
+        v2_safe = np.where(v2 == 0, 1e-6, v2)
+        t_star = -(rx0 * rvx + ry0 * rvy) / v2_safe
+        t_closest = np.clip(t_star, 0.0, self.dt_horizon)
+
+        rx_closest = rx0 + rvx * t_closest
+        ry_closest = ry0 + rvy * t_closest
+        rz_closest = rz0
+
+        min_dist_horizon = np.sqrt(rx_closest**2 + ry_closest**2 + rz_closest**2)
         future_dist_3d = np.sqrt(
             (future_worker_x - future_machine_x)**2 +
             (future_worker_y - future_machine_y)**2 +
@@ -77,11 +95,11 @@ class ParticleFilter3DPredictor:
         )
 
         # 5. Evaluación de Colisión y Asimilación de Pesos Monte Carlo
-        # Partículas en zona crítica (< 7 metros en 30 segundos)
-        collision_mask = future_dist_3d <= 7.0
+        # Partículas en zona crítica (< collision_threshold metros dentro de la ventana de 30 segundos)
+        collision_mask = min_dist_horizon <= self.collision_threshold
         collision_probability = float(np.mean(collision_mask)) * 100.0
 
-        # Posición futura estimada (media ponderada del Filtro de Partículas)
+        # Posición futura estimada (media ponderada del Filtro de Partículas a +30s)
         mean_future_worker = [
             round(float(np.mean(future_worker_x)), 2),
             round(float(np.mean(future_worker_y)), 2),
@@ -104,7 +122,7 @@ class ParticleFilter3DPredictor:
             "collision_probability_30s": round(collision_probability, 2),
             "early_warning_level": early_warning_level,
             "projected_worker_position_30s": mean_future_worker,
-            "min_future_distance_meters": round(float(np.min(future_dist_3d)), 2),
+            "min_future_distance_meters": round(float(np.min(min_dist_horizon)), 2),
             "mean_future_distance_meters": round(float(np.mean(future_dist_3d)), 2),
             "suggested_action_30s": sug_action
         }

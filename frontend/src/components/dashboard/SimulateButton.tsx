@@ -48,7 +48,8 @@ export function SimulateButton({
       setLoading(false);
       setIsRunning(false);
       setIsError(true);
-      setStatusText('Error al conectar con Backend (http://localhost:8000)');
+      const errMsg = err.response?.data?.detail || err.response?.data?.message || err.message || 'Error al conectar con Backend (http://localhost:8000)';
+      setStatusText(`Error: ${errMsg}`);
       setTimeout(() => {
         setStatusText(null);
         setIsError(false);

@@ -17,8 +17,8 @@
         "w_statistic": 6.0,
         "p_value": 0.8125
       },
-      "h0_rejected": true,
-      "conclusion": "H0 Rechazada: El modelo propuesto es estadisticamente superior (p < 0.05)"
+      "h0_rejected": false,
+      "conclusion": "H0 No Rechazada: Rendimientos equivalentes (p >= 0.05)"
     },
     "MLP_NeuralNet": {
       "comparison_model_f1": 0.9446504902925403,
@@ -36,7 +36,7 @@
         "p_value": 0.0625
       },
       "h0_rejected": true,
-      "conclusion": "H0 Rechazada: El modelo propuesto es estadisticamente superior (p < 0.05)"
+      "conclusion": "H0 Rechazada: El modelo propuesto es estad\u00edsticamente superior (p < 0.05)"
     },
     "Stacking_Ensemble": {
       "comparison_model_f1": 0.9956203111738695,
@@ -53,8 +53,8 @@
         "w_statistic": 2.0,
         "p_value": 0.1875
       },
-      "h0_rejected": true,
-      "conclusion": "H0 Rechazada: El modelo propuesto es estadisticamente superior (p < 0.05)"
+      "h0_rejected": false,
+      "conclusion": "H0 No Rechazada: Rendimientos equivalentes (p >= 0.05)"
     },
     "Voting_Ensemble": {
       "comparison_model_f1": 0.9951500717217024,
@@ -72,7 +72,7 @@
         "p_value": 0.0625
       },
       "h0_rejected": true,
-      "conclusion": "H0 Rechazada: El modelo propuesto es estadisticamente superior (p < 0.05)"
+      "conclusion": "H0 Rechazada: El modelo propuesto es estad\u00edsticamente superior (p < 0.05)"
     }
   }
 }

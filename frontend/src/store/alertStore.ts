@@ -19,6 +19,8 @@ interface AlertMessage {
     projected_worker_position_30s: [number, number, number];
     suggested_action_30s: string;
   };
+  distance?: number;
+  distance_3d?: number;
   worker_bpm?: number;
   fatigue_index?: number;
   gas_co_ppm?: number;

@@ -50,6 +50,10 @@ venv/
 logs/
 *.log
 
+# Output reports
+reports_output/
+backend/reports_output/
+
 # OS
 .DS_Store
 Thumbs.db

@@ -19,7 +19,8 @@ def run_statistical_validation():
     p("PRUEBAS DE SIGNIFICANCIA ESTADÍSTICA Y VALIDACIÓN DE HIPÓTESIS - TESIS M-11")
     p("================================================================================")
 
-    json_path = Path("backend/app/ml/artifacts/model_comparison_results.json")
+    artifacts_dir = Path(__file__).resolve().parent.parent / "app" / "ml" / "artifacts"
+    json_path = artifacts_dir / "model_comparison_results.json"
     if not json_path.exists():
         p(f"[ERROR] No se encontro el archivo de resultados de CV en {json_path}.")
         p("Ejecuta backend/scripts/train_all_models.py primero.")
@@ -81,7 +82,7 @@ def run_statistical_validation():
         sem_diff = stats.sem(diff) if np.std(diff) > 0 else 1e-6
         ci_95 = stats.t.interval(0.95, len(diff)-1, loc=mean_diff, scale=sem_diff)
 
-        h0_rejected = bool(p_val_ttest < 0.05 or p_val_wilcoxon < 0.05 or mean_diff > 0)
+        h0_rejected = bool(p_val_ttest < 0.05 or p_val_wilcoxon < 0.05)
 
         report["comparisons"][model_name] = {
             "comparison_model_f1": float(np.mean(comp_f1_folds)),
@@ -96,7 +97,7 @@ def run_statistical_validation():
                 "p_value": float(p_val_wilcoxon)
             },
             "h0_rejected": h0_rejected,
-            "conclusion": "H0 Rechazada: El modelo propuesto es estadisticamente superior (p < 0.05)" if h0_rejected else "H0 No Rechazada: Rendimientos equivalentes"
+            "conclusion": "H0 Rechazada: El modelo propuesto es estadísticamente superior (p < 0.05)" if h0_rejected else "H0 No Rechazada: Rendimientos equivalentes (p >= 0.05)"
         }
 
         p(f"\n🔍 Comparacion: [{best_model_name}] VS [{model_name}]")
@@ -106,7 +107,7 @@ def run_statistical_validation():
         p(f"   Resultado de Hipotesis : {'✅ H0 RECHAZADA (Diferencia Significativa)' if h0_rejected else '⚖️ H0 NO RECHAZADA (Equivalencia)'}")
 
     # Exportar reporte estadístico completo
-    output_path = Path("backend/app/ml/artifacts/statistical_validation_report.json")
+    output_path = artifacts_dir / "statistical_validation_report.json"
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(report, f, indent=2)
 

@@ -45,13 +45,14 @@ class MLLoader:
         prediction = self.pipeline.predict(df)[0]
         probas = self.pipeline.predict_proba(df)[0]
         
-        risk_map = {0: "BAJO", 1: "MEDIO", 2: "ALTO"}
         risk_score = float(probas[2]) * 100 
         
-        if probas[2] >= 0.35:
+        if risk_score >= 80.0:
             prediction_label = "ALTO"
+        elif risk_score >= 50.0:
+            prediction_label = "MEDIO"
         else:
-            prediction_label = risk_map.get(prediction, "BAJO")
+            prediction_label = "BAJO"
             
         return {
             "risk_level": prediction_label,
@@ -70,15 +71,16 @@ class MLLoader:
         predictions = self.pipeline.predict(df)
         probas = self.pipeline.predict_proba(df)
         
-        risk_map = {0: "BAJO", 1: "MEDIO", 2: "ALTO"}
         results = []
         
         for i, (pred, proba) in enumerate(zip(predictions, probas)):
             risk_score = float(proba[2]) * 100
-            if proba[2] >= 0.35:
+            if risk_score >= 80.0:
                 prediction_label = "ALTO"
+            elif risk_score >= 50.0:
+                prediction_label = "MEDIO"
             else:
-                prediction_label = risk_map.get(pred, "BAJO")
+                prediction_label = "BAJO"
                 
             results.append({
                 "risk_level": prediction_label,

@@ -36,10 +36,23 @@ export default function ReportesPage() {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!generatedFile) return;
-    const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/reports/${generatedFile}/download`;
-    window.open(downloadUrl, '_blank');
+    try {
+      const response = await api.get(`/reports/${generatedFile}/download`, {
+        responseType: 'blob',
+      });
+      const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.setAttribute('download', generatedFile);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Error al descargar el reporte:', err);
+    }
   };
 
   const handleChat = useCallback(async (e: React.FormEvent) => {

@@ -13,6 +13,22 @@ export default function InfoPanel3D({ activeAlert }: InfoPanelProps) {
   const pf = activeAlert?.particle_filter_30s;
   const hmmState = activeAlert?.hmm_state || 'SEGURO';
 
+  // Sincronización estricta de umbrales en UI (<50% BAJO, 50-79% MEDIO, >=80% ALTO)
+  const rawScore = activeAlert?.risk_score != null 
+    ? (activeAlert.risk_score > 1 ? activeAlert.risk_score : activeAlert.risk_score * 100)
+    : 0;
+
+  let calculatedRiskLevel = 'BAJO';
+  let riskBadgeStyle = 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold';
+
+  if (rawScore >= 80) {
+    calculatedRiskLevel = 'ALTO';
+    riskBadgeStyle = 'bg-red-600 hover:bg-red-700 text-white font-bold';
+  } else if (rawScore >= 50) {
+    calculatedRiskLevel = 'MEDIO';
+    riskBadgeStyle = 'bg-amber-500 hover:bg-amber-600 text-black font-bold';
+  }
+
   return (
     <div className="absolute top-4 right-4 w-96 z-10 pointer-events-none">
       <Card className="bg-card/95 backdrop-blur-md shadow-2xl pointer-events-auto border-primary/20">
@@ -42,14 +58,20 @@ export default function InfoPanel3D({ activeAlert }: InfoPanelProps) {
               {/* Nivel de Riesgo ML y HMM */}
               <div className="flex justify-between items-center bg-muted/40 p-2 rounded-lg">
                 <div>
-                  <span className="text-xs text-muted-foreground block">Riesgo ML (RandomForest):</span>
-                  <Badge variant={activeAlert.risk_level === 'ALTO' ? 'destructive' : 'default'} className={activeAlert.risk_level === 'MEDIO' ? 'bg-amber-500 text-black font-bold' : 'font-bold'}>
-                    {activeAlert.risk_level} ({activeAlert.risk_score || 0}%)
+                  <span className="text-xs text-muted-foreground block">Riesgo ML (XGBoost):</span>
+                  <Badge className={riskBadgeStyle}>
+                    {calculatedRiskLevel} ({rawScore.toFixed(1)}%)
                   </Badge>
                 </div>
                 <div className="text-right">
                   <span className="text-xs text-muted-foreground block">Estado Oculto (HMM):</span>
-                  <Badge variant={hmmState === 'INMINENTE' ? 'destructive' : hmmState === 'INCIPIENTE' ? 'outline' : 'secondary'} className={hmmState === 'INCIPIENTE' ? 'border-amber-500 text-amber-500 font-bold' : 'font-bold'}>
+                  <Badge className={
+                    hmmState === 'INMINENTE'
+                      ? 'bg-red-600 hover:bg-red-700 text-white font-bold'
+                      : hmmState === 'INCIPIENTE'
+                      ? 'bg-amber-500 hover:bg-amber-600 text-black font-bold'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold'
+                  }>
                     {hmmState}
                   </Badge>
                 </div>
@@ -100,4 +122,3 @@ export default function InfoPanel3D({ activeAlert }: InfoPanelProps) {
     </div>
   );
 }
-
