@@ -17,9 +17,10 @@ export default function RestrictedZone({ position, size, name }: RestrictedZoneP
   useFrame(({ clock }) => {
     if (meshRef.current) {
       // Pulse effect on opacity
-      meshRef.current.material.opacity = 0.2 + Math.sin(clock.elapsedTime * 2) * 0.1;
+      (meshRef.current.material as any).opacity = 0.2 + Math.sin(clock.elapsedTime * 2) * 0.1;
     }
   });
+
 
   return (
     <group position={position}>

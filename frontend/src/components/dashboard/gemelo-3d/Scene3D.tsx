@@ -63,19 +63,38 @@ export default function Scene3D() {
             position={[0, -0.01, 0]}
           />
 
+          {/* Niebla de Gas/Polvo ambiental (Tema 3) */}
+          {((activeAlert?.gas_co_ppm ?? 0) > 30 || (activeAlert?.dust_density_mg_m3 ?? 0) > 3) && (
+            <fog attach="fog" args={['#1f2937', 5, 22]} />
+          )}
+
+
           {/* El Túnel */}
           <TunnelGeometry />
 
           {/* Zona Restringida */}
           <RestrictedZone position={[5, 0, -5]} size={[10, 4, 10]} name="Zona Carguío" />
 
-          {/* Trabajadores */}
-          <WorkerAvatar position={[0, 0, 0]} riskLevel={workerRisk} label="W-001 (Juan)" />
-          <WorkerAvatar position={[-5, 0, 8]} riskLevel="BAJO" label="W-002 (Ana)" />
+          {/* Trabajadores con Biometría */}
+          <WorkerAvatar
+            position={[0, 0, 0]}
+            riskLevel={workerRisk}
+            label="W-001 (Juan)"
+            bpm={activeAlert?.worker_bpm || 85}
+            fatigueIndex={activeAlert?.fatigue_index || 0.2}
+          />
+          <WorkerAvatar
+            position={[-5, 0, 8]}
+            riskLevel="BAJO"
+            label="W-002 (Ana)"
+            bpm={74}
+            fatigueIndex={0.15}
+          />
 
           {/* Maquinaria */}
           <MachineModel position={[4, 0, 0]} riskLevel={machineRisk} label="M-001 (LHD)" />
         </Suspense>
+
 
         {/* Controles de cámara */}
         <OrbitControls

@@ -21,5 +21,6 @@ reportlab
 openpyxl
 python-docx
 pytest
+pytest-asyncio
 httpx
 imbalanced-learn

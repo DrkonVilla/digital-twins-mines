@@ -27,7 +27,7 @@ def upgrade() -> None:
     sa.Column('type', sa.String(), nullable=False),
     sa.Column('model', sa.String(), nullable=True),
     sa.Column('status', sa.String(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_machines_id'), 'machines', ['id'], unique=False)
@@ -38,7 +38,7 @@ def upgrade() -> None:
     sa.Column('password_hash', sa.String(), nullable=False),
     sa.Column('role', sa.String(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
@@ -58,7 +58,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('worker_id', sa.Integer(), nullable=True),
     sa.Column('machine_id', sa.Integer(), nullable=True),
-    sa.Column('timestamp', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('timestamp', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
     sa.Column('distance_3d', sa.Float(), nullable=True),
     sa.Column('ttc', sa.Float(), nullable=True),
     sa.Column('worker_speed', sa.Float(), nullable=True),
@@ -83,7 +83,7 @@ def upgrade() -> None:
     sa.Column('status', sa.String(), nullable=True),
     sa.Column('acknowledged_by', sa.Integer(), nullable=True),
     sa.Column('acknowledged_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
     sa.ForeignKeyConstraint(['acknowledged_by'], ['users.id'], ),
     sa.ForeignKeyConstraint(['interaction_id'], ['interactions.id'], ),
     sa.PrimaryKeyConstraint('id')

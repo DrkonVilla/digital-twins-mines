@@ -1,7 +1,18 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
-from main import app
+from main import app as fastapi_app
 from app.core.security import create_access_token
+from app.db.session import engine, Base
+import app.models.user
+import app.models.worker
+import app.models.machine
+import app.models.interaction
+import app.models.alert
+
+@pytest.fixture(autouse=True)
+async def setup_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 @pytest.fixture
 def token():
@@ -14,7 +25,7 @@ def headers(token):
 @pytest.mark.asyncio
 async def test_predict_endpoint(headers):
     # Using ASGITransport to avoid DeprecationWarnings in newer httpx versions
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         interaction_data = {
             "worker_id": 1,
@@ -46,7 +57,7 @@ async def test_predict_endpoint(headers):
 
 @pytest.mark.asyncio
 async def test_read_workers(headers):
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.get("/api/v1/workers/", headers=headers)
         assert response.status_code == 200
@@ -54,7 +65,7 @@ async def test_read_workers(headers):
 
 @pytest.mark.asyncio
 async def test_auth_no_token():
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.get("/api/v1/workers/")
         assert response.status_code == 401

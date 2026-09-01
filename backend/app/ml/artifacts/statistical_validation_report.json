@@ -1,0 +1,78 @@
+{
+  "proposed_model": "RandomForest",
+  "mean_f1_proposed": 0.9969190289301662,
+  "comparisons": {
+    "XGBoost": {
+      "comparison_model_f1": 0.9957372360679543,
+      "mean_f1_difference": 0.0011817928622118723,
+      "ci_95_percent": [
+        -0.0020462553043367566,
+        0.004409841028760501
+      ],
+      "t_student": {
+        "t_statistic": 1.0164603619140016,
+        "p_value": 0.36689215215909077
+      },
+      "wilcoxon_signed_rank": {
+        "w_statistic": 6.0,
+        "p_value": 0.8125
+      },
+      "h0_rejected": false,
+      "conclusion": "H0 No Rechazada: Rendimientos equivalentes (p >= 0.05)"
+    },
+    "MLP_NeuralNet": {
+      "comparison_model_f1": 0.9446504902925403,
+      "mean_f1_difference": 0.052268538637625726,
+      "ci_95_percent": [
+        0.04677064936780925,
+        0.0577664279074422
+      ],
+      "t_student": {
+        "t_statistic": 26.39571681681438,
+        "p_value": 1.2242589009295287e-05
+      },
+      "wilcoxon_signed_rank": {
+        "w_statistic": 0.0,
+        "p_value": 0.0625
+      },
+      "h0_rejected": true,
+      "conclusion": "H0 Rechazada: El modelo propuesto es estad\u00edsticamente superior (p < 0.05)"
+    },
+    "Stacking_Ensemble": {
+      "comparison_model_f1": 0.9956203111738695,
+      "mean_f1_difference": 0.0012987177562965523,
+      "ci_95_percent": [
+        -0.00047517161860121835,
+        0.003072607131194323
+      ],
+      "t_student": {
+        "t_statistic": 2.032718955606143,
+        "p_value": 0.11186607138136875
+      },
+      "wilcoxon_signed_rank": {
+        "w_statistic": 2.0,
+        "p_value": 0.1875
+      },
+      "h0_rejected": false,
+      "conclusion": "H0 No Rechazada: Rendimientos equivalentes (p >= 0.05)"
+    },
+    "Voting_Ensemble": {
+      "comparison_model_f1": 0.9951500717217024,
+      "mean_f1_difference": 0.0017689572084636173,
+      "ci_95_percent": [
+        0.00030164247625868654,
+        0.003236271940668548
+      ],
+      "t_student": {
+        "t_statistic": 3.34721138890414,
+        "p_value": 0.028642987717040994
+      },
+      "wilcoxon_signed_rank": {
+        "w_statistic": 0.0,
+        "p_value": 0.0625
+      },
+      "h0_rejected": true,
+      "conclusion": "H0 Rechazada: El modelo propuesto es estad\u00edsticamente superior (p < 0.05)"
+    }
+  }
+}

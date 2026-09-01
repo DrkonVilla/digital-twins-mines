@@ -1,4 +1,9 @@
+import os
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DB_FILE = BASE_DIR / "m11_db.db"
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "M-11 Sistema de Alerta Temprana"
@@ -6,6 +11,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Database
+    DATABASE_URL: str = f"sqlite+aiosqlite:///{DB_FILE.as_posix()}"
     POSTGRES_SERVER: str = "127.0.0.1"
     POSTGRES_USER: str = "m11_user"
     POSTGRES_PASSWORD: str = "m11_password"
@@ -14,12 +20,14 @@ class Settings(BaseSettings):
     
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
     
     # JWT Auth
     SECRET_KEY: str = "super-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     
     # Gemini
     GEMINI_API_KEY: str = ""

@@ -1,5 +1,5 @@
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
-from sqlalchemy.sql import func
 from app.db.session import Base
 
 class Machine(Base):
@@ -10,4 +10,4 @@ class Machine(Base):
     type = Column(String, nullable=False)
     model = Column(String)
     status = Column(String, default="Detenida")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
