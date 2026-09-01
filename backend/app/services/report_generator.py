@@ -254,6 +254,16 @@ class ReportGenerator:
                 )
                 elements.append(Paragraph(conclusion_text, normal_style))
 
+                # Alineación FICHA 11 & Revistas Q1
+                elements.append(Spacer(1, 10))
+                elements.append(Paragraph("4. Cumplimiento Metodológico Ficha 11 & Revistas Q1", heading_style))
+                ficha_text = (
+                    "<b>• Sincronización Temporal:</b> NTP de alta precisión (&le; 1 ms) para datos biométricos, IoT y ambientales.<br/>"
+                    "<b>• Datasets Públicos de Referencia:</b> DsLMF+ Dataset (138,004 imágenes anotadas) y Mine 4.0-MineCareerDB.<br/>"
+                    "<b>• Revistas Q1 de Destino:</b> <i>Safety Science</i> (Elsevier, IF: ~6.1) y <i>IEEE Transactions on Human-Machine Systems</i> (IF: ~5.4)."
+                )
+                elements.append(Paragraph(ficha_text, normal_style))
+
         doc.build(elements)
         return filepath
 
@@ -389,6 +399,17 @@ class ReportGenerator:
                     "Rechazar H0" if c_data.get("h0_rejected") else "No rechazar H0"
                 ])
 
+            ws_stats.append([])
+            ws_stats.append(["Cumplimiento Metodológico Ficha 11 & Revistas Q1"])
+            ws_stats.cell(ws_stats.max_row, 1).font = Font(bold=True, size=12, color="1E3A8A")
+            ws_stats.append(["Requerimiento", "Detalle de Implementación / Referencia"])
+            for cell in ws_stats[ws_stats.max_row]:
+                cell.fill = header_fill
+                cell.font = header_font
+            ws_stats.append(["Sincronización Temporal", "NTP precisión <= 1 ms para biometría, IoT y ambiente"])
+            ws_stats.append(["Datasets Públicos", "DsLMF+ Dataset (138,004 imágenes) y Mine 4.0-MineCareerDB"])
+            ws_stats.append(["Revistas Q1 Objetivo", "Safety Science (Elsevier, IF: ~6.1) y IEEE Transactions on Human-Machine Systems (IF: ~5.4)"])
+
         wb.save(filepath)
         return filepath
 
@@ -515,6 +536,14 @@ class ReportGenerator:
                     f"El análisis de significancia estadística confirma que el modelo propuesto {proposed} supera de manera "
                     f"estadísticamente significativa a la Red Neuronal MLP (p < 0.05) y al Ensamblado Voting (p < 0.05), "
                     f"mientras que presenta un rendimiento equivalente con XGBoost y Stacking (p >= 0.05)."
+                )
+
+                doc.add_paragraph()
+                doc.add_heading("4. Cumplimiento Metodológico Ficha 11 & Revistas Q1", 2)
+                doc.add_paragraph(
+                    "• Sincronización Temporal: NTP de precisión <= 1 ms para biométricos, IoT y ambiente.\n"
+                    "• Datasets Públicos: DsLMF+ Dataset (138,004 imágenes) y Mine 4.0-MineCareerDB.\n"
+                    "• Revistas Q1 Objetivo: Safety Science (Elsevier, IF: ~6.1) y IEEE Transactions on Human-Machine Systems (IF: ~5.4)."
                 )
 
         doc.save(filepath)
