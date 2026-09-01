@@ -1,8 +1,6 @@
-'use client';
-
 import { Html } from '@react-three/drei';
 import { useRef } from 'react';
-import { Mesh } from 'three';
+import { Mesh, Group, MathUtils } from 'three';
 import { useFrame } from '@react-three/fiber';
 
 interface WorkerProps {
@@ -14,6 +12,7 @@ interface WorkerProps {
 }
 
 export default function WorkerAvatar({ position, riskLevel, label, bpm = 85, fatigueIndex = 0.2 }: WorkerProps) {
+  const groupRef = useRef<Group>(null);
   const haloRef = useRef<Mesh>(null);
 
   // Color mapping
@@ -21,7 +20,14 @@ export default function WorkerAvatar({ position, riskLevel, label, bpm = 85, fat
   if (riskLevel === 'MEDIO') color = '#eab308';
   if (riskLevel === 'ALTO') color = '#ef4444';
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, delta) => {
+    // Smooth position LERP animation
+    if (groupRef.current) {
+      groupRef.current.position.x = MathUtils.lerp(groupRef.current.position.x, position[0], delta * 3.5);
+      groupRef.current.position.y = MathUtils.lerp(groupRef.current.position.y, position[1], delta * 3.5);
+      groupRef.current.position.z = MathUtils.lerp(groupRef.current.position.z, position[2], delta * 3.5);
+    }
+
     if (haloRef.current && (riskLevel === 'MEDIO' || riskLevel === 'ALTO')) {
       const speed = riskLevel === 'ALTO' ? 8 : 3;
       const pulse = Math.sin(clock.elapsedTime * speed);
@@ -34,7 +40,7 @@ export default function WorkerAvatar({ position, riskLevel, label, bpm = 85, fat
   const isFatigued = fatigueIndex > 0.5;
 
   return (
-    <group position={position}>
+    <group ref={groupRef} position={position}>
       {/* Risk halo on the floor */}
       <mesh ref={haloRef} position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.55, 0.85, 32]} />

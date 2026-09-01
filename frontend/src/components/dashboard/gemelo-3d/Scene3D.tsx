@@ -22,9 +22,25 @@ export default function Scene3D() {
   const handleWsMessage = useCallback((data: any) => addAlert(data), [addAlert]);
   useWebSocket(WS_URL, handleWsMessage);
 
-  // Derive risk levels for our mock entities
+  // Derive risk levels for entities
   const workerRisk = activeAlert?.worker_id === 1 ? activeAlert.risk_level : 'BAJO';
   const machineRisk = activeAlert?.machine_id === 1 ? activeAlert.risk_level : 'BAJO';
+
+  // Dynamic 3D Positions derived from real-time telemetry / activeAlert
+  const workerPos: [number, number, number] = [
+    activeAlert?.worker_x ?? 0,
+    0,
+    activeAlert?.worker_z ?? 0,
+  ];
+
+  // Scale machine distance dynamically for the 3D tunnel viewport (35m -> X=24, 12m -> X=10, 4m -> X=3.5)
+  const rawDist = activeAlert?.distance_3d ?? activeAlert?.machine_x ?? 15;
+  const scaledMachineX = Math.max(3.2, Math.min(rawDist, 24));
+  const machinePos: [number, number, number] = [
+    scaledMachineX,
+    0,
+    activeAlert?.machine_z ?? 0,
+  ];
 
   return (
     <>
@@ -52,6 +68,11 @@ export default function Scene3D() {
         />
         <pointLight position={[0, 6, 0]} intensity={0.5} color="#ffe4b5" />
 
+        {/* Baliza Estroboscópica Roja en 3D ante Alerta Crítica */}
+        {activeAlert?.risk_level === 'ALTO' && (
+          <pointLight position={[scaledMachineX / 2, 4, 0]} intensity={6} color="#ef4444" distance={30} />
+        )}
+
         {/* Entorno y grilla */}
         <Suspense fallback={null}>
           <Environment preset="city" />
@@ -68,31 +89,34 @@ export default function Scene3D() {
             <fog attach="fog" args={['#1f2937', 5, 22]} />
           )}
 
-
           {/* El Túnel */}
           <TunnelGeometry />
 
           {/* Zona Restringida */}
           <RestrictedZone position={[5, 0, -5]} size={[10, 4, 10]} name="Zona Carguío" />
 
-          {/* Trabajadores con Biometría */}
+          {/* Trabajadores con Biometría y Posición Dinámica */}
           <WorkerAvatar
-            position={[0, 0, 0]}
+            position={workerPos}
             riskLevel={workerRisk}
             label="W-001 (Juan)"
             bpm={activeAlert?.worker_bpm || 85}
             fatigueIndex={activeAlert?.fatigue_index || 0.2}
           />
           <WorkerAvatar
-            position={[-5, 0, 8]}
+            position={[-7, 0, 7]}
             riskLevel="BAJO"
             label="W-002 (Ana)"
             bpm={74}
             fatigueIndex={0.15}
           />
 
-          {/* Maquinaria */}
-          <MachineModel position={[4, 0, 0]} riskLevel={machineRisk} label="M-001 (LHD)" />
+          {/* Maquinaria con Desplazamiento Dinámico en Túnel 3D */}
+          <MachineModel
+            position={machinePos}
+            riskLevel={machineRisk}
+            label={`M-001 (LHD) [${Math.round(rawDist)}m]`}
+          />
         </Suspense>
 
 
