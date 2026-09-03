@@ -14,8 +14,12 @@ from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
 import xgboost as xgb
 
+DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "raw", "synthetic_interactions.csv")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "app", "ml", "artifacts", "xgboost_collision_model.pkl")
+PIPELINE_PATH = os.path.join(os.path.dirname(__file__), "..", "app", "ml", "artifacts", "preprocessing_pipeline.pkl")
+
 def train_and_evaluate():
-    data_path = Path("../../data/raw/synthetic_interactions.csv")
+    data_path = Path(DATA_PATH)
     if not data_path.exists():
         print(f"Data file not found at {data_path}. Run generate_synthetic_data.py first.")
         return

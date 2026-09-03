@@ -1,0 +1,15 @@
+{
+  "title": "M-11 数字孪生与机器学习仪表板",
+  "welcome": "欢迎来到 M-11 系统的机器学习和数字孪生控制面板。",
+  "desc": "使用侧边栏浏览不同的工具，进行数据可视化、模型训练、统计测试和实时模拟。",
+  "sidebar_lang": "选择语言",
+  "nav_home": "主页",
+  "nav_dataset": "1. 数据集",
+  "nav_training": "2. 训练 & 交叉验证",
+  "nav_stats": "3. 统计测试",
+  "nav_twin": "4. 真实数字孪生测试",
+  "nav_reports": "5. 报告",
+  "btn_load": "加载数据",
+  "btn_train": "训练模型",
+  "btn_simulate": "模拟"
+}

@@ -25,7 +25,6 @@ async def read_alerts(
     db: AsyncSession = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user = Depends(get_current_user),
 ) -> Any:
     result = await db.execute(select(Alert).order_by(Alert.created_at.desc()).offset(skip).limit(limit))
     alerts = result.scalars().all()
