@@ -4,6 +4,7 @@ import requests
 from utils.i18n import init_i18n
 
 if "authenticated" not in st.session_state or not st.session_state.authenticated:
+    st.markdown("""<style>[data-testid="stSidebar"] {display: none;}</style>""", unsafe_allow_html=True)
     st.warning("Please login from the main page.")
     st.stop()
 
@@ -24,9 +25,10 @@ with col1:
     if st.button("Generate"):
         with st.spinner(f"Generating {format_type.upper()} report..."):
             try:
-                # We assume no auth needed or we can pass a dummy for now since it's local test
-                # In real scenario, we'd need JWT token in headers
-                res = requests.post(f"{API_URL}?format={format_type}")
+                headers = {
+                    "Authorization": f"Bearer {st.session_state.get('token', '')}"
+                }
+                res = requests.post(f"{API_URL}?format={format_type}", headers=headers)
                 if res.status_code == 200:
                     data = res.json()
                     st.success(f"Report generated successfully: {data.get('filename')}")

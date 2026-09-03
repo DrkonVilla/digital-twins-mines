@@ -56,16 +56,31 @@ def main():
         st.session_state.authenticated = False
 
     if not st.session_state.authenticated:
+        # Hide sidebar completely on login screen using CSS
+        st.markdown("""
+            <style>
+                [data-testid="stSidebar"] {
+                    display: none;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+        
         st.title("Login - M-11 Dashboard")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         if st.button("Login"):
-            # Simple hardcoded authentication for the dashboard
-            if username == "admin@example.com" and password == "admin123":
-                st.session_state.authenticated = True
-                st.rerun()
-            else:
-                st.error("Invalid credentials")
+            import requests
+            auth_data = {"username": username, "password": password}
+            try:
+                res = requests.post("http://localhost:8000/api/v1/auth/login", data=auth_data)
+                if res.status_code == 200:
+                    st.session_state.token = res.json().get("access_token")
+                    st.session_state.authenticated = True
+                    st.rerun()
+                else:
+                    st.error("Invalid credentials")
+            except Exception as e:
+                st.error(f"Cannot connect to the backend: {e}")
         return
 
     render_sidebar()

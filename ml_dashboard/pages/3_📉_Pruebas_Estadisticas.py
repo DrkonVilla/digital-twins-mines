@@ -6,6 +6,7 @@ import scipy.stats as stats
 from utils.i18n import init_i18n
 
 if "authenticated" not in st.session_state or not st.session_state.authenticated:
+    st.markdown("""<style>[data-testid="stSidebar"] {display: none;}</style>""", unsafe_allow_html=True)
     st.warning("Please login from the main page.")
     st.stop()
 

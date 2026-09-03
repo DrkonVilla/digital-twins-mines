@@ -5,6 +5,7 @@ import pandas as pd
 from utils.i18n import init_i18n
 
 if "authenticated" not in st.session_state or not st.session_state.authenticated:
+    st.markdown("""<style>[data-testid="stSidebar"] {display: none;}</style>""", unsafe_allow_html=True)
     st.warning("Please login from the main page.")
     st.stop()
 
@@ -46,7 +47,11 @@ if submit:
     
     with st.spinner("Connecting to Digital Twin backend..."):
         try:
-            response = requests.post(API_URL, json=payload, headers={"Content-Type": "application/json"})
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {st.session_state.get('token', '')}"
+            }
+            response = requests.post(API_URL, json=payload, headers=headers)
             if response.status_code == 200:
                 result = response.json()
                 risk = result.get("risk_level", "UNKNOWN")
