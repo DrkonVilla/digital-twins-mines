@@ -26,6 +26,12 @@ FLAGS = {
     "fr": {"file": "france.png", "label": "Français"},
 }
 
+def safe_rerun():
+    if hasattr(st, "rerun"):
+        st.rerun()
+    elif hasattr(st, "experimental_rerun"):
+        st.experimental_rerun()
+
 def render_sidebar():
     st.sidebar.title("M-11 Dashboard")
     st.sidebar.markdown(f"**{t['sidebar_lang']}**")
@@ -35,10 +41,6 @@ def render_sidebar():
     for idx, (lang_code, info) in enumerate(FLAGS.items()):
         img_path = os.path.join(IMG_DIR, info["file"])
         with cols[idx]:
-            # Usamos un botón para cambiar el idioma. 
-            # Streamlit no soporta imagenes directamente cliqueables nativamente sin HTML,
-            # pero podemos usar el label del botón o inyectar HTML. 
-            # Para mayor interactividad, si st.button se presiona, cambiamos.
             try:
                 img = Image.open(img_path)
                 st.image(img, use_container_width=True)
@@ -46,7 +48,7 @@ def render_sidebar():
                 pass
             if st.button("🌐", key=f"btn_{lang_code}", help=info["label"]):
                 change_lang(lang_code)
-                st.rerun()
+                safe_rerun()
                 
     st.sidebar.divider()
     st.sidebar.info("M-11 Digital Twin AI System")
@@ -76,7 +78,7 @@ def main():
                 if res.status_code == 200:
                     st.session_state.token = res.json().get("access_token")
                     st.session_state.authenticated = True
-                    st.rerun()
+                    safe_rerun()
                 else:
                     st.error("Invalid credentials")
             except Exception as e:
