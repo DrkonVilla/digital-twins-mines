@@ -21,13 +21,14 @@ with st.form("digital_twin_test_form"):
     st.subheader("Input Parameters")
     col1, col2 = st.columns(2)
     with col1:
-        distance = st.number_input("Distance (m)", min_value=0.0, max_value=100.0, value=15.0)
-        relative_velocity = st.number_input("Relative Velocity (m/s)", min_value=0.0, max_value=30.0, value=5.0)
-        angle = st.number_input("Angle (degrees)", min_value=0.0, max_value=360.0, value=45.0)
+        distance_3d = st.number_input("Distance 3D (m)", min_value=0.0, max_value=100.0, value=15.0)
+        worker_speed = st.number_input("Worker Speed (m/s)", min_value=0.0, max_value=10.0, value=1.5)
+        machine_speed = st.number_input("Machine Speed (m/s)", min_value=0.0, max_value=30.0, value=5.0)
+        relative_speed = st.number_input("Relative Speed (m/s)", min_value=0.0, max_value=40.0, value=6.5)
     with col2:
-        visibility = st.slider("Visibility (%)", 0, 100, 80)
-        noise_level = st.slider("Noise Level (dB)", 0, 120, 85)
-        machine_type = st.selectbox("Machine Type", ["LHD", "DUMPER", "JUMBO", "SCALER"])
+        ttc = st.slider("Time to Collision (TTC - sec)", 0.0, 60.0, 5.0)
+        in_restricted_zone = st.selectbox("In Restricted Zone?", [0, 1])
+        machine_status = st.selectbox("Machine Status (0=Off, 1=Idle, 2=Active)", [0, 1, 2], index=2)
         
     submit = st.form_submit_button(t["btn_simulate"])
 
@@ -35,14 +36,21 @@ if submit:
     payload = {
         "worker_id": 1,
         "machine_id": 1,
-        "machine_type": machine_type,
-        "distance": distance,
-        "relative_velocity": relative_velocity,
-        "angle": angle,
-        "visibility": visibility,
-        "noise_level": noise_level,
-        "area_id": "AREA-01",
-        "timestamp": pd.Timestamp.utcnow().isoformat()
+        "worker_x": 0.0,
+        "worker_y": 0.0,
+        "worker_z": 0.0,
+        "machine_x": distance_3d,
+        "machine_y": 0.0,
+        "machine_z": 0.0,
+        "direction_worker": 90,
+        "direction_machine": 270,
+        "distance_3d": distance_3d,
+        "ttc": ttc,
+        "worker_speed": worker_speed,
+        "machine_speed": machine_speed,
+        "relative_speed": relative_speed,
+        "in_restricted_zone": in_restricted_zone,
+        "machine_status": machine_status
     }
     
     with st.spinner("Connecting to Digital Twin backend..."):
