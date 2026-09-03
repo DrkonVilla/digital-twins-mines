@@ -1,0 +1,15 @@
+{
+  "title": "M-11 Digital Twin & ML Dashboard",
+  "welcome": "Bem-vindo ao Painel de Machine Learning e Digital Twin do Sistema M-11.",
+  "desc": "Use a barra lateral para navegar pelas diferentes ferramentas de visualização de dados, treinamento, testes estatísticos e simulação em tempo real.",
+  "sidebar_lang": "Selecionar Idioma",
+  "nav_home": "Início",
+  "nav_dataset": "1. Dataset",
+  "nav_training": "2. Treinamento & CV",
+  "nav_stats": "3. Testes Estatísticos",
+  "nav_twin": "4. Teste Digital Twin Real",
+  "nav_reports": "5. Relatórios",
+  "btn_load": "Carregar Dados",
+  "btn_train": "Treinar Modelo",
+  "btn_simulate": "Simular"
+}

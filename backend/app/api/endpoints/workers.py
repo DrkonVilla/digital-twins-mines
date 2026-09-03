@@ -14,7 +14,6 @@ async def read_workers(
     db: AsyncSession = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user = Depends(get_current_user),
 ) -> Any:
     result = await db.execute(select(Worker).offset(skip).limit(limit))
     workers = result.scalars().all()
@@ -43,7 +42,6 @@ async def read_worker(
     *,
     db: AsyncSession = Depends(get_db),
     worker_id: int,
-    current_user = Depends(get_current_user),
 ) -> Any:
     result = await db.execute(select(Worker).filter(Worker.id == worker_id))
     worker = result.scalars().first()

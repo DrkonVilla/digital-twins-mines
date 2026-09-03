@@ -14,7 +14,6 @@ async def read_machines(
     db: AsyncSession = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user = Depends(get_current_user),
 ) -> Any:
     result = await db.execute(select(Machine).offset(skip).limit(limit))
     machines = result.scalars().all()
@@ -42,7 +41,6 @@ async def read_machine(
     *,
     db: AsyncSession = Depends(get_db),
     machine_id: int,
-    current_user = Depends(get_current_user),
 ) -> Any:
     result = await db.execute(select(Machine).filter(Machine.id == machine_id))
     machine = result.scalars().first()
