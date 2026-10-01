@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { AlertTriangle, ShieldAlert, Cpu, Activity, Clock, HeartPulse, Gauge, Wind } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { EmergencyProtocolModal } from '@/components/dashboard/EmergencyProtocolModal';
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/api/v1/alerts/ws';
 
@@ -93,6 +94,9 @@ export default function AlertasPage() {
           <h2 className="text-3xl font-bold tracking-tight">{t('alertsFeed.title')}</h2>
           <p className="text-sm text-muted-foreground">{t('alertsFeed.subtitle')}</p>
         </div>
+        <EmergencyProtocolModal 
+          buttonLabel="Generar Protocolo de Emergencia IA"
+        />
       </div>
       
       <div className="grid gap-4">
@@ -121,6 +125,17 @@ export default function AlertasPage() {
                       {alert.message ? translateMessage(alert.message) : t('alertsFeed.defaultAlert')}
                     </CardTitle>
                     <div className="flex items-center gap-2">
+                      <EmergencyProtocolModal 
+                        buttonLabel="Protocolo IA"
+                        buttonSize="xs"
+                        buttonVariant="outline"
+                        telemetryData={{
+                          distance_3d: alert.distance,
+                          gas_co_ppm: alert.gas_co_ppm,
+                          fatigue_index: alert.fatigue_index,
+                          worker_bpm: alert.worker_bpm
+                        }}
+                      />
                       <Badge variant="outline" className="font-mono text-xs bg-background">
                         {t('alertsFeed.worker')} #{alert.worker_id} ↔ {t('alertsFeed.machine')} #{alert.machine_id}
                       </Badge>

@@ -1,0 +1,185 @@
+{
+  "name": "M-11 Predictor de Riesgo Minero con IA",
+  "description": "Flujo de Langflow que conecta el modelo predictivo entrenado (best_risk_model.joblib) con Google Gemini para evaluar riesgos de proximidad y generar protocolos de seguridad en mina subterránea.",
+  "data": {
+    "nodes": [
+      {
+        "id": "CustomComponent-MiningPredictor",
+        "type": "genericNode",
+        "position": { "x": 100, "y": 200 },
+        "data": {
+          "id": "CustomComponent-MiningPredictor",
+          "type": "MiningRiskPredictorComponent",
+          "node": {
+            "display_name": "Predictor de Riesgo Minero (XGBoost/Voting)",
+            "description": "Ejecuta inferencia sobre el modelo predictivo de seguridad minera M-11 y emite el diagnóstico de riesgo.",
+            "template": {
+              "model_path": {
+                "type": "str",
+                "value": "backend/app/ml/artifacts/best_risk_model.joblib",
+                "display_name": "Ruta del Modelo .joblib"
+              },
+              "distance_3d": {
+                "type": "float",
+                "value": 3.2,
+                "display_name": "Distancia 3D (metros)"
+              },
+              "ttc": {
+                "type": "float",
+                "value": 1.8,
+                "display_name": "Time to Collision (TTC seg)"
+              },
+              "worker_speed": {
+                "type": "float",
+                "value": 1.1,
+                "display_name": "Velocidad del Operario (m/s)"
+              },
+              "machine_speed": {
+                "type": "float",
+                "value": 3.8,
+                "display_name": "Velocidad de Maquinaria (m/s)"
+              },
+              "in_restricted_zone": {
+                "type": "int",
+                "value": 1,
+                "display_name": "En Zona Restringida (0 o 1)"
+              },
+              "gas_co_ppm": {
+                "type": "float",
+                "value": 38.5,
+                "display_name": "Gas CO (ppm)"
+              },
+              "fatigue_index": {
+                "type": "float",
+                "value": 0.68,
+                "display_name": "Índice de Fatiga (0.0 a 1.0)"
+              },
+              "worker_bpm": {
+                "type": "float",
+                "value": 115.0,
+                "display_name": "Frecuencia Cardíaca (BPM)"
+              },
+              "dust_density_mg_m3": {
+                "type": "float",
+                "value": 4.2,
+                "display_name": "Polvo en Suspensión (mg/m3)"
+              }
+            },
+            "outputs": [
+              {
+                "name": "diagnostic_message",
+                "display_name": "Diagnóstico Formateado (Texto)",
+                "type": "Message"
+              },
+              {
+                "name": "prediction_data",
+                "display_name": "Datos Estructurados (Data)",
+                "type": "Data"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "Prompt-SecurityTemplate",
+        "type": "genericNode",
+        "position": { "x": 600, "y": 200 },
+        "data": {
+          "id": "Prompt-SecurityTemplate",
+          "type": "PromptComponent",
+          "node": {
+            "display_name": "Prompt Protocolo de Mina",
+            "description": "Estructura el análisis de seguridad para el LLM",
+            "template": {
+              "template": {
+                "type": "str",
+                "value": "Eres el Agente Inteligente de Seguridad Minera M-11. Analiza el siguiente reporte del modelo predictivo y genera la respuesta de emergencia en Markdown:\n\n{telemetria}\n\nEstructura tu respuesta en:\n1. 🚨 Evaluación de Riesgo Inmediata\n2. 🚧 Acciones de Maniobra para la Maquinaria (frenado, desvío)\n3. 🏃‍♂️ Protocolo de Evacuación/Alerta para el Operario\n4. 📋 Normativa Aplicable (D.S. 024-2016-EM / OSHA)"
+              }
+            },
+            "outputs": [
+              {
+                "name": "prompt",
+                "display_name": "Prompt Formateado",
+                "type": "Message"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "GoogleGenerativeAI-GeminiFlash",
+        "type": "genericNode",
+        "position": { "x": 1050, "y": 200 },
+        "data": {
+          "id": "GoogleGenerativeAI-GeminiFlash",
+          "type": "GoogleGenerativeAIModel",
+          "node": {
+            "display_name": "Google Gemini AI",
+            "description": "Modelo LLM para razonamiento de seguridad minera",
+            "template": {
+              "model_name": {
+                "type": "str",
+                "value": "gemini-2.5-flash"
+              },
+              "temperature": {
+                "type": "float",
+                "value": 0.5
+              },
+              "api_key": {
+                "type": "str",
+                "value": "",
+                "display_name": "Google API Key"
+              }
+            },
+            "outputs": [
+              {
+                "name": "text",
+                "display_name": "Respuesta Generada",
+                "type": "Message"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "ChatOutput-FinalResult",
+        "type": "genericNode",
+        "position": { "x": 1500, "y": 200 },
+        "data": {
+          "id": "ChatOutput-FinalResult",
+          "type": "ChatOutput",
+          "node": {
+            "display_name": "Protocolo de Emergencia Generado",
+            "description": "Muestra el protocolo resultante en la interfaz de chat",
+            "template": {
+              "input_value": {
+                "type": "str",
+                "value": ""
+              }
+            }
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "CustomComponent-MiningPredictor",
+        "sourceHandle": "diagnostic_message",
+        "target": "Prompt-SecurityTemplate",
+        "targetHandle": "telemetria"
+      },
+      {
+        "source": "Prompt-SecurityTemplate",
+        "sourceHandle": "prompt",
+        "target": "GoogleGenerativeAI-GeminiFlash",
+        "targetHandle": "input_value"
+      },
+      {
+        "source": "GoogleGenerativeAI-GeminiFlash",
+        "sourceHandle": "text",
+        "target": "ChatOutput-FinalResult",
+        "targetHandle": "input_value"
+      }
+    ]
+  }
+}
