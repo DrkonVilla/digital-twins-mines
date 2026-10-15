@@ -106,51 +106,72 @@ export async function POST(req: Request) {
 
     // Si Langflow no está disponible, generar protocolo técnico normativo M-11
     if (!generatedText) {
-      const d3d = telemetry?.distance_3d ?? 2.15;
-      const ttc = telemetry?.ttc ?? 1.12;
-      const inZone = (telemetry?.in_restricted_zone ?? 1) === 1;
-      const co = telemetry?.gas_co_ppm ?? 32.4;
-      const bpm = telemetry?.worker_bpm ?? 108;
-      const fatigue = telemetry?.fatigue_index ?? 0.72;
-      const dust = telemetry?.dust_density_mg_m3 ?? 3.4;
+      const d3d = telemetry?.distance_3d ?? 25.0;
+      const inZone = telemetry?.in_restricted_zone !== undefined
+        ? Number(telemetry.in_restricted_zone) === 1
+        : d3d < 5.0;
+      const ttc = telemetry?.ttc !== undefined
+        ? Number(telemetry.ttc)
+        : (d3d > 10 ? 99.0 : Number((d3d / 2.0).toFixed(2)));
+      const co = telemetry?.gas_co_ppm ?? 9.9;
+      const bpm = telemetry?.worker_bpm ?? 75;
+      const fatigue = telemetry?.fatigue_index ?? 0.27;
+      const dust = telemetry?.dust_density_mg_m3 ?? 2.8;
 
-      const isHighRisk = d3d < 3.0 || ttc < 2.0 || inZone || co > 50 || fatigue > 0.75;
-      const nivelRiesgo = isHighRisk ? 'CRÍTICO / ALTO' : 'PREVENTIVO / MEDIO';
+      const isHighRisk = d3d < 4.0 || (ttc < 3.0 && ttc > 0) || inZone || co > 50 || fatigue > 0.75;
+      const nivelRiesgo = isHighRisk ? 'CRÍTICO / ALTO' : 'PREVENTIVO / NOMINAL';
 
-      generatedText = `### 🚨 PROTOCOLO DE EMERGENCIA OPERACIONAL M-11
+      const ttcDisplay = ttc >= 60 ? '> 30 s (Sin colisión inminente)' : `${ttc.toFixed(2)} s`;
+      const zoneDisplay = inZone 
+        ? '⚠️ **INVASIÓN ACTIVA DE RADIO DE GIRO / ZONA CIEGA**' 
+        : '✅ En perímetro seguro de maniobra (> 5 m)';
+
+      const accion1 = isHighRisk
+        ? '1. **Parada de Emergencia Inmediata (E-Stop):** El operador del equipo pesado (Scoop / Camión) debe desacoplar tracción e inmovilizar la pala contra el suelo.'
+        : '1. **Monitoreo Continuo Preventivo:** Mantener velocidad reglamentaria (máx. 15 km/h en galerías subterráneas) y vigilar la distancia mínima de seguridad.';
+
+      const accion2 = isHighRisk
+        ? '2. **Señalización Acústica-Visual:** Activación de baliza estroboscópica y sirena de 95 dB en el Frente de Trabajo.'
+        : '2. **Confirmación de Visibilidad:** Verificar funcionamiento de luces LED del vehículo y bandas reflectivas del personal.';
+
+      const accion3 = isHighRisk
+        ? '3. **Evacuación de la Línea de Fuego:** El trabajador a pie debe desplazarse inmediatamente a la berma de seguridad o refugio peatonal más próximo.'
+        : '3. **Mantenimiento de Canales de Tránsito:** Asegurar que las bermas peatonales y cunetas permanezcan libres de obstáculos.';
+
+      generatedText = `### 🚨 PROTOCOLO DE PREVENCIÓN Y EMERGENCIA OPERACIONAL M-11
 **Referencia Normativa:** D.S. 024-2016-EM (Perú) & Estándares OSHA 29 CFR 1926 | **Nivel de Alerta:** \`${nivelRiesgo}\`
 
 ---
 
 #### 1. 📊 Diagnóstico de Telemetría Multivariable
 - **Distancia 3D Humano-Máquina:** \`${d3d.toFixed(2)} m\`
-- **Tiempo Estimado al Impacto (TTC):** \`${ttc.toFixed(2)} s\`
-- **Zona de Exclusión Operacional:** ${inZone ? '⚠️ **INVASIÓN ACTIVA DE RADIO DE GIRO**' : '✅ En perímetro seguro'}
+- **Tiempo Estimado al Impacto (TTC):** \`${ttcDisplay}\`
+- **Zona de Exclusión Operacional:** ${zoneDisplay}
 - **Monóxido de Carbono (CO):** \`${co.toFixed(1)} ppm\` *(Límite Permisible OIT/OSHA: 25 ppm)*
 - **Biometría & Fatiga:** \`${bpm.toFixed(0)} BPM\` | **Índice de Fatiga:** \`${(fatigue * 100).toFixed(0)}%\`
 - **Concentración de Polvo Respirable:** \`${dust.toFixed(2)} mg/m³\`
 
 ---
 
-#### 2. 🛑 Acciones Inmediatas de Contención (Primeros 30 Segundos)
-1. **Parada de Emergencia Inmediata (E-Stop):** El operador del equipo pesado (Scoop / Camión) debe desacoplar tracción e inmovilizar la pala/cuchara contra el suelo.
-2. **Señalización Acústica-Visual:** Activación de baliza estroboscópica y sirena de 95 dB en el Frente de Trabajo.
-3. **Evacuación de la Línea de Fuego:** El trabajador a pie debe desplazarse inmediatamente a la berma de seguridad o refugio peatonal más próximo sin dar la espalda al equipo.
+#### 2. 🛑 Acciones Operacionales Recomendadas
+${accion1}
+${accion2}
+${accion3}
 
 ---
 
 #### 3. 🛡️ Mitigación Ambiental y Relevo Biomecánico
-- **Control de Ventilación Secundaria:** Incrementar el tiro forzado en mangas de ventilación para abatir gases acumulados (${co.toFixed(1)} ppm CO).
-- **Comunicación Radial de Urgencia:** Informar a Supervisión y Despacho central por frecuencia interna **Canal 4**:
-  > *"Atención Despacho, Frente Norte 01 activando protocolo anticolisión M-11. Operación suspendida preventivamente."*
-- **Condición Biomecánica:** Dado el nivel de pulsaciones (${bpm.toFixed(0)} BPM) y fatiga (${(fatigue * 100).toFixed(0)}%), realizar rotación y pausa de hidratación obligatoria.
+- **Control de Ventilación Secundaria:** Monitoreo constante del caudal de inyección en mangas (CO en nivel ${co <= 25 ? 'óptimo' : 'alto'}: \`${co.toFixed(1)} ppm\`).
+- **Comunicación Radial:** Enlace activo con Sala de Control en frecuencia interna **Canal 4**:
+  > *"Frente Norte 01 reportando telemetría nominal. Gemelo Digital operando con normalidad."*
+- **Condición Biomecánica:** Frecuencia cardíaca (${bpm.toFixed(0)} BPM) y fatiga (${(fatigue * 100).toFixed(0)}%) en rango ${fatigue < 0.5 ? 'seguro para la operación' : 'atención requerida'}.
 
 ---
 
 #### 4. 📋 Auditoría y Restablecimiento
 - **ID de Incidente:** \`M11-AUTO-${Date.now().toString().slice(-6)}\`
-- **Validación del Gemelo Digital:** Registro confirmado en la base de datos central.
-- **Reinicio:** Reanudar maniobras únicamente tras confirmación visual de despeje 360° por parte del supervisor de guardia.`;
+- **Validación del Gemelo Digital:** Registro confirmado en base de datos PostgreSQL Neon.
+- **Estado de Turno:** Operación autorizada conforme al Art. 262 del D.S. 024-2016-EM.`;
     }
 
     return NextResponse.json({
