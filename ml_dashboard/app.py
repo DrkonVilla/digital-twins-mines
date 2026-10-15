@@ -74,6 +74,9 @@ def main():
         st.title("🔑 Login - M-11 ML Dashboard")
         st.caption("Sistema de Alerta Temprana de Riesgo Humano — Gemelo Digital")
 
+        BACKEND_URL = os.getenv("BACKEND_URL", "https://m11-backend-ub10.onrender.com").rstrip("/")
+        login_url = f"{BACKEND_URL}/api/v1/auth/login"
+
         # Botón de relleno rápido
         col_btn1, col_btn2 = st.columns([1, 1])
         with col_btn1:
@@ -86,11 +89,14 @@ def main():
             if st.button("⚡ Login Directo Demo"):
                 import requests
                 try:
-                    res = requests.post("http://localhost:8000/api/v1/auth/login", data={"username": "admin@example.com", "password": "admin123"})
+                    with st.spinner("Conectando con el backend..."):
+                        res = requests.post(login_url, data={"username": "admin@example.com", "password": "admin123"}, timeout=30)
                     if res.status_code == 200:
                         st.session_state.token = res.json().get("access_token")
                         st.session_state.authenticated = True
                         safe_rerun()
+                    else:
+                        st.error(f"Error {res.status_code}: {res.text}")
                 except Exception as e:
                     st.error(f"Cannot connect to the backend: {e}")
 
@@ -103,13 +109,14 @@ def main():
             import requests
             auth_data = {"username": username, "password": password}
             try:
-                res = requests.post("http://localhost:8000/api/v1/auth/login", data=auth_data)
+                with st.spinner("Autenticando..."):
+                    res = requests.post(login_url, data=auth_data, timeout=30)
                 if res.status_code == 200:
                     st.session_state.token = res.json().get("access_token")
                     st.session_state.authenticated = True
                     safe_rerun()
                 else:
-                    st.error("Invalid credentials")
+                    st.error("Credenciales inválidas")
             except Exception as e:
                 st.error(f"Cannot connect to the backend: {e}")
         return
