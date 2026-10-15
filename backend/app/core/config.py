@@ -27,9 +27,20 @@ class Settings(BaseSettings):
         elif raw_url.startswith("sqlite://"):
             raw_url = raw_url.replace("sqlite://", "sqlite+aiosqlite://", 1)
 
-        # Standardize sslmode query parameter for asyncpg
-        if "sslmode=" in raw_url:
-            raw_url = raw_url.replace("sslmode=", "ssl=")
+        # For asyncpg, strip unsupported query parameters like channel_binding (added by Neon)
+        if "postgresql+asyncpg://" in raw_url:
+            try:
+                from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+                parsed = urlparse(raw_url)
+                qs = parse_qs(parsed.query)
+                # Keep ssl=require if sslmode or ssl is present, or if connecting to cloud providers
+                new_qs = {}
+                if "sslmode" in qs or "ssl" in qs or "neon.tech" in raw_url:
+                    new_qs["ssl"] = "require"
+                new_query = urlencode(new_qs)
+                raw_url = urlunparse((parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment))
+            except Exception:
+                pass
 
         return raw_url
 

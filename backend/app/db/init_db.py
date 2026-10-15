@@ -37,25 +37,26 @@ async def init_database():
             w_res = await session.execute(select(Worker))
             if not w_res.scalars().first():
                 workers_data = [
-                    Worker(id=1, worker_code="W001", full_name="Juan Perez", role_job="Operador LHD", area="Frente Norte 01", is_active=True),
-                    Worker(id=2, worker_code="W002", full_name="Carlos Gomez", role_job="Supervisión", area="Frente Norte 01", is_active=True),
-                    Worker(id=3, worker_code="W003", full_name="Maria Torres", role_job="Técnico IoT", area="Galería Principal", is_active=True),
+                    Worker(worker_code="W001", full_name="Juan Perez", role_job="Operador LHD", area="Frente Norte 01", is_active=True),
+                    Worker(worker_code="W002", full_name="Carlos Gomez", role_job="Supervisión", area="Frente Norte 01", is_active=True),
+                    Worker(worker_code="W003", full_name="Maria Torres", role_job="Técnico IoT", area="Galería Principal", is_active=True),
                 ]
                 session.add_all(workers_data)
-                logger.info("Trabajadores iniciales registrados.")
+                print("[INIT_DB] Trabajadores iniciales registrados.")
 
             # 3. Verificar / Crear Maquinaria
             m_res = await session.execute(select(Machine))
             if not m_res.scalars().first():
                 machines_data = [
-                    Machine(id=1, machine_code="M001", type="Cargador Subterráneo", model="Scoop LHD-01", status="OPERATING"),
-                    Machine(id=2, machine_code="M002", type="Transporte Pesado", model="Camión Minero BK-04", status="OPERATING"),
-                    Machine(id=3, machine_code="M003", type="Perforación", model="Jumbo J-02", status="STOPPED"),
+                    Machine(machine_code="M001", type="Cargador Subterráneo", model="Scoop LHD-01", status="OPERATING"),
+                    Machine(machine_code="M002", type="Transporte Pesado", model="Camión Minero BK-04", status="OPERATING"),
+                    Machine(machine_code="M003", type="Perforación", model="Jumbo J-02", status="STOPPED"),
                 ]
                 session.add_all(machines_data)
-                logger.info("Maquinaria inicial registrada.")
+                print("[INIT_DB] Maquinaria inicial registrada.")
 
             await session.commit()
-            logger.info("Base de datos lista y sincronizada.")
+            print("[INIT_DB] Base de datos lista y sincronizada.")
     except Exception as e:
+        print(f"[INIT_DB ERROR] Aviso durante inicializacion de base de datos: {e}")
         logger.warning(f"Aviso durante inicialización de base de datos: {e}")
