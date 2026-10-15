@@ -1,0 +1,26 @@
+services:
+  # Backend API - FastAPI Web Service
+  - type: web
+    name: m11-digital-twin-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.11
+      - key: SECRET_KEY
+        generateValue: true
+      # Descomentar si usas la base de datos PostgreSQL de Render
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: m11-postgres
+      #     property: connectionString
+
+# Base de datos PostgreSQL en Render (Opcional - Render ofrece 30 días gratis)
+# databases:
+#   - name: m11-postgres
+#     databaseName: m11_db
+#     user: m11_user
+#     plan: free

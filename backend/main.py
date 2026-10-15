@@ -1,12 +1,21 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.db.init_db import init_database
 from app.api.endpoints import auth, workers, machines, predict, alerts, users, gemini, reports
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Auto-initialize database tables and seed records on startup
+    await init_database()
+    yield
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    lifespan=lifespan
 )
 
 # Set CORS enabled origins

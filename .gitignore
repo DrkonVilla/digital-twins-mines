@@ -57,3 +57,14 @@ backend/reports_output/
 # OS
 .DS_Store
 Thumbs.db
+
+# Artículos, Entregables y Documentación Word
+Artículo/
+Articulo/
+Artículo_Corregido/
+Articulo_Corregido/
+Codigo_Fuente_Word/
+Entregables/
+generate_word_source_code.py
+*.docx
+

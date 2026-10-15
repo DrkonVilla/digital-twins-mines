@@ -3,11 +3,14 @@ uvicorn[standard]
 sqlalchemy
 asyncpg
 psycopg2-binary
+aiosqlite
+greenlet
 alembic
 pydantic
 pydantic-settings
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt
 python-multipart
 scikit-learn
 xgboost
@@ -27,3 +30,4 @@ imbalanced-learn
 langchain
 langchain-google-genai
 langchain-core
+
