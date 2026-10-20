@@ -67,5 +67,5 @@ async def test_read_workers(headers):
 async def test_auth_no_token():
     transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        response = await ac.get("/api/v1/workers/")
+        response = await ac.get("/api/v1/users/me")
         assert response.status_code == 401

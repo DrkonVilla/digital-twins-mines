@@ -48,6 +48,7 @@ export function EmergencyProtocolModal({
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [protocol, setProtocol] = useState<string | null>(null);
+  const [source, setSource] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -86,9 +87,10 @@ export function EmergencyProtocolModal({
       }
 
       setProtocol(data.result);
+      setSource(data.source || 'm11-native');
     } catch (err: any) {
-      console.error('Error al invocar Langflow:', err);
-      setErrorMsg(err.message || 'No se pudo conectar con el servidor de Langflow.');
+      console.error('Error al generar protocolo de emergencia:', err);
+      setErrorMsg(err.message || 'No se pudo generar el protocolo de emergencia.');
     } finally {
       setLoading(false);
     }
@@ -126,9 +128,19 @@ export function EmergencyProtocolModal({
                 <div>
                   <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
                     Protocolo de Emergencia Minera M-11
-                    <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
-                      Gemini AI + ML
-                    </Badge>
+                    {source === 'langflow' ? (
+                      <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-400 border-purple-500/30">
+                        Langflow Agent
+                      </Badge>
+                    ) : source === 'gemini' ? (
+                      <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                        Gemini AI Flash
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
+                        Normativa D.S. 024 / M-11
+                      </Badge>
+                    )}
                   </h3>
                   <p className="text-xs text-zinc-400">
                     Inferencia predictiva en tiempo real y normativas D.S. 024-2016-EM / OSHA
@@ -188,21 +200,28 @@ export function EmergencyProtocolModal({
                     <Bot className="w-4 h-4 absolute text-zinc-300" />
                   </div>
                   <p className="font-medium text-zinc-200">
-                    Procesando telemetría minera con Langflow...
+                    Generando protocolo de emergencia con IA M-11...
                   </p>
                   <p className="text-xs text-zinc-500 max-w-sm text-center">
-                    Cargando inferencia de XGBoost y consultando protocolos normativos con Google Gemini.
+                    Evaluando telemetría de proximidad, cinemática y límites atmosféricos según D.S. 024-2016-EM y OSHA.
                   </p>
                 </div>
               ) : errorMsg ? (
                 <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <strong className="font-semibold block">Error al generar protocolo</strong>
                     <p className="text-xs text-red-400/90">{errorMsg}</p>
-                    <p className="text-xs text-zinc-400 mt-2">
-                      Verifica que el servidor de Langflow esté activo en <code className="text-zinc-300">http://localhost:7860</code> y que el flujo tenga el modelo configurado.
-                    </p>
+                    <div className="pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={fetchProtocol}
+                        className="text-xs border-red-500/40 text-red-300 hover:bg-red-500/20"
+                      >
+                        Reintentar generación
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ) : protocol ? (

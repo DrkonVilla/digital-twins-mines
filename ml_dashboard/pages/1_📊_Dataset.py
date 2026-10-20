@@ -23,7 +23,6 @@ def load_data():
     possible_paths = [
         Path(__file__).resolve().parent.parent.parent / "data" / "raw" / "public_mining_equipment_dataset.csv",
         Path("data/raw/public_mining_equipment_dataset.csv"),
-        Path(__file__).resolve().parent.parent.parent / "data" / "raw" / "synthetic_interactions.csv",
     ]
     for p in possible_paths:
         if os.path.exists(p):

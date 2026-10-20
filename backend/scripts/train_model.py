@@ -14,31 +14,38 @@ from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
 import xgboost as xgb
 
-DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "raw", "synthetic_interactions.csv")
+DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "raw", "public_mining_equipment_dataset.csv")
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "app", "ml", "artifacts", "xgboost_collision_model.pkl")
 PIPELINE_PATH = os.path.join(os.path.dirname(__file__), "..", "app", "ml", "artifacts", "preprocessing_pipeline.pkl")
 
 def train_and_evaluate():
     data_path = Path(DATA_PATH)
     if not data_path.exists():
-        print(f"Data file not found at {data_path}. Run generate_synthetic_data.py first.")
+        print(f"Data file not found at {data_path}. Run download_and_process_public_dataset.py first.")
         return
 
     print("Loading data...")
     df = pd.read_csv(data_path)
     
-    X = df.drop('risk_level', axis=1)
-    y = df['risk_level']
-    
-    # Preprocessing
+    # Feature columns supported by hybrid dataset
     numeric_features = [
         'worker_x', 'worker_y', 'worker_z', 
         'machine_x', 'machine_y', 'machine_z',
         'distance_3d', 'worker_speed', 'machine_speed',
-        'relative_speed', 'ttc'
+        'relative_speed', 'ttc',
+        'worker_bpm', 'fatigue_index', 'vibration_rms',
+        'acceleration_z', 'gas_co_ppm', 'dust_density_mg_m3', 'ambient_light_lux'
     ]
     categorical_features = ['direction_worker', 'direction_machine', 'in_restricted_zone', 'machine_status']
     
+    numeric_features = [col for col in numeric_features if col in df.columns]
+    categorical_features = [col for col in categorical_features if col in df.columns]
+    all_features = numeric_features + categorical_features
+    
+    X = df[all_features]
+    y = df['risk_level'].astype(int)
+    
+    # Preprocessing
     numeric_transformer = Pipeline(steps=[
         ('imputer', SimpleImputer(strategy='median')),
         ('scaler', StandardScaler())
