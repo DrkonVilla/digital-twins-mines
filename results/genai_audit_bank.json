@@ -1,0 +1,1252 @@
+[
+  {
+    "scenario_id": "S001",
+    "hazard": "colision_proximidad",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 6.6 m de ScoopTram (LHD) en movimiento; TTC estimado 5.2 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S002",
+    "hazard": "zona_restringida",
+    "alert_level": "ALTO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de cargador frontal a 5.7 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S003",
+    "hazard": "gas_co",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 76 ppm cerca de cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S004",
+    "hazard": "fatiga_operador",
+    "alert_level": "MEDIO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de jumbo de perforación = 0.97 y frecuencia cardíaca 120 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S005",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "MEDIO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 12.0 mg/m3 y baja iluminación (11 lux) en frente con jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S006",
+    "hazard": "falla_maquina",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 10.0 m/s2 en jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S007",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "jumbo de perforación en retroceso con trabajador en punto ciego a 11.1 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S008",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 99 ppm y fatiga 0.72 en operador de ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S009",
+    "hazard": "colision_proximidad",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 3.9 m de cargador frontal en movimiento; TTC estimado 0.8 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S010",
+    "hazard": "zona_restringida",
+    "alert_level": "ALTO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de jumbo de perforación a 11.5 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S011",
+    "hazard": "gas_co",
+    "alert_level": "MEDIO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 79 ppm cerca de cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S012",
+    "hazard": "fatiga_operador",
+    "alert_level": "CRITICO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de camión de bajo perfil (dumper) = 0.97 y frecuencia cardíaca 147 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S013",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 6.8 mg/m3 y baja iluminación (22 lux) en frente con ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S014",
+    "hazard": "falla_maquina",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 9.0 m/s2 en jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S015",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "ScoopTram (LHD) en retroceso con trabajador en punto ciego a 2.7 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S016",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "MEDIO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 125 ppm y fatiga 0.63 en operador de camión de bajo perfil (dumper).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S017",
+    "hazard": "colision_proximidad",
+    "alert_level": "ALTO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 4.3 m de jumbo de perforación en movimiento; TTC estimado 2.3 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S018",
+    "hazard": "zona_restringida",
+    "alert_level": "ALTO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de camión de bajo perfil (dumper) a 2.2 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S019",
+    "hazard": "gas_co",
+    "alert_level": "MEDIO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 78 ppm cerca de cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S020",
+    "hazard": "fatiga_operador",
+    "alert_level": "ALTO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de locomotora de transporte = 0.62 y frecuencia cardíaca 126 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S021",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 8.7 mg/m3 y baja iluminación (7 lux) en frente con cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S022",
+    "hazard": "falla_maquina",
+    "alert_level": "MEDIO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 11.2 m/s2 en camión de bajo perfil (dumper).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S023",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "ScoopTram (LHD) en retroceso con trabajador en punto ciego a 4.9 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S024",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 115 ppm y fatiga 0.82 en operador de ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S025",
+    "hazard": "colision_proximidad",
+    "alert_level": "MEDIO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 2.4 m de cargador frontal en movimiento; TTC estimado 5.6 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S026",
+    "hazard": "zona_restringida",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de cargador frontal a 1.1 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S027",
+    "hazard": "gas_co",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 125 ppm cerca de ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S028",
+    "hazard": "fatiga_operador",
+    "alert_level": "ALTO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de camión de bajo perfil (dumper) = 0.76 y frecuencia cardíaca 122 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S029",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "ALTO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 5.7 mg/m3 y baja iluminación (17 lux) en frente con camión de bajo perfil (dumper).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S030",
+    "hazard": "falla_maquina",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 6.1 m/s2 en ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S031",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "MEDIO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "locomotora de transporte en retroceso con trabajador en punto ciego a 3.1 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S032",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "CRITICO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 62 ppm y fatiga 0.69 en operador de locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S033",
+    "hazard": "colision_proximidad",
+    "alert_level": "ALTO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 2.1 m de cargador frontal en movimiento; TTC estimado 5.1 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S034",
+    "hazard": "zona_restringida",
+    "alert_level": "CRITICO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de camión de bajo perfil (dumper) a 11.1 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S035",
+    "hazard": "gas_co",
+    "alert_level": "ALTO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 51 ppm cerca de locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S036",
+    "hazard": "fatiga_operador",
+    "alert_level": "MEDIO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de locomotora de transporte = 0.96 y frecuencia cardíaca 155 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S037",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 12.3 mg/m3 y baja iluminación (9 lux) en frente con cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S038",
+    "hazard": "falla_maquina",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 11.8 m/s2 en jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S039",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "ScoopTram (LHD) en retroceso con trabajador en punto ciego a 8.6 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S040",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 89 ppm y fatiga 0.80 en operador de ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S041",
+    "hazard": "colision_proximidad",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 2.4 m de ScoopTram (LHD) en movimiento; TTC estimado 1.1 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S042",
+    "hazard": "zona_restringida",
+    "alert_level": "CRITICO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de locomotora de transporte a 10.9 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S043",
+    "hazard": "gas_co",
+    "alert_level": "ALTO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 143 ppm cerca de locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S044",
+    "hazard": "fatiga_operador",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de cargador frontal = 0.65 y frecuencia cardíaca 135 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S045",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "CRITICO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 12.8 mg/m3 y baja iluminación (7 lux) en frente con locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S046",
+    "hazard": "falla_maquina",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 11.4 m/s2 en ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S047",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "MEDIO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "cargador frontal en retroceso con trabajador en punto ciego a 4.0 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S048",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 62 ppm y fatiga 0.92 en operador de ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S049",
+    "hazard": "colision_proximidad",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 11.9 m de cargador frontal en movimiento; TTC estimado 0.7 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S050",
+    "hazard": "zona_restringida",
+    "alert_level": "MEDIO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de jumbo de perforación a 10.5 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S051",
+    "hazard": "gas_co",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 55 ppm cerca de ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S052",
+    "hazard": "fatiga_operador",
+    "alert_level": "ALTO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de camión de bajo perfil (dumper) = 0.71 y frecuencia cardíaca 135 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S053",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 7.8 mg/m3 y baja iluminación (11 lux) en frente con ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S054",
+    "hazard": "falla_maquina",
+    "alert_level": "ALTO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 8.5 m/s2 en locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S055",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "ALTO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "jumbo de perforación en retroceso con trabajador en punto ciego a 3.8 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S056",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "ALTO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 76 ppm y fatiga 0.79 en operador de camión de bajo perfil (dumper).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S057",
+    "hazard": "colision_proximidad",
+    "alert_level": "ALTO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 11.4 m de locomotora de transporte en movimiento; TTC estimado 2.2 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S058",
+    "hazard": "zona_restringida",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de ScoopTram (LHD) a 5.2 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S059",
+    "hazard": "gas_co",
+    "alert_level": "MEDIO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 77 ppm cerca de locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S060",
+    "hazard": "fatiga_operador",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de ScoopTram (LHD) = 0.68 y frecuencia cardíaca 132 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S061",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 8.9 mg/m3 y baja iluminación (7 lux) en frente con cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S062",
+    "hazard": "falla_maquina",
+    "alert_level": "ALTO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 8.9 m/s2 en ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S063",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "ALTO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "cargador frontal en retroceso con trabajador en punto ciego a 7.3 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S064",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "MEDIO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 74 ppm y fatiga 0.92 en operador de locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S065",
+    "hazard": "colision_proximidad",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 8.6 m de jumbo de perforación en movimiento; TTC estimado 5.2 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S066",
+    "hazard": "zona_restringida",
+    "alert_level": "ALTO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de locomotora de transporte a 3.1 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S067",
+    "hazard": "gas_co",
+    "alert_level": "MEDIO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 108 ppm cerca de jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S068",
+    "hazard": "fatiga_operador",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de jumbo de perforación = 0.64 y frecuencia cardíaca 144 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S069",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 6.2 mg/m3 y baja iluminación (6 lux) en frente con jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S070",
+    "hazard": "falla_maquina",
+    "alert_level": "ALTO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 10.8 m/s2 en cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S071",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "CRITICO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "camión de bajo perfil (dumper) en retroceso con trabajador en punto ciego a 11.7 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S072",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 41 ppm y fatiga 0.69 en operador de ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S073",
+    "hazard": "colision_proximidad",
+    "alert_level": "CRITICO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 1.2 m de camión de bajo perfil (dumper) en movimiento; TTC estimado 2.7 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S074",
+    "hazard": "zona_restringida",
+    "alert_level": "MEDIO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de cargador frontal a 8.6 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S075",
+    "hazard": "gas_co",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 82 ppm cerca de jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S076",
+    "hazard": "fatiga_operador",
+    "alert_level": "ALTO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de ScoopTram (LHD) = 0.74 y frecuencia cardíaca 104 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S077",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "ALTO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 7.8 mg/m3 y baja iluminación (23 lux) en frente con cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S078",
+    "hazard": "falla_maquina",
+    "alert_level": "MEDIO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 7.9 m/s2 en jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S079",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "ScoopTram (LHD) en retroceso con trabajador en punto ciego a 12.3 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S080",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 126 ppm y fatiga 0.67 en operador de jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S081",
+    "hazard": "colision_proximidad",
+    "alert_level": "ALTO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 6.5 m de locomotora de transporte en movimiento; TTC estimado 0.7 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S082",
+    "hazard": "zona_restringida",
+    "alert_level": "ALTO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de camión de bajo perfil (dumper) a 4.9 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S083",
+    "hazard": "gas_co",
+    "alert_level": "ALTO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 48 ppm cerca de jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S084",
+    "hazard": "fatiga_operador",
+    "alert_level": "ALTO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de jumbo de perforación = 0.72 y frecuencia cardíaca 115 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S085",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "MEDIO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 5.5 mg/m3 y baja iluminación (8 lux) en frente con locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S086",
+    "hazard": "falla_maquina",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 11.1 m/s2 en ScoopTram (LHD).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S087",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "MEDIO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "jumbo de perforación en retroceso con trabajador en punto ciego a 12.1 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S088",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "ALTO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 129 ppm y fatiga 0.72 en operador de cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S089",
+    "hazard": "colision_proximidad",
+    "alert_level": "MEDIO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 1.8 m de locomotora de transporte en movimiento; TTC estimado 0.7 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S090",
+    "hazard": "zona_restringida",
+    "alert_level": "MEDIO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de cargador frontal a 12.5 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S091",
+    "hazard": "gas_co",
+    "alert_level": "MEDIO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 102 ppm cerca de camión de bajo perfil (dumper).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S092",
+    "hazard": "fatiga_operador",
+    "alert_level": "MEDIO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de ScoopTram (LHD) = 0.85 y frecuencia cardíaca 150 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S093",
+    "hazard": "polvo_visibilidad",
+    "alert_level": "CRITICO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Polvo en suspensión de 12.3 mg/m3 y baja iluminación (16 lux) en frente con cargador frontal.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S094",
+    "hazard": "falla_maquina",
+    "alert_level": "CRITICO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "Temperatura de motor elevada y vibración 11.3 m/s2 en locomotora de transporte.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S095",
+    "hazard": "punto_ciego_retroceso",
+    "alert_level": "ALTO",
+    "machine_key": "locomotora",
+    "equipment_present": [
+      "locomotora"
+    ],
+    "gases_present": [],
+    "message": "locomotora de transporte en retroceso con trabajador en punto ciego a 9.8 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S096",
+    "hazard": "combinado_gas_fatiga",
+    "alert_level": "ALTO",
+    "machine_key": "dumper",
+    "equipment_present": [
+      "dumper"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "CO de 79 ppm y fatiga 0.80 en operador de camión de bajo perfil (dumper).",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S097",
+    "hazard": "colision_proximidad",
+    "alert_level": "MEDIO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [],
+    "message": "Trabajador a 12.7 m de jumbo de perforación en movimiento; TTC estimado 5.3 s.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S098",
+    "hazard": "zona_restringida",
+    "alert_level": "ALTO",
+    "machine_key": "cargador",
+    "equipment_present": [
+      "cargador"
+    ],
+    "gases_present": [],
+    "message": "Ingreso de personal a zona restringida de operación de cargador frontal a 10.3 m.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S099",
+    "hazard": "gas_co",
+    "alert_level": "CRITICO",
+    "machine_key": "jumbo",
+    "equipment_present": [
+      "jumbo"
+    ],
+    "gases_present": [
+      "co"
+    ],
+    "message": "Concentración de CO de 78 ppm cerca de jumbo de perforación.",
+    "created_at": "2026-01-01T00:00:00"
+  },
+  {
+    "scenario_id": "S100",
+    "hazard": "fatiga_operador",
+    "alert_level": "CRITICO",
+    "machine_key": "scooptram",
+    "equipment_present": [
+      "scooptram"
+    ],
+    "gases_present": [],
+    "message": "Índice de fatiga del operador de ScoopTram (LHD) = 0.93 y frecuencia cardíaca 117 lpm.",
+    "created_at": "2026-01-01T00:00:00"
+  }
+]

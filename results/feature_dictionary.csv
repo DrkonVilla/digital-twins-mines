@@ -1,0 +1,38 @@
+﻿n,variable,rol,tipo,unidad,origen_descripcion
+1,record_id,id,int,-,UCI AI4I 2020 (UID); no se usa como predictor
+2,machine_serial,id,str,-,UCI AI4I 2020 (Product ID); no se usa como predictor
+3,machine_type_class,contexto,cat (L/M/H),-,UCI AI4I 2020 (Type): clase de equipo
+4,ambient_temp_k,contexto,float,K,UCI AI4I 2020 (Air temperature)
+5,engine_temp_k,contexto,float,K,UCI AI4I 2020 (Process temperature)
+6,rpm_speed,contexto,int,rpm,UCI AI4I 2020 (Rotational speed); genera machine_speed
+7,torque_nm,contexto,float,N·m,UCI AI4I 2020 (Torque)
+8,operating_hours_wear,contexto,int,min,UCI AI4I 2020 (Tool wear)
+9,failure_flag,contexto,bin,-,UCI AI4I 2020 (Machine failure); condiciona la cercanía simulada
+10,TWF,contexto,bin,-,UCI AI4I 2020: falla por desgaste de herramienta
+11,HDF,contexto,bin,-,UCI AI4I 2020: falla por disipación de calor
+12,PWF,contexto,bin,-,UCI AI4I 2020: falla de potencia
+13,OSF,contexto,bin,-,UCI AI4I 2020: falla por sobreesfuerzo
+14,RNF,contexto,bin,-,UCI AI4I 2020: falla aleatoria
+15,worker_x,posición (simulada),float,m,"Uniforme(0,500)"
+16,worker_y,posición (simulada),float,m,"Uniforme(0,300)"
+17,worker_z,posición (simulada),float,m,"Uniforme(-800,-50)"
+18,machine_x,posición (simulada),float,m,"Cercana al trabajador si falla o p=0.25; si no, uniforme"
+19,machine_y,posición (simulada),float,m,ídem
+20,machine_z,posición (simulada),float,m,ídem
+21,distance_3d,PREDICTOR (espacial),float,m,Distancia euclídea trabajador-máquina
+22,worker_speed,PREDICTOR (cinemática),float,m/s,"Normal(0.8,0.3) recortada [0,2.5]"
+23,machine_speed,PREDICTOR (cinemática),float,m/s,"rpm/3000*15 recortada [0,15]"
+24,relative_speed,PREDICTOR (cinemática),float,m/s,worker_speed + machine_speed
+25,direction_worker,PREDICTOR (categórica),int 0-7,-,Rumbo discretizado en 8 sectores (aleatorio)
+26,direction_machine,PREDICTOR (categórica),int 0-7,-,ídem
+27,ttc,PREDICTOR (espacial),float,s,distance_3d / relative_speed (300 si ≈ 0)
+28,in_restricted_zone,PREDICTOR (categórica),bin,-,1 si distance_3d < 15 m
+29,machine_status,PREDICTOR (telemetría máquina),int 0-3,-,"Estado operacional (aleatorio, p=[.2,.5,.1,.2])"
+30,worker_bpm,PREDICTOR (biometría),float,lpm,"Normal(85,18) recortada [55,165]"
+31,fatigue_index,PREDICTOR (biometría),float,0-1,"Beta(2,5); proxy PERCLOS"
+32,vibration_rms,PREDICTOR (telemetría máquina),float,m/s²,"Gamma(2,1.5) recortada [0.1,12]"
+33,acceleration_z,PREDICTOR (telemetría máquina),float,m/s²,"Normal(9.81,1.2) recortada [6,15]"
+34,gas_co_ppm,PREDICTOR (ambiental),float,ppm,"Exponencial(15) recortada [0,150]"
+35,dust_density_mg_m3,PREDICTOR (ambiental),float,mg/m³,"Exponencial(2) recortada [0.1,15]"
+36,ambient_light_lux,PREDICTOR (ambiental),float,lx,"Normal(45,15) recortada [5,120]"
+37,risk_level,TARGET (sintético),int 0-2,-,"0=BAJO 45 %, 1=MEDIO 33 %, 2=ALTO 22 %; ver audit_label_circularity.py"

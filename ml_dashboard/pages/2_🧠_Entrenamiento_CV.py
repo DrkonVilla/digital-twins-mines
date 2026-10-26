@@ -84,6 +84,64 @@ if cv_results:
         
     df_summary = pd.DataFrame(summary_rows)
     st.dataframe(df_summary, use_container_width=True)
+
+    # 1b. Comparación SIMÉTRICA con umbral F2 idéntico para todos los modelos (revisión por pares G27, FON-01/02)
+    fair_path = ARTIFACT_DIR / "fair_comparison_results.json"
+    if fair_path.exists():
+        with open(fair_path, "r", encoding="utf-8") as f:
+            fair = json.load(f)
+        st.subheader("Comparación simétrica — clase ALTO (umbral F2 calibrado igual para todos)")
+        st.caption(
+            "Todos los modelos usan el mismo protocolo: SMOTENC dentro de cada pliegue, umbral F2 elegido sobre "
+            "probabilidades OOF del entrenamiento y evaluación única sobre el 20 % de prueba. "
+            "El baseline determinista se evalúa con la misma partición y el mismo bootstrap pareado."
+        )
+        fair_rows = []
+        for mname, res in fair["models"].items():
+            c, a = res["test_calibrated"], res["test_argmax"]
+            ci = res["bootstrap_calibrated"]["f2"]["ci95"]
+            fair_rows.append({
+                "Sistema": mname,
+                "Umbral F2": f"{res['calibration']['threshold_alto']:.2f}",
+                "Precisión ALTO": f"{c['precision_alto']:.3f}",
+                "Recall ALTO": f"{c['recall_alto']:.3f}",
+                "F2 ALTO (IC95 bootstrap)": f"{c['f2_alto']:.3f} [{ci[0]:.3f}, {ci[1]:.3f}]",
+                "AUC-ROC ALTO": f"{c['auc_roc_alto']:.3f}",
+                "AUC-PR ALTO": f"{c['auc_pr_alto']:.3f}",
+                "F2 con argmax": f"{a['f2_alto']:.3f}",
+            })
+        for bname, b in fair["baselines"].items():
+            ci = b["bootstrap"]["f2"]["ci95"]
+            fair_rows.append({
+                "Sistema": bname,
+                "Umbral F2": "regla fija" if "fixed" in bname else f"TTC<{b['ttc_threshold_s']:.0f}s",
+                "Precisión ALTO": f"{b['test']['precision_alto']:.3f}",
+                "Recall ALTO": f"{b['test']['recall_alto']:.3f}",
+                "F2 ALTO (IC95 bootstrap)": f"{b['test']['f2_alto']:.3f} [{ci[0]:.3f}, {ci[1]:.3f}]",
+                "AUC-ROC ALTO": "—", "AUC-PR ALTO": "—", "F2 con argmax": "—",
+            })
+        st.dataframe(pd.DataFrame(fair_rows), use_container_width=True)
+
+        ref = fair["paired_comparisons"]["reference"]
+        cmp_rows = []
+        for other, r in fair["paired_comparisons"]["calibrated"].items():
+            d = r["delta_f2_ref_minus_other"]
+            cmp_rows.append({
+                "Comparación": f"{ref} vs {other}",
+                "ΔF2 (IC95 pareado)": f"{d['mean']:+.4f} [{d['ci95'][0]:+.4f}, {d['ci95'][1]:+.4f}]",
+                "McNemar recall p (Holm)": f"{r['mcnemar_recall']['p_holm']:.4f}",
+                "McNemar decisión p (Holm)": f"{r['mcnemar_decision']['p_holm']:.4f}",
+                "Cliff's δ": f"{r['cliffs_delta_f2_bootstrap']:+.2f} ({r['cliffs_delta_label']})",
+            })
+        st.markdown(f"**Pruebas pareadas sobre las mismas predicciones (referencia: {ref})**")
+        st.dataframe(pd.DataFrame(cmp_rows), use_container_width=True)
+        st.warning(
+            "El target `risk_level` es sintético y comparte variables con el baseline (ver "
+            "`results/label_circularity_audit.json`). Estos resultados no constituyen validación de campo."
+        )
+    else:
+        st.info("Ejecute el pipeline para generar `fair_comparison_results.json` (comparación simétrica).")
+
     
     st.divider()
     

@@ -1,0 +1,19 @@
+model,evaluation_mode,true_class,pred_bajo,pred_medio,pred_alto,total_true
+XGBoost,Argmax,BAJO (0),627,271,2,900
+XGBoost,Argmax,MEDIO (1),360,256,44,660
+XGBoost,Argmax,ALTO (2),9,54,377,440
+XGBoost,Calibrated_Threshold,BAJO (0),626,260,14,900
+XGBoost,Calibrated_Threshold,MEDIO (1),358,193,109,660
+XGBoost,Calibrated_Threshold,ALTO (2),9,14,417,440
+RandomForest,Argmax,BAJO (0),719,179,2,900
+RandomForest,Argmax,MEDIO (1),405,218,37,660
+RandomForest,Argmax,ALTO (2),14,51,375,440
+RandomForest,Calibrated_Threshold,BAJO (0),719,163,18,900
+RandomForest,Calibrated_Threshold,MEDIO (1),405,137,118,660
+RandomForest,Calibrated_Threshold,ALTO (2),14,4,422,440
+Baseline_TTC_fixed,Deterministic_Rule,BAJO (0),884,0,16,900
+Baseline_TTC_fixed,Deterministic_Rule,MEDIO (1),541,0,119,660
+Baseline_TTC_fixed,Deterministic_Rule,ALTO (2),20,0,420,440
+Baseline_TTC_tuned,Deterministic_Rule,BAJO (0),881,0,19,900
+Baseline_TTC_tuned,Deterministic_Rule,MEDIO (1),540,0,120,660
+Baseline_TTC_tuned,Deterministic_Rule,ALTO (2),19,0,421,440

@@ -1,0 +1,591 @@
+{
+  "model": "XGBoost",
+  "protocol": "idéntico a train_cv.py; bootstrap pareado vs A_full",
+  "configs": {
+    "A_full": {
+      "label": "Modelo completo (16 variables)",
+      "features": [
+        "distance_3d",
+        "worker_speed",
+        "machine_speed",
+        "relative_speed",
+        "direction_worker",
+        "direction_machine",
+        "ttc",
+        "in_restricted_zone",
+        "machine_status",
+        "worker_bpm",
+        "fatigue_index",
+        "vibration_rms",
+        "acceleration_z",
+        "gas_co_ppm",
+        "dust_density_mg_m3",
+        "ambient_light_lux"
+      ],
+      "n_features": 16,
+      "threshold_alto": 0.18,
+      "metrics": {
+        "precision_alto": 0.7722222222222223,
+        "recall_alto": 0.9477272727272728,
+        "f1_alto": 0.8510204081632654,
+        "f2_alto": 0.9065217391304349,
+        "auc_roc_alto": 0.9709892191142191,
+        "auc_pr_alto": 0.9483563030783685,
+        "f1_macro": 0.6183022243096462,
+        "accuracy": 0.618
+      },
+      "bootstrap_ci95": {
+        "precision": [
+          0.7370321637426901,
+          0.8062625017150367
+        ],
+        "recall": [
+          0.926933789954338,
+          0.9681121143971275
+        ],
+        "f2": [
+          0.8873532648569333,
+          0.925113435615124
+        ]
+      },
+      "delta_vs_full": null,
+      "paired_bootstrap_f2_full_minus_config": null,
+      "mcnemar_decision_vs_full": null
+    },
+    "B_no_distance3d": {
+      "label": "Sin distance_3d (resto intacto)",
+      "features": [
+        "worker_speed",
+        "machine_speed",
+        "relative_speed",
+        "direction_worker",
+        "direction_machine",
+        "ttc",
+        "in_restricted_zone",
+        "machine_status",
+        "worker_bpm",
+        "fatigue_index",
+        "vibration_rms",
+        "acceleration_z",
+        "gas_co_ppm",
+        "dust_density_mg_m3",
+        "ambient_light_lux"
+      ],
+      "n_features": 15,
+      "threshold_alto": 0.11,
+      "metrics": {
+        "precision_alto": 0.7491103202846975,
+        "recall_alto": 0.9568181818181818,
+        "f1_alto": 0.840319361277445,
+        "f2_alto": 0.9065460809646857,
+        "auc_roc_alto": 0.9714874708624709,
+        "auc_pr_alto": 0.9479586793833814,
+        "f1_macro": 0.6204667399450015,
+        "accuracy": 0.623
+      },
+      "bootstrap_ci95": {
+        "precision": [
+          0.7150110540328161,
+          0.784540288836529
+        ],
+        "recall": [
+          0.9379128253005018,
+          0.9753942392490396
+        ],
+        "f2": [
+          0.8880454131478722,
+          0.9243374075961521
+        ]
+      },
+      "delta_vs_full": {
+        "precision": {
+          "absolute_pp": -2.311190193752477,
+          "relative_pct": -2.9929081645715527
+        },
+        "recall": {
+          "absolute_pp": 0.9090909090909038,
+          "relative_pct": 0.9592326139088673
+        },
+        "f2": {
+          "absolute_pp": 0.0024341834250818373,
+          "relative_pct": 0.002685190349011139
+        },
+        "auc_roc": {
+          "absolute_pp": 0.049825174825179896,
+          "relative_pct": 0.051313829076941465
+        }
+      },
+      "paired_bootstrap_f2_full_minus_config": {
+        "mean": -9.720672743876303e-05,
+        "ci95": [
+          -0.008653696148969815,
+          0.007929158271147353
+        ],
+        "ci_excludes_zero": false,
+        "cliffs_delta": -0.0063710000000000155
+      },
+      "mcnemar_decision_vs_full": {
+        "full_only_correct": 28,
+        "config_only_correct": 14,
+        "p": 0.04355852192384191
+      }
+    },
+    "B2_no_distance_ttc_relspeed": {
+      "label": "Sin distance_3d, ttc ni relative_speed",
+      "features": [
+        "worker_speed",
+        "machine_speed",
+        "direction_worker",
+        "direction_machine",
+        "in_restricted_zone",
+        "machine_status",
+        "worker_bpm",
+        "fatigue_index",
+        "vibration_rms",
+        "acceleration_z",
+        "gas_co_ppm",
+        "dust_density_mg_m3",
+        "ambient_light_lux"
+      ],
+      "n_features": 13,
+      "threshold_alto": 0.34,
+      "metrics": {
+        "precision_alto": 0.9634831460674157,
+        "recall_alto": 0.7795454545454545,
+        "f1_alto": 0.8618090452261307,
+        "f2_alto": 0.8104914933837428,
+        "auc_roc_alto": 0.8873965617715618,
+        "auc_pr_alto": 0.8403143346160165,
+        "f1_macro": 0.610739905491457,
+        "accuracy": 0.569
+      },
+      "bootstrap_ci95": {
+        "precision": [
+          0.9431491419863514,
+          0.9805013927576601
+        ],
+        "recall": [
+          0.7389251336898396,
+          0.8196427510177399
+        ],
+        "f2": [
+          0.7739783790397288,
+          0.8448810520577388
+        ]
+      },
+      "delta_vs_full": {
+        "precision": {
+          "absolute_pp": 19.126092384519346,
+          "relative_pct": 24.767601649017852
+        },
+        "recall": {
+          "absolute_pp": -16.81818181818182,
+          "relative_pct": -17.745803357314152
+        },
+        "f2": {
+          "absolute_pp": -9.603024574669206,
+          "relative_pct": -10.593264518819746
+        },
+        "auc_roc": {
+          "absolute_pp": -8.35926573426573,
+          "relative_pct": -8.60902013092528
+        }
+      },
+      "paired_bootstrap_f2_full_minus_config": {
+        "mean": 0.09648785169777661,
+        "ci95": [
+          0.06481286747452582,
+          0.12875989139996824
+        ],
+        "ci_excludes_zero": true,
+        "cliffs_delta": 1.0
+      },
+      "mcnemar_decision_vs_full": {
+        "full_only_correct": 75,
+        "config_only_correct": 111,
+        "p": 0.010087181693807163
+      }
+    },
+    "C_spatial_only": {
+      "label": "Sólo espacial/cinemática",
+      "features": [
+        "distance_3d",
+        "worker_speed",
+        "machine_speed",
+        "relative_speed",
+        "direction_worker",
+        "direction_machine",
+        "ttc",
+        "in_restricted_zone"
+      ],
+      "n_features": 8,
+      "threshold_alto": 0.18,
+      "metrics": {
+        "precision_alto": 0.7717996289424861,
+        "recall_alto": 0.9454545454545454,
+        "f1_alto": 0.849846782431052,
+        "f2_alto": 0.9047411918225314,
+        "auc_roc_alto": 0.9696168414918415,
+        "auc_pr_alto": 0.94137332870346,
+        "f1_macro": 0.619379647749186,
+        "accuracy": 0.626
+      },
+      "bootstrap_ci95": {
+        "precision": [
+          0.7344264471587892,
+          0.8078358208955224
+        ],
+        "recall": [
+          0.923989170346517,
+          0.9655958671819544
+        ],
+        "f2": [
+          0.8847256855864323,
+          0.9227798665721061
+        ]
+      },
+      "delta_vs_full": {
+        "precision": {
+          "absolute_pp": -0.04225932797361498,
+          "relative_pct": -0.05472430960612012
+        },
+        "recall": {
+          "absolute_pp": -0.2272727272727315,
+          "relative_pct": -0.23980815347722267
+        },
+        "f2": {
+          "absolute_pp": -0.17805473079034462,
+          "relative_pct": -0.19641529056009235
+        },
+        "auc_roc": {
+          "absolute_pp": -0.13723776223776296,
+          "relative_pct": -0.1413380906154216
+        }
+      },
+      "paired_bootstrap_f2_full_minus_config": {
+        "mean": 0.002012449766433395,
+        "ci95": [
+          -0.008410505013856451,
+          0.012359572236427006
+        ],
+        "ci_excludes_zero": false,
+        "cliffs_delta": 0.11296100000000009
+      },
+      "mcnemar_decision_vs_full": {
+        "full_only_correct": 21,
+        "config_only_correct": 20,
+        "p": 1.0
+      }
+    },
+    "D_no_biometric": {
+      "label": "Sin biometría (BPM, fatiga)",
+      "features": [
+        "distance_3d",
+        "worker_speed",
+        "machine_speed",
+        "relative_speed",
+        "direction_worker",
+        "direction_machine",
+        "ttc",
+        "in_restricted_zone",
+        "machine_status",
+        "vibration_rms",
+        "acceleration_z",
+        "gas_co_ppm",
+        "dust_density_mg_m3",
+        "ambient_light_lux"
+      ],
+      "n_features": 14,
+      "threshold_alto": 0.21,
+      "metrics": {
+        "precision_alto": 0.7794392523364486,
+        "recall_alto": 0.9477272727272728,
+        "f1_alto": 0.8553846153846154,
+        "f2_alto": 0.9084967320261439,
+        "auc_roc_alto": 0.9699854312354312,
+        "auc_pr_alto": 0.9476973212949146,
+        "f1_macro": 0.6382324441554798,
+        "accuracy": 0.6365
+      },
+      "bootstrap_ci95": {
+        "precision": [
+          0.7448005220991989,
+          0.8140435420184398
+        ],
+        "recall": [
+          0.926605504587156,
+          0.9681826517003779
+        ],
+        "f2": [
+          0.890374387653105,
+          0.9262507438652992
+        ]
+      },
+      "delta_vs_full": {
+        "precision": {
+          "absolute_pp": 0.7217030114226364,
+          "relative_pct": 0.9345794392523348
+        },
+        "recall": {
+          "absolute_pp": 0.0,
+          "relative_pct": 0.0
+        },
+        "f2": {
+          "absolute_pp": 0.19749928957090157,
+          "relative_pct": 0.21786492374727748
+        },
+        "auc_roc": {
+          "absolute_pp": -0.1003787878787854,
+          "relative_pct": -0.10337786033335729
+        }
+      },
+      "paired_bootstrap_f2_full_minus_config": {
+        "mean": -0.0020594863781239264,
+        "ci95": [
+          -0.011531086328986398,
+          0.007042821240324314
+        ],
+        "ci_excludes_zero": false,
+        "cliffs_delta": -0.11696399999999996
+      },
+      "mcnemar_decision_vs_full": {
+        "full_only_correct": 12,
+        "config_only_correct": 17,
+        "p": 0.45825831964612007
+      }
+    },
+    "E_no_environmental": {
+      "label": "Sin ambiental (CO, polvo, luz)",
+      "features": [
+        "distance_3d",
+        "worker_speed",
+        "machine_speed",
+        "relative_speed",
+        "direction_worker",
+        "direction_machine",
+        "ttc",
+        "in_restricted_zone",
+        "machine_status",
+        "worker_bpm",
+        "fatigue_index",
+        "vibration_rms",
+        "acceleration_z"
+      ],
+      "n_features": 13,
+      "threshold_alto": 0.16,
+      "metrics": {
+        "precision_alto": 0.7572992700729927,
+        "recall_alto": 0.9431818181818182,
+        "f1_alto": 0.840080971659919,
+        "f2_alto": 0.8990467937608319,
+        "auc_roc_alto": 0.9664364801864801,
+        "auc_pr_alto": 0.9424177143540873,
+        "f1_macro": 0.6186942899807867,
+        "accuracy": 0.6205
+      },
+      "bootstrap_ci95": {
+        "precision": [
+          0.7194599435088044,
+          0.7925925925925926
+        ],
+        "recall": [
+          0.919236435453308,
+          0.9646240732641926
+        ],
+        "f2": [
+          0.878703829270468,
+          0.9177375416927449
+        ]
+      },
+      "delta_vs_full": {
+        "precision": {
+          "absolute_pp": -1.4922952149229562,
+          "relative_pct": -1.9324686236412383
+        },
+        "recall": {
+          "absolute_pp": -0.4545454545454519,
+          "relative_pct": -0.47961630695443364
+        },
+        "f2": {
+          "absolute_pp": -0.7474945369603025,
+          "relative_pct": -0.8245743093566885
+        },
+        "auc_roc": {
+          "absolute_pp": -0.45527389277389974,
+          "relative_pct": -0.4688763621796146
+        }
+      },
+      "paired_bootstrap_f2_full_minus_config": {
+        "mean": 0.007694890981563619,
+        "ci95": [
+          0.0015717098065101214,
+          0.014390356856965058
+        ],
+        "ci_excludes_zero": true,
+        "cliffs_delta": 0.4189830000000001
+      },
+      "mcnemar_decision_vs_full": {
+        "full_only_correct": 22,
+        "config_only_correct": 10,
+        "p": 0.050102459732443094
+      }
+    },
+    "F_no_machine_telemetry": {
+      "label": "Sin telemetría de máquina (estado, vibración, acel. Z)",
+      "features": [
+        "distance_3d",
+        "worker_speed",
+        "machine_speed",
+        "relative_speed",
+        "direction_worker",
+        "direction_machine",
+        "ttc",
+        "in_restricted_zone",
+        "worker_bpm",
+        "fatigue_index",
+        "gas_co_ppm",
+        "dust_density_mg_m3",
+        "ambient_light_lux"
+      ],
+      "n_features": 13,
+      "threshold_alto": 0.17,
+      "metrics": {
+        "precision_alto": 0.7655677655677655,
+        "recall_alto": 0.95,
+        "f1_alto": 0.8478701825557808,
+        "f2_alto": 0.9063313096270598,
+        "auc_roc_alto": 0.9721794871794872,
+        "auc_pr_alto": 0.9479599234282092,
+        "f1_macro": 0.6284267157004684,
+        "accuracy": 0.626
+      },
+      "bootstrap_ci95": {
+        "precision": [
+          0.7293406927985964,
+          0.8003632303545791
+        ],
+        "recall": [
+          0.9293592325254902,
+          0.9700512237817545
+        ],
+        "f2": [
+          0.8876401841890272,
+          0.9242029848211195
+        ]
+      },
+      "delta_vs_full": {
+        "precision": {
+          "absolute_pp": -0.6654456654456742,
+          "relative_pct": -0.8617281998577077
+        },
+        "recall": {
+          "absolute_pp": 0.2272727272727204,
+          "relative_pct": 0.23980815347721096
+        },
+        "f2": {
+          "absolute_pp": -0.019042950337511133,
+          "relative_pct": -0.021006611883105805
+        },
+        "auc_roc": {
+          "absolute_pp": 0.11902680652681186,
+          "relative_pct": 0.12258303612824205
+        }
+      },
+      "paired_bootstrap_f2_full_minus_config": {
+        "mean": -2.8372639550746203e-05,
+        "ci95": [
+          -0.008677376143775966,
+          0.008408033341653192
+        ],
+        "ci_excludes_zero": false,
+        "cliffs_delta": -0.003457999999999961
+      },
+      "mcnemar_decision_vs_full": {
+        "full_only_correct": 15,
+        "config_only_correct": 11,
+        "p": 0.557197093963623
+      }
+    },
+    "G_no_spatial": {
+      "label": "Sin espacial/cinemática (sólo biometría + ambiente + máquina)",
+      "features": [
+        "machine_status",
+        "worker_bpm",
+        "fatigue_index",
+        "vibration_rms",
+        "acceleration_z",
+        "gas_co_ppm",
+        "dust_density_mg_m3",
+        "ambient_light_lux"
+      ],
+      "n_features": 8,
+      "threshold_alto": 0.05,
+      "metrics": {
+        "precision_alto": 0.21909547738693466,
+        "recall_alto": 0.990909090909091,
+        "f1_alto": 0.3588477366255144,
+        "f2_alto": 0.5813333333333333,
+        "auc_roc_alto": 0.48941506410256413,
+        "auc_pr_alto": 0.21694935179991187,
+        "f1_macro": 0.1233490224846266,
+        "accuracy": 0.22
+      },
+      "bootstrap_ci95": {
+        "precision": [
+          0.2013027714479649,
+          0.23631287939159606
+        ],
+        "recall": [
+          0.9810403972015347,
+          0.9978120545568094
+        ],
+        "f2": [
+          0.5552478345594335,
+          0.6058311281817967
+        ]
+      },
+      "delta_vs_full": {
+        "precision": {
+          "absolute_pp": -55.31267448352876,
+          "relative_pct": -71.62792379161998
+        },
+        "recall": {
+          "absolute_pp": 4.318181818181821,
+          "relative_pct": 4.556354916067149
+        },
+        "f2": {
+          "absolute_pp": -32.518840579710165,
+          "relative_pct": -35.8721023181455
+        },
+        "auc_roc": {
+          "absolute_pp": -48.157415501165495,
+          "relative_pct": -49.59624118699989
+        }
+      },
+      "paired_bootstrap_f2_full_minus_config": {
+        "mean": 0.3247361410459802,
+        "ci95": [
+          0.29838331264149065,
+          0.352309970454471
+        ],
+        "ci_excludes_zero": true,
+        "cliffs_delta": 1.0
+      },
+      "mcnemar_decision_vs_full": {
+        "full_only_correct": 1434,
+        "config_only_correct": 22,
+        "p": 0.0
+      }
+    }
+  },
+  "interpretation": [
+    "B_no_distance3d: F2 SUBE +0.00 pp al quitar estas variables (IC95 de Δ=full−config: -0.0087..+0.0079); no hay evidencia de que aporten a F2.",
+    "B2_no_distance_ttc_relspeed: F2 baja 9.60 pp y el IC95 pareado excluye 0 (aporte real).",
+    "C_spatial_only: F2 baja 0.18 pp pero el IC95 pareado incluye 0 (aporte no concluyente).",
+    "D_no_biometric: F2 SUBE +0.20 pp al quitar estas variables (IC95 de Δ=full−config: -0.0115..+0.0070); no hay evidencia de que aporten a F2.",
+    "E_no_environmental: F2 baja 0.75 pp y el IC95 pareado excluye 0 (aporte real).",
+    "F_no_machine_telemetry: F2 baja 0.02 pp pero el IC95 pareado incluye 0 (aporte no concluyente).",
+    "G_no_spatial: F2 baja 32.52 pp y el IC95 pareado excluye 0 (aporte real)."
+  ],
+  "warning": "Con un target sintético generado por una función de utilidad, la ablación mide qué variables usa la función generadora y cuán ruidosa es; no es evidencia de campo."
+}

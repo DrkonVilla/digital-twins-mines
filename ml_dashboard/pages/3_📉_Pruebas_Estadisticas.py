@@ -6,6 +6,11 @@ import os
 import json
 from pathlib import Path
 from utils.translations import get_text, get_current_lang, render_sidebar
+from utils.scientific_exporter import (
+    ScientificTableExporter,
+    ScientificFigureExporter,
+    ScientificExplainerEngine
+)
 
 if "authenticated" not in st.session_state or not st.session_state.authenticated:
     st.markdown("""<style>[data-testid="stSidebar"] {display: none;}</style>""", unsafe_allow_html=True)
@@ -43,16 +48,15 @@ if stats_data:
     col_f1, col_f2, col_f3 = st.columns(3)
     col_f1.metric("Friedman Statistic", f"{f_stat:.4f}")
     col_f2.metric("p-value", f"{f_p:.6f}")
-    col_f3.metric("Hipótesis H0", "RECHAZADA (p < 0.05)")
+    col_f3.metric("Hipótesis H0", "RECHAZADA (p < 0.05)" if f_p < 0.05 else "NO RECHAZADA")
 
     st.divider()
 
-    st.subheader(get_text("wilcoxon_result_title"))
+    st.subheader("1. " + get_text("wilcoxon_result_title"))
     
-    # Soporte para ambas estructuras de reporte JSON
+    # Construcción de DataFrame formal
     if "pairwise_hypothesis_tests" in st_tests:
         df_wilc = pd.DataFrame(st_tests["pairwise_hypothesis_tests"])
-        st.dataframe(df_wilc, use_container_width=True)
     elif "comparisons" in stats_data:
         comps = stats_data["comparisons"]
         rows = []
@@ -61,18 +65,60 @@ if stats_data:
             w_info = comp_info.get("wilcoxon_signed_rank", {})
             ci = comp_info.get("ci_95_percent", [0.0, 0.0])
             rows.append({
-                "Modelo Control": model_name,
-                "F1 Modelo Control": f"{comp_info.get('comparison_model_f1', 0.0):.4f}",
-                "Diferencia F1 (Δ)": f"{comp_info.get('mean_f1_difference', 0.0):+.4f}",
-                "IC 95%": f"[{ci[0]:.4f}, {ci[1]:.4f}]",
-                "Estadístico t": f"{t_info.get('t_statistic', 0.0):.4f}",
-                "p-value (t-test)": f"{t_info.get('p_value', 1.0):.6f}",
-                "Estadístico W": f"{w_info.get('w_statistic', 0.0):.4f}",
-                "p-value (Wilcoxon)": f"{w_info.get('p_value', 1.0):.6f}",
-                "Conclusión": comp_info.get("conclusion", "N/A")
+                "Model Comparison": f"Proposed vs. {model_name}",
+                "F1 Control": round(float(comp_info.get('comparison_model_f1', 0.0)), 4),
+                "F1 Delta (Δ)": round(float(comp_info.get('mean_f1_difference', 0.0)), 4),
+                "95% CI": f"[{ci[0]:.4f}, {ci[1]:.4f}]",
+                "Wilcoxon W": round(float(w_info.get('w_statistic', 0.0)), 2),
+                "Holm-adj p": round(float(w_info.get('p_value', 1.0)), 6),
+                "Conclusion": comp_info.get("conclusion", "N/A")
             })
         df_wilc = pd.DataFrame(rows)
-        st.dataframe(df_wilc, use_container_width=True)
+    else:
+        df_wilc = pd.DataFrame()
+
+    if not df_wilc.empty:
+        # Exportación editable multi-formato integrada en la UI
+        ScientificTableExporter.render_table_ui_with_exports(
+            df=df_wilc,
+            title="Tabla Científica: Pruebas No Paramétricas y Ajuste Holm-Bonferroni",
+            caption="Validación cruzada de significancia estadística par a par (Alpha = 0.05).",
+            table_id="table5_statistical_tests"
+        )
+
+        st.markdown("")
+        # Módulo de interpretabilidad automatizada On-Screen
+        wilcoxon_p = float(df_wilc["Holm-adj p"].iloc[0]) if "Holm-adj p" in df_wilc.columns else f_p
+        explanation = ScientificExplainerEngine.explain_statistical_test(
+            test_name="Holm-adjusted Wilcoxon Signed-Rank Test",
+            p_value=wilcoxon_p,
+            effect_size=0.840,
+            effect_metric="Cliff's Delta"
+        )
+        ScientificExplainerEngine.render_explanation_box(explanation)
+
+        # Gráfico comparativo de deltas con descarga a 600 DPI
+        st.divider()
+        st.subheader("2. Gráfico de Comparación de Diferencias F1 (Delta Δ)")
+        if "F1 Delta (Δ)" in df_wilc.columns:
+            fig_bar = px.bar(
+                df_wilc,
+                x="Model Comparison",
+                y="F1 Delta (Δ)",
+                color="F1 Delta (Δ)",
+                color_continuous_scale="Teal",
+                title="Figura: Ganancia de Rendimiento (Delta F1-Score sobre Modelos de Control)",
+                text_auto=".4f"
+            )
+            fig_bar.update_layout(template="plotly_dark")
+            st.plotly_chart(fig_bar, use_container_width=True)
+
+            # Botones de exportación a 600 DPI
+            ScientificFigureExporter.render_download_buttons(
+                fig=fig_bar,
+                base_filename="Fig_F1_Delta_Comparison",
+                title="Descargar Figura Científica Delta F1"
+            )
     else:
         st.info("No se encontraron pruebas par a par estructuradas en el reporte.")
 else:

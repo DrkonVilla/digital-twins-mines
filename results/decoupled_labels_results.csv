@@ -1,0 +1,5 @@
+scenario,description,ml_model,ml_f2,baseline_ttc_fixed_f2,baseline_ttc_tuned_f2,ml_advantage_over_baseline_pp,interpretation
+Escenario Original (Acoplado),Etiqueta dominada por cinemática (82.1% varianza espacial),XGBoost,0.906,0.862,0.91,-0.4,Baseline TTC empírico iguala o supera a ML debido a circularidad sintética
+Escenario Desacoplado 1: Intoxicación por Gas (CO > 50 ppm),"Riesgo ALTO sin proximidad física (distancia > 10m, TTC > 20s)",XGBoost Multimodal,0.942,0.115,0.128,81.4,El baseline cinemático falla completamente (Recall < 15%); el modelo multimodal previene el riesgo
+Escenario Desacoplado 2: Fatiga Crítica del Operador (Fatigue > 0.85),Riesgo latente con maquinaria en movimiento pero distancia moderada,XGBoost Multimodal,0.887,0.342,0.365,52.2,TTC no detecta deterioro psicofisiológico humano antes del incidente
+Escenario Desacoplado 3: Falla Mecánica Catastrófica (Vibración RMS anómala),Riesgo de proyección de fragmentos mecánicos sin trayectoria de colisión directa,XGBoost Multimodal,0.875,0.22,0.245,63.0,La telemetría de vibración alerta al gemelo digital cuando las reglas de proximidad son ciegas

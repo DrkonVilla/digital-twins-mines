@@ -1,160 +1,224 @@
-import sys
+"""
+Entrenamiento y evaluación de M-11 con protocolo SIMÉTRICO (ver fair_eval.py).
+
+Corrige los hallazgos FON-01 (umbral asimétrico) y FON-02 (SMOTE/escalado dentro
+de cada pliegue) del informe de revisión por pares G27:
+
+  * XGBoost, RandomForest, SVM-RBF, MLP, Stacking y Voting se calibran con el MISMO
+    criterio (max F2 de la clase ALTO sobre probabilidades OOF del entrenamiento).
+  * El baseline determinista de TTC se evalúa con la misma partición y el mismo
+    bootstrap pareado; además se reporta una versión "ajustada" con el mismo criterio F2.
+  * SMOTENC + escalado/one-hot se ajustan sólo con el entrenamiento de cada pliegue.
+  * Análisis de sensibilidad SIN SMOTE (class_weight='balanced' donde aplica).
+  * Se exportan curvas PR, sensibilidad al umbral y comparaciones pareadas (McNemar + Holm).
+
+Salidas (backend/app/ml/artifacts):
+  cv_metrics_results.json        -> formato histórico {modelo: [métricas por fold]} (usado por el dashboard)
+  fair_comparison_results.json   -> resultados completos del protocolo simétrico
+  pr_curves_symmetric.png        -> curvas Precision-Recall de todos los modelos
+  processed_data.joblib          -> partición train/test
+"""
+import argparse
 import os
+import sys
 import time
-import json
+
 import joblib
 import numpy as np
 import pandas as pd
-from pathlib import Path
+from sklearn.metrics import precision_recall_curve
+from sklearn.model_selection import StratifiedKFold
 
-if hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fair_eval as fe  # noqa: E402
 
-from sklearn.model_selection import StratifiedKFold, train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import RandomForestClassifier, StackingClassifier, VotingClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    accuracy_score, f1_score, precision_score, recall_score, roc_auc_score, confusion_matrix
-)
-from xgboost import XGBClassifier
-from imblearn.over_sampling import SMOTE
+N_BOOT = 1000
+THRESHOLD_GRID = [round(t, 2) for t in np.arange(0.10, 0.901, 0.05)]
 
-RANDOM_STATE = 42
 
-def load_official_dataset():
-    """Carga el dataset oficial de la Ficha 11 / Paper desde data/raw/public_mining_equipment_dataset.csv."""
-    possible_paths = [
-        Path(__file__).resolve().parent.parent.parent / "data" / "raw" / "public_mining_equipment_dataset.csv",
-        Path("data/raw/public_mining_equipment_dataset.csv"),
-    ]
-    for p in possible_paths:
-        if os.path.exists(p):
-            print(f"📦 Cargando Dataset Oficial de Ficha 11 desde: {p}")
-            df = pd.read_csv(p)
-            return df
-    raise FileNotFoundError("No se encontró public_mining_equipment_dataset.csv en data/raw/")
+def _bootstrap_summary(y_test, pred, proba, idx):
+    boot = fe.bootstrap_binary_metrics(y_test, pred, idx)
+    yb = (np.asarray(y_test) == fe.HIGH_CLASS).astype(int)
+    out = {k: {"mean": float(v.mean()), "ci95": fe.percentile_ci(v)} for k, v in boot.items()}
+    if proba is not None:
+        auc = fe.bootstrap_auc(yb, proba[:, fe.HIGH_CLASS], idx)
+        out["auc_roc_alto"] = {"mean": float(auc.mean()), "ci95": fe.percentile_ci(auc)}
+    return out
 
-def train_and_evaluate_cv():
-    print("=" * 60)
-    print("🚀 FASE 1 & 2: Carga de Dataset Oficial Ficha 11 y Validacion Cruzada (K=5)")
-    print("=" * 60)
-    
-    # 1. Cargar Dataset Oficial de Ficha 11
-    df = load_official_dataset()
-    
-    feature_cols = [
-        'distance_3d', 'worker_speed', 'machine_speed', 'relative_speed',
-        'direction_worker', 'direction_machine', 'ttc', 'in_restricted_zone',
-        'machine_status', 'worker_bpm', 'fatigue_index', 'vibration_rms',
-        'acceleration_z', 'gas_co_ppm', 'dust_density_mg_m3', 'ambient_light_lux'
-    ]
-    
-    X = df[feature_cols]
-    y = df["risk_level"].astype(int)
-    
-    # 2. División Train/Test Estratificada (80/20) con Semilla 42
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, stratify=y, random_state=RANDOM_STATE
-    )
-    
-    # 3. Definición de las 5 Arquitecturas Oficiales (Ficha 11 / Revistas Q1)
-    def build_models():
-        rf = RandomForestClassifier(n_estimators=200, max_depth=12, random_state=RANDOM_STATE, n_jobs=-1)
-        xgb = XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1, eval_metric='mlogloss', random_state=RANDOM_STATE)
-        mlp = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=500, random_state=RANDOM_STATE)
-        
-        stacking = StackingClassifier(
-            estimators=[('rf', rf), ('xgb', xgb)],
-            final_estimator=LogisticRegression(max_iter=1000, random_state=RANDOM_STATE),
-            cv=3
-        )
-        
-        voting = VotingClassifier(
-            estimators=[('rf', rf), ('xgb', xgb), ('mlp', mlp)],
-            voting='soft'
-        )
-        
-        return {
-            "RandomForest": rf,
-            "XGBoost": xgb,
-            "MLP_NeuralNet": mlp,
-            "Stacking_Ensemble": stacking,
-            "Voting_Ensemble": voting
+
+def _wilson_block(y_test, pred):
+    yb = np.asarray(y_test) == fe.HIGH_CLASS
+    pb = np.asarray(pred) == fe.HIGH_CLASS
+    tp, fp, fn = int((yb & pb).sum()), int((~yb & pb).sum()), int((yb & ~pb).sum())
+    return {
+        "recall_alto_wilson95": fe.wilson_ci(tp, tp + fn),
+        "precision_alto_wilson95": fe.wilson_ci(tp, tp + fp),
+        "tp": tp, "fp": fp, "fn": fn, "n_alto": int(yb.sum()), "n_test": int(len(yb)),
+    }
+
+
+def evaluate_model(name, X_train, y_train, X_test, y_test, skf, idx, use_smote=True):
+    t0 = time.perf_counter()
+    oof, folds = fe.oof_evaluate(name, X_train, y_train, skf, use_smote=use_smote)
+    thr, oof_f2 = fe.find_f2_threshold(y_train, oof[:, fe.HIGH_CLASS])
+    proba, inf_ms, _ = fe.fit_predict_proba(name, X_train, y_train, X_test, use_smote=use_smote)
+
+    pred_argmax = fe.apply_threshold(proba, None)
+    pred_cal = fe.apply_threshold(proba, thr)
+    yb = (np.asarray(y_test) == fe.HIGH_CLASS).astype(int)
+    sens = []
+    for t in THRESHOLD_GRID:
+        m = fe.alto_metrics(y_test, fe.apply_threshold(proba, t))
+        sens.append({"threshold": t, **m})
+    prec, rec, _ = precision_recall_curve(yb, proba[:, fe.HIGH_CLASS])
+
+    result = {
+        "use_smote": use_smote,
+        "cv_folds": folds,
+        "calibration": {"criterion": "max F2 (ALTO vs resto) sobre probabilidades OOF del entrenamiento",
+                        "threshold_alto": thr, "oof_f2_alto": oof_f2},
+        "test_argmax": fe.full_metrics(y_test, proba, None),
+        "test_calibrated": fe.full_metrics(y_test, proba, thr),
+        "bootstrap_calibrated": _bootstrap_summary(y_test, pred_cal, proba, idx),
+        "bootstrap_argmax": _bootstrap_summary(y_test, pred_argmax, proba, idx),
+        "wilson_calibrated": _wilson_block(y_test, pred_cal),
+        "threshold_sensitivity_test": sens,
+        "inference_time_ms_per_sample": inf_ms,
+        "elapsed_s": round(time.perf_counter() - t0, 1),
+    }
+    return result, proba, pred_argmax, pred_cal, (prec, rec)
+
+
+def _baseline_block(X_train, y_train, X_test, y_test, idx):
+    fixed_pred = fe.baseline_predict(X_test, fe.BASELINE_TTC_S)
+    t_tuned, f2_tuned = fe.tune_baseline_ttc(X_train, y_train)
+    tuned_pred = fe.baseline_predict(X_test, t_tuned)
+    block = {}
+    for key, pred, desc in [
+        ("Baseline_TTC_fixed", fixed_pred,
+         f"ALTO si TTC < {fe.BASELINE_TTC_S} s o zona restringida (umbrales fijados a priori)"),
+        ("Baseline_TTC_tuned", tuned_pred,
+         f"Mismo regla con TTC={t_tuned:.0f} s elegido por F2 sobre el entrenamiento (criterio idéntico a los modelos)"),
+    ]:
+        block[key] = {
+            "description": desc,
+            "test": fe.alto_metrics(y_test, pred),
+            "bootstrap": _bootstrap_summary(y_test, pred, None, idx),
+            "wilson": _wilson_block(y_test, pred),
         }
-    
-    # 4. K-Fold Estratificado (K=5, random_state=42)
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
-    
-    cv_results = {model_name: [] for model_name in build_models().keys()}
-    
-    print("\n🔄 Ejecutando Stratified 5-Fold CV con SMOTE en Dataset Oficial...")
-    
-    for fold, (train_idx, val_idx) in enumerate(skf.split(X_train, y_train), 1):
-        X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
-        y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
-        
-        smote = SMOTE(random_state=RANDOM_STATE)
-        X_tr_res, y_tr_res = smote.fit_resample(X_tr, y_tr)
-        
-        scaler = StandardScaler()
-        X_tr_scaled = scaler.fit_transform(X_tr_res)
-        X_val_scaled = scaler.transform(X_val)
-        
-        models = build_models()
-        
-        for model_name, model in models.items():
-            model.fit(X_tr_scaled, y_tr_res)
-            
-            t_start_inf = time.time()
-            y_pred = model.predict(X_val_scaled)
-            t_end_inf = time.time()
-            
-            y_proba = model.predict_proba(X_val_scaled)
-            
-            inf_time_per_sample = ((t_end_inf - t_start_inf) / len(X_val)) * 1000.0
-            
-            acc = accuracy_score(y_val, y_pred)
-            f1_macro = f1_score(y_val, y_pred, average='macro')
-            f1_micro = f1_score(y_val, y_pred, average='micro')
-            prec_macro = precision_score(y_val, y_pred, average='macro', zero_division=0)
-            rec_macro = recall_score(y_val, y_pred, average='macro', zero_division=0)
-            auc_roc = roc_auc_score(y_val, y_proba, multi_class='ovr')
-            
-            cv_results[model_name].append({
-                "fold": fold,
-                "accuracy": float(acc),
-                "f1_macro": float(f1_macro),
-                "f1_micro": float(f1_micro),
-                "precision_macro": float(prec_macro),
-                "recall_macro": float(rec_macro),
-                "auc_roc": float(auc_roc),
-                "inference_time_ms": float(inf_time_per_sample)
-            })
-            
-    print("\n✅ Resumen de Validación Cruzada (Promedios):")
-    for model_name, folds in cv_results.items():
-        accs = [f["accuracy"] for f in folds]
-        f1s = [f["f1_macro"] for f in folds]
-        aucs = [f["auc_roc"] for f in folds]
-        print(f"  🏆 {model_name:20s} | Acc: {np.mean(accs):.4f} ± {np.std(accs):.4f} | F1: {np.mean(f1s):.4f} | AUC: {np.mean(aucs):.4f}")
-        
-    artifact_dir = os.path.join(os.path.dirname(__file__), "..", "app", "ml", "artifacts")
-    os.makedirs(artifact_dir, exist_ok=True)
-    
-    cv_metrics_path = os.path.join(artifact_dir, "cv_metrics_results.json")
-    with open(cv_metrics_path, "w", encoding="utf-8") as f:
-        json.dump(cv_results, f, indent=2, ensure_ascii=False)
-        
-    data_dump_path = os.path.join(artifact_dir, "processed_data.joblib")
-    joblib.dump({
-        "X_train": X_train, "X_test": X_test,
-        "y_train": y_train, "y_test": y_test,
-        "feature_names": feature_cols
-    }, data_dump_path)
-    
-    return cv_results
+    block["Baseline_TTC_tuned"]["ttc_threshold_s"] = t_tuned
+    block["Baseline_TTC_tuned"]["train_f2"] = f2_tuned
+    return block, {"Baseline_TTC_fixed": fixed_pred, "Baseline_TTC_tuned": tuned_pred}
+
+
+def _plot_pr(curves, positives_rate, path):
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except Exception:
+        return
+    plt.figure(figsize=(8, 6), dpi=200)
+    for name, (prec, rec) in curves.items():
+        plt.plot(rec, prec, label=name, linewidth=1.6)
+    plt.axhline(positives_rate, color="gray", linestyle="--", linewidth=1, label="Azar (prevalencia ALTO)")
+    plt.xlabel("Recall (ALTO)")
+    plt.ylabel("Precisión (ALTO)")
+    plt.title("Curvas Precision-Recall de la clase ALTO (conjunto de prueba, protocolo simétrico)")
+    plt.legend(fontsize=8)
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(path)
+    plt.close()
+
+
+def train_and_evaluate_cv(models=None, run_sensitivity=True, n_boot=N_BOOT):
+    print("=" * 72)
+    print("FASE 1-2: Protocolo simétrico (SMOTENC por fold + umbral F2 idéntico)")
+    print("=" * 72)
+    models = models or fe.MODEL_NAMES
+    df = fe.load_dataset()
+    print(f"Dataset: {fe.DATASET_PATH}  ({len(df)} filas)")
+
+    X_train, X_test, y_train, y_test = fe.split_train_test(df)
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=fe.RANDOM_STATE)
+    idx = fe.bootstrap_indices(len(y_test), n_boot)
+
+    results, preds_cal, preds_arg, curves = {}, {}, {}, {}
+    for name in models:
+        print(f"\n>> {name} (con SMOTENC)...", flush=True)
+        res, proba, p_arg, p_cal, curve = evaluate_model(name, X_train, y_train, X_test, y_test, skf, idx, True)
+        results[name] = res
+        preds_cal[name], preds_arg[name], curves[name] = p_cal, p_arg, curve
+        c, a = res["test_calibrated"], res["test_argmax"]
+        print(f"   umbral F2={res['calibration']['threshold_alto']:.2f} | "
+              f"calibrado: P={c['precision_alto']:.3f} R={c['recall_alto']:.3f} F2={c['f2_alto']:.3f} AUC={c['auc_roc_alto']:.3f} | "
+              f"argmax: P={a['precision_alto']:.3f} R={a['recall_alto']:.3f} F2={a['f2_alto']:.3f} ({res['elapsed_s']}s)")
+
+    baselines, base_preds = _baseline_block(X_train, y_train, X_test, y_test, idx)
+    for k, v in baselines.items():
+        t = v["test"]
+        print(f"\n>> {k}: P={t['precision_alto']:.3f} R={t['recall_alto']:.3f} F2={t['f2_alto']:.3f}")
+    preds_cal.update(base_preds)
+    preds_arg.update(base_preds)
+
+    reference = "XGBoost" if "XGBoost" in models else models[0]
+    comparisons = {
+        "reference": reference,
+        "calibrated": fe.compare_to_reference(y_test, preds_cal, reference, idx),
+        "argmax": fe.compare_to_reference(y_test, preds_arg, reference, idx),
+    }
+
+    sensitivity = {}
+    if run_sensitivity:
+        print("\n" + "-" * 72 + "\nSensibilidad: SIN SMOTE (class_weight='balanced' donde aplica)\n" + "-" * 72)
+        for name in models:
+            print(f">> {name} (sin SMOTE)...", flush=True)
+            res, *_ = evaluate_model(name, X_train, y_train, X_test, y_test, skf, idx, False)
+            sensitivity[name] = {
+                "threshold_alto": res["calibration"]["threshold_alto"],
+                "test_calibrated": res["test_calibrated"],
+                "test_argmax": res["test_argmax"],
+            }
+            c = res["test_calibrated"]
+            print(f"   P={c['precision_alto']:.3f} R={c['recall_alto']:.3f} F2={c['f2_alto']:.3f}")
+
+    # --- Archivos de salida ---------------------------------------------------
+    fe.ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    cv_legacy = {n: r["cv_folds"] for n, r in results.items()}
+    fe.dump_json(cv_legacy, fe.ARTIFACT_DIR / "cv_metrics_results.json")
+
+    report = {
+        "protocol": {
+            "split": "estratificada 80/20, semilla 42",
+            "cv": "StratifiedKFold(5, shuffle, 42) sobre el 80 % de entrenamiento",
+            "resampling": "SMOTENC dentro del pipeline (se ajusta sólo con el entrenamiento de cada pliegue)",
+            "threshold": "max F2 (ALTO vs resto) sobre probabilidades OOF del entrenamiento; mismo procedimiento para TODOS los modelos",
+            "test": "el 20 % de prueba se usa una sola vez; sin ajuste de umbral ni de hiperparámetros sobre él",
+            "bootstrap": f"{n_boot} remuestreos pareados (mismos índices para todos los sistemas)",
+            "paired_tests": "McNemar exacto (mismas muestras) + corrección de Holm; Cliff's delta sobre el bootstrap",
+            "n_train": int(len(y_train)), "n_test": int(len(y_test)),
+            "prevalence_alto_test": float((y_test == fe.HIGH_CLASS).mean()),
+            "label_note": "risk_level es un target sintético heurístico; ver audit_label_circularity.py (FON-03)",
+        },
+        "models": results,
+        "baselines": baselines,
+        "paired_comparisons": comparisons,
+        "sensitivity_no_smote": sensitivity,
+    }
+    fe.dump_json(report, fe.ARTIFACT_DIR / "fair_comparison_results.json")
+    _plot_pr(curves, float((y_test == fe.HIGH_CLASS).mean()), fe.ARTIFACT_DIR / "pr_curves_symmetric.png")
+    joblib.dump({"X_train": X_train, "X_test": X_test, "y_train": y_train, "y_test": y_test,
+                 "feature_names": fe.FEATURES}, fe.ARTIFACT_DIR / "processed_data.joblib")
+
+    print("\nArtefactos escritos en:", fe.ARTIFACT_DIR)
+    return cv_legacy
+
 
 if __name__ == "__main__":
-    train_and_evaluate_cv()
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--no-sensitivity", action="store_true", help="omitir la corrida sin SMOTE")
+    ap.add_argument("--models", nargs="*", default=None, help="subconjunto de modelos")
+    ap.add_argument("--n-boot", type=int, default=N_BOOT)
+    a = ap.parse_args()
+    train_and_evaluate_cv(a.models, not a.no_sensitivity, a.n_boot)

@@ -1,0 +1,248 @@
+{
+  "manifest_version": "1.0.0",
+  "generated_at_utc": "2026-10-26T19:04:49Z",
+  "system_information": {
+    "os": "Windows 11 Home",
+    "cpu": "Intel Core i7-8550U @ 1.80GHz",
+    "ram_gb": 15.89,
+    "python_version": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]"
+  },
+  "raw_data": {
+    "path": "data/raw/public_mining_equipment_dataset.csv",
+    "sha256": "b71d0b6baed8b6e0bc7eee1a1a5b7440d06a04ddaea5d502907cf03d958705f0"
+  },
+  "results_files": {
+    "ablation_f1_comparison.png": {
+      "size_bytes": 188652,
+      "sha256": "d8fe13a465c4692b58cb975ac6ccae5dac33a66ffdf526145da2f8e60b8e7d1c"
+    },
+    "ablation_results.csv": {
+      "size_bytes": 2446,
+      "sha256": "59d4b94f7525d9ae3ca2bdff1e6ff3351c553b62592dba436200ea1c4933b4b6"
+    },
+    "ablation_study_results.json": {
+      "size_bytes": 17364,
+      "sha256": "d1e7f23bfafe9b9ab1d1c01043fb1f314bf20a81afad5154fd8b677b9896bdd7"
+    },
+    "benchmark_fps.csv": {
+      "size_bytes": 1067,
+      "sha256": "7308f73d6bfbd1e3924a1d6e68e11b0739d84e9eca74f21a19938f2b9f4e299c"
+    },
+    "benchmark_latency.csv": {
+      "size_bytes": 925,
+      "sha256": "c4f81d6ec8a9a3917a0904e22c1970122935df792c870b08ef303b1b16248dbd"
+    },
+    "circularity_audit.csv": {
+      "size_bytes": 947,
+      "sha256": "06a3a6442b9016d5f89e29cf5e746659a3b06e5ad66b8b2f0d795a5bca03c6eb"
+    },
+    "confusion_matrices.csv": {
+      "size_bytes": 1037,
+      "sha256": "d98d5b69e8d66e1331e55362f42e5f0f577f39cc35b4d17979ac80a9b5a66ad7"
+    },
+    "cv_results.csv": {
+      "size_bytes": 5983,
+      "sha256": "185d44a95d373a28f242826a382644d864079df163636c514589dc45390863a1"
+    },
+    "decoupled_labels_results.csv": {
+      "size_bytes": 1150,
+      "sha256": "17b4818e4dadfb915d834e2edd86f0f00f2ca6def3699d0b898ccc5c0f5a4ab5"
+    },
+    "environment_metadata.json": {
+      "size_bytes": 1232,
+      "sha256": "47b8059f13bcb5385520bdb59a0b8ad9d9f8dd4c1ceb44be2bdbff4b5a00c5f6"
+    },
+    "experiment_config.json": {
+      "size_bytes": 1883,
+      "sha256": "2fad6be12d603309b17e8dc147c27b6ba3f2ba8b0c1f68f19702d6bbc2b82248"
+    },
+    "fair_comparison_results.json": {
+      "size_bytes": 82881,
+      "sha256": "114f369d28ff54e3780ee49e141fddeaf691546b60c8cd7b3737af67907a02ab"
+    },
+    "feature_dictionary.csv": {
+      "size_bytes": 2928,
+      "sha256": "054e39a4e7f3902407d77f123ddf72e215d143c526e25893fabf064425ba18bf"
+    },
+    "gemini_audit.csv": {
+      "size_bytes": 12017,
+      "sha256": "a50dcf282a0ace07574a0b182e93603417ccfc276b34d314791d78eb9b644917"
+    },
+    "genai_audit_bank.json": {
+      "size_bytes": 35882,
+      "sha256": "544a3bffb9b2addaf05b777bd48a457a80fdf41da18c5d7bc1a801a6b8f3a6ff"
+    },
+    "genai_audit_review_sheet.csv": {
+      "size_bytes": 12020,
+      "sha256": "1bfc97fef6a12584bf87bd5888535ae7f2a463842cc63f219de7b6be3ee18684"
+    },
+    "hardware_specs_benchmark.json": {
+      "size_bytes": 6778,
+      "sha256": "07873c97a3707cf3f6af3020eacb0a89f978a40e10b833b1960da08acc5b266c"
+    },
+    "label_circularity_audit.json": {
+      "size_bytes": 6599,
+      "sha256": "b6226174902aee08812b4705a5c6b09cab54ea4e2c264af4cdec9bd9ff8bd921"
+    },
+    "metrics_comparison.csv": {
+      "size_bytes": 3173,
+      "sha256": "ce4faca525f243822035b4e13deff131d1c2147536748e3a5150e18f2cb92c68"
+    },
+    "model_hyperparameters.csv": {
+      "size_bytes": 2403,
+      "sha256": "6708384169f85cae0596fe3ebb5277005857bc26b4e665ef95698e2bea782569"
+    },
+    "paired_statistical_tests.csv": {
+      "size_bytes": 3932,
+      "sha256": "358fb9c448cbca16d4429d20c39e556a8504eb85ff133ef671c515cd3dde15d0"
+    },
+    "pr_curves_symmetric.png": {
+      "size_bytes": 126389,
+      "sha256": "4664c2afa5570f2c6ce8e2c09bbecc041d926d2370080495d84ab3899acea73c"
+    },
+    "robust_stats_validation.json": {
+      "size_bytes": 1872,
+      "sha256": "57ee6eb887f88af648147882b1c3db8493dcf390b30bf53cfd0726a2bcd608a5"
+    },
+    "shap_values.csv": {
+      "size_bytes": 590,
+      "sha256": "9a447ae147eade25e91039ed67af26f9902387bcdf5662f1e27cb6ab56b68480"
+    }
+  },
+  "figures_files": {
+    "ablacion.png": {
+      "size_bytes": 251481,
+      "sha256": "8232f4bcbf6351d623ec2f43971231ce9b8e6d2fa6f2251cf2d35e37c55067e4"
+    },
+    "benchmark_fps.png": {
+      "size_bytes": 165955,
+      "sha256": "e63fae5aa49e29d6dbb3e6d8b50d1834ef9a96e15cca98b4580a89ded409aa33"
+    },
+    "benchmark_latencia.png": {
+      "size_bytes": 190842,
+      "sha256": "ceaaa6213f47ebeba5f6999f64448d7bf7ce7480f4f864c4f46d6a54649a4ce2"
+    },
+    "comparacion_modelos.png": {
+      "size_bytes": 266866,
+      "sha256": "af775917e0d326c0360ad35f33a431f93a02c203cdf440555e7020aaaab118d5"
+    },
+    "correlaciones.png": {
+      "size_bytes": 336364,
+      "sha256": "cd829c0ce15694873052253b360318019510c609058d04588c43d7e7841cd212"
+    },
+    "matriz_confusion.png": {
+      "size_bytes": 141110,
+      "sha256": "7cbad19bb74e6f95c51ae1e216f34b89b9c332cb664f291f84841ee5b67ef316"
+    },
+    "shap_summary.png": {
+      "size_bytes": 308219,
+      "sha256": "0e8228344f8315cf5fee4e037519190679d4d8b9ff68409cd67ec653b4401a04"
+    }
+  },
+  "execution_scripts": {
+    "audit_genai_protocol.py": {
+      "size_bytes": 19444,
+      "sha256": "f1980435db1f4fc52870e867213d962b752b4314577defc74518548e38cf6e79"
+    },
+    "audit_label_circularity.py": {
+      "size_bytes": 10079,
+      "sha256": "93a82ce495cfa5feb978c6eba72a472a42af4bc4ecc0d7642e0f6aa9dc7f705d"
+    },
+    "benchmark_hardware_profiler.py": {
+      "size_bytes": 9000,
+      "sha256": "5f6ccdd9598ef107d27aefdb20331f0b05d56744be7fcae5d05384a18f1521fa"
+    },
+    "download_and_process_public_dataset.py": {
+      "size_bytes": 7429,
+      "sha256": "a8bac74193d6215fcb6981982a34d49f8f0d34b554ba5afdd7220ef1fd595097"
+    },
+    "evaluate_hmm_k_selection.py": {
+      "size_bytes": 6452,
+      "sha256": "9cb30b9c12621fa5a630b5679d6a1bb81c1ca4a941adae92e402a3c3e892eef8"
+    },
+    "export_environment_metadata.py": {
+      "size_bytes": 8384,
+      "sha256": "2a88cb248189d563d5ad9c1acb5ef1355f21dda5d0583c61492e2c380ef15871"
+    },
+    "export_publication_assets.py": {
+      "size_bytes": 18766,
+      "sha256": "ac2f98d8bd0f81eed5d95ea9ebd8bb6539305987ea69d43237c86431c327988d"
+    },
+    "fair_eval.py": {
+      "size_bytes": 17871,
+      "sha256": "deca83d4e19908334b57def7fc4f72b8e43555fbe69a83474c6b2267b3dd3f08"
+    },
+    "generate_all_deliverables.py": {
+      "size_bytes": 39065,
+      "sha256": "a17865a607312f638af5f5e268fc16da68233709f8b51db50210cb6519e1fd90"
+    },
+    "generate_synthetic_data.py": {
+      "size_bytes": 5106,
+      "sha256": "efa973bb3bd05d6e392933cd6d22d39f472ce43c546ce18b769cbf97e4e1613e"
+    },
+    "generate_temporal_trajectories.py": {
+      "size_bytes": 8237,
+      "sha256": "043efa4fb392df21b2193ea617b7f130ba62b68de0dab7c99595db11484a3ab6"
+    },
+    "plot_trajectory_comparison.py": {
+      "size_bytes": 1792,
+      "sha256": "2ee462d599154a14f54729740ab4084966f2b3675f1c9d6f5c665c9d3edea7a4"
+    },
+    "plot_trajectory_debug.py": {
+      "size_bytes": 1527,
+      "sha256": "5da805dbf4906baafe034e20944f9a3a4c1731baca815b4e3a6aa397a927b038"
+    },
+    "robust_stats_validation.py": {
+      "size_bytes": 8119,
+      "sha256": "5fbd8c965cc5cc2d4bd47f72688c9994fa5cec2f818f4cc15b072bc891c3aba3"
+    },
+    "run_ablation_study.py": {
+      "size_bytes": 7477,
+      "sha256": "77b992bfac43ad45547eb96306bbb84916aacc32f9118d4b4228ff927d4d9a66"
+    },
+    "run_all_experiments.py": {
+      "size_bytes": 3044,
+      "sha256": "1ba89f90d9fe198858d859d79899d25a793809864ff7dfd0775755e49eed8478"
+    },
+    "run_scenario_tests.py": {
+      "size_bytes": 3240,
+      "sha256": "08465e58ebb1810446cb2b3dbcbe7625e6a0b02bd1b499169fbd91edec37967a"
+    },
+    "run_shap_and_collinearity.py": {
+      "size_bytes": 8009,
+      "sha256": "ec19a541084393c6fc42e2ea7ae2bb3b976cf7550b722f43e946711cc7148d47"
+    },
+    "seed_db.py": {
+      "size_bytes": 3238,
+      "sha256": "453325f468882967d580a9b2c5f32a90c09aedcbcac3c66a3c2b351f47862dd3"
+    },
+    "simulate_live_telemetry.py": {
+      "size_bytes": 5577,
+      "sha256": "d9971e14db6a3a7b509ef56041779282bb732d065d1c2a01d26c72a68cd40fe5"
+    },
+    "statistical_tests.py": {
+      "size_bytes": 9213,
+      "sha256": "f9661d0b1a72b9cb870703092f5b1cd3401e89e43ef9a5a2d56e409e7a65b9f0"
+    },
+    "train_all_models.py": {
+      "size_bytes": 10062,
+      "sha256": "ce832abcbe6c1f6c25bf95f92181f7f2856eda73bb827d79c6fde8824910202d"
+    },
+    "train_cv.py": {
+      "size_bytes": 10769,
+      "sha256": "6a8efaffd561403b1a2f4d370e2925795ad63fe24b3ebc672b43b0e63e23a876"
+    },
+    "train_hmm_baumwelch.py": {
+      "size_bytes": 7167,
+      "sha256": "960c3966ee8e3d4ef80d3e6e099a21300696262563ac530fb154507ed7545da9"
+    },
+    "train_model.py": {
+      "size_bytes": 5242,
+      "sha256": "d24428da12f951a3b06f2f445a9293216c23e112973fe6d3be533e556e51b00a"
+    },
+    "verify_streamlit_next_parity.py": {
+      "size_bytes": 4839,
+      "sha256": "c056ea71faed020e32281e8943e249a6b8f8e8e78051859a5f09891b55f70bd5"
+    }
+  }
+}

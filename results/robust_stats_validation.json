@@ -1,0 +1,86 @@
+{
+  "protocol": "10-fold estratificado, SMOTENC + escalado dentro de cada fold, mismos pliegues",
+  "features_base": [
+    "distance_3d",
+    "ttc",
+    "relative_speed",
+    "in_restricted_zone"
+  ],
+  "features_hybrid": [
+    "distance_3d",
+    "ttc",
+    "relative_speed",
+    "in_restricted_zone",
+    "worker_bpm",
+    "fatigue_index",
+    "gas_co_ppm",
+    "dust_density_mg_m3"
+  ],
+  "f1_macro_base_folds": [
+    0.6408251659385185,
+    0.6210146611719342,
+    0.666482258212497,
+    0.60753221395139,
+    0.6280714517620152,
+    0.6159119096663133,
+    0.621690029909208,
+    0.6294041831450768,
+    0.6204320322741829,
+    0.5989274053498266
+  ],
+  "f1_macro_hybrid_folds": [
+    0.627758293935564,
+    0.6518304668632565,
+    0.6637151959836832,
+    0.6045524976243531,
+    0.6298877850997326,
+    0.6555787057451666,
+    0.638879443164024,
+    0.6447788925054129,
+    0.6310101538757161,
+    0.6267494593291113
+  ],
+  "accuracy_base_folds": [
+    0.638,
+    0.61,
+    0.658,
+    0.621,
+    0.627,
+    0.619,
+    0.613,
+    0.625,
+    0.615,
+    0.599
+  ],
+  "accuracy_hybrid_folds": [
+    0.615,
+    0.634,
+    0.643,
+    0.596,
+    0.615,
+    0.645,
+    0.627,
+    0.639,
+    0.618,
+    0.616
+  ],
+  "mean_diff_f1": 0.012444958274505823,
+  "ci95_t": [
+    0.00032675400966144033,
+    0.024563162539350206
+  ],
+  "paired_t": {
+    "t": 2.323153735225081,
+    "p": 0.04525155887985484,
+    "p_holm": 0.09050311775970968
+  },
+  "wilcoxon": {
+    "W": 10.0,
+    "p": 0.083984375,
+    "p_holm": 0.09050311775970968
+  },
+  "cohens_d": 0.7346457158039,
+  "cliffs_delta": 0.45999999999999996,
+  "cliffs_label": "mediano",
+  "caveat": "Los folds de CV no son independientes; los p-valores son orientativos. La inferencia confirmatoria usa bootstrap pareado + McNemar (train_cv.py)."
+}

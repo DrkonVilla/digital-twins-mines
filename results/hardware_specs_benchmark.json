@@ -1,0 +1,220 @@
+{
+  "system": {
+    "date_utc": "2026-10-26T16:09:55.146646+00:00",
+    "os": "Windows-10-10.0.26200-SP0",
+    "os_version": "10.0.26200",
+    "machine": "AMD64",
+    "python": "3.10.11",
+    "python_implementation": "CPython",
+    "cpu_logical_cores": 8,
+    "cpu_physical_cores": 4,
+    "ram_total_gb": 15.89,
+    "ram_available_gb": 0.64,
+    "cpu_freq_mhz_current": 1792.0,
+    "cpu_freq_mhz_max": 1992.0,
+    "cpu_model": "Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz",
+    "gpus": [
+      {
+        "name": "Parsec Virtual Display Adapter",
+        "adapter_ram_bytes_wmi_may_cap_at_4GB": "",
+        "driver_version": "0.45.0.0"
+      },
+      {
+        "name": "Epson Projection Idd Device",
+        "adapter_ram_bytes_wmi_may_cap_at_4GB": "",
+        "driver_version": "9.40.11.700"
+      },
+      {
+        "name": "Intel(R) UHD Graphics 620",
+        "adapter_ram_bytes_wmi_may_cap_at_4GB": "1073741824",
+        "driver_version": "31.0.101.2140"
+      }
+    ],
+    "nvidia_smi": null,
+    "libraries": {
+      "numpy": "1.26.4",
+      "pandas": "2.2.3",
+      "scikit-learn": "1.7.2",
+      "xgboost": "3.2.0",
+      "imbalanced-learn": "0.14.2",
+      "scipy": "1.15.3",
+      "shap": null,
+      "psutil": "7.2.2",
+      "websockets": "16.1.1",
+      "fastapi": "0.141.1",
+      "uvicorn": "0.52.4",
+      "langchain": "1.3.18",
+      "langchain-google-genai": "4.1.3",
+      "google-generativeai": "0.8.6"
+    }
+  },
+  "benchmark": {
+    "50": {
+      "agents": 50,
+      "ticks_measured": 300,
+      "tick_rate_hz": 5.0,
+      "budget_ms": 200.0,
+      "inference_ms": {
+        "mean": 7.599033999528426,
+        "p50": 7.670950028114021,
+        "p95": 8.532820007530972,
+        "p99": 9.06515798822511,
+        "max": 11.770599987357855,
+        "pct_within_budget": 100.0
+      },
+      "serialization_ms": {
+        "mean": 0.82667800054575,
+        "p50": 0.8207499631680548,
+        "p95": 1.0302999871782959,
+        "p99": 1.2938270001905021,
+        "max": 1.5983000048436224,
+        "pct_within_budget": 100.0
+      },
+      "websocket_loopback_roundtrip_ms": {
+        "mean": 1.2407293329791476,
+        "p50": 0.9371500345878303,
+        "p95": 1.6454050026368354,
+        "p99": 9.222377963014788,
+        "max": 21.725700004026294,
+        "pct_within_budget": 100.0
+      },
+      "websocket_error": null,
+      "end_to_end_ms": {
+        "mean": 9.666441333053323,
+        "p50": 9.475600032601506,
+        "p95": 11.017029988579452,
+        "p99": 18.061940975021493,
+        "max": 30.133899999782443,
+        "pct_within_budget": 100.0
+      },
+      "payload_bytes": 2185
+    },
+    "100": {
+      "agents": 100,
+      "ticks_measured": 300,
+      "tick_rate_hz": 5.0,
+      "budget_ms": 200.0,
+      "inference_ms": {
+        "mean": 8.16141800081823,
+        "p50": 7.96210000407882,
+        "p95": 9.62223501119297,
+        "p99": 11.122652975027432,
+        "max": 24.562700011301786,
+        "pct_within_budget": 100.0
+      },
+      "serialization_ms": {
+        "mean": 1.5702059977532674,
+        "p50": 1.553350011818111,
+        "p95": 1.9091349822701889,
+        "p99": 2.338681022520173,
+        "max": 7.2530999896116555,
+        "pct_within_budget": 100.0
+      },
+      "websocket_loopback_roundtrip_ms": {
+        "mean": 0.8101406662414471,
+        "p50": 0.6788999889977276,
+        "p95": 1.2190750247100368,
+        "p99": 1.3935020129429172,
+        "max": 1.767300011124462,
+        "pct_within_budget": 100.0
+      },
+      "websocket_error": null,
+      "end_to_end_ms": {
+        "mean": 10.541764664812945,
+        "p50": 10.324000002583489,
+        "p95": 12.379854964092374,
+        "p99": 13.643245922867187,
+        "max": 28.58150005340576,
+        "pct_within_budget": 100.0
+      },
+      "payload_bytes": 4380
+    },
+    "200": {
+      "agents": 200,
+      "ticks_measured": 300,
+      "tick_rate_hz": 5.0,
+      "budget_ms": 200.0,
+      "inference_ms": {
+        "mean": 8.354952667529384,
+        "p50": 8.276749984361231,
+        "p95": 9.523649959010074,
+        "p99": 10.717762041604145,
+        "max": 19.948900036979467,
+        "pct_within_budget": 100.0
+      },
+      "serialization_ms": {
+        "mean": 3.0844870009847605,
+        "p50": 3.0599499586969614,
+        "p95": 3.7095499777933596,
+        "p99": 4.112275991938076,
+        "max": 4.66259999666363,
+        "pct_within_budget": 100.0
+      },
+      "websocket_loopback_roundtrip_ms": {
+        "mean": 0.9949816658627242,
+        "p50": 0.8203499892260879,
+        "p95": 1.5769300138344988,
+        "p99": 1.9042820058530197,
+        "max": 1.9961000070907176,
+        "pct_within_budget": 100.0
+      },
+      "websocket_error": null,
+      "end_to_end_ms": {
+        "mean": 12.43442133437687,
+        "p50": 12.429800000973046,
+        "p95": 13.875635026488455,
+        "p99": 14.680466972640708,
+        "max": 23.87749997433275,
+        "pct_within_budget": 100.0
+      },
+      "payload_bytes": 8870
+    },
+    "500": {
+      "agents": 500,
+      "ticks_measured": 300,
+      "tick_rate_hz": 5.0,
+      "budget_ms": 200.0,
+      "inference_ms": {
+        "mean": 11.0730399992705,
+        "p50": 10.157499986235052,
+        "p95": 16.121955015114537,
+        "p99": 28.657944021397267,
+        "max": 46.1115000071004,
+        "pct_within_budget": 100.0
+      },
+      "serialization_ms": {
+        "mean": 7.92557700110289,
+        "p50": 7.749399985186756,
+        "p95": 10.267384990584105,
+        "p99": 12.06797304213977,
+        "max": 21.304900001268834,
+        "pct_within_budget": 100.0
+      },
+      "websocket_loopback_roundtrip_ms": {
+        "mean": 1.5200186664393793,
+        "p50": 1.338350004516542,
+        "p95": 2.461645001312718,
+        "p99": 2.907539006555451,
+        "max": 3.5974999773316085,
+        "pct_within_budget": 100.0
+      },
+      "websocket_error": null,
+      "end_to_end_ms": {
+        "mean": 20.51863566681277,
+        "p50": 19.744250021176413,
+        "p95": 27.908224987913858,
+        "p99": 41.11334003682708,
+        "max": 56.17950001033023,
+        "pct_within_budget": 100.0
+      },
+      "payload_bytes": 22342
+    }
+  },
+  "frontend_fps": null,
+  "limitations": [
+    "FPS de Three.js/InstancedMesh NO medido aquí (requiere el navegador); no se reportan cifras inventadas.",
+    "El transporte es WebSocket en loopback local; no refleja una red subterránea real.",
+    "Los agentes son muestras del conjunto de prueba, no telemetría operativa real.",
+    "Se mide una sola máquina; repetir en el hardware objetivo antes de generalizar."
+  ]
+}

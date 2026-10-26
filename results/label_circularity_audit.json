@@ -1,0 +1,176 @@
+{
+  "generator": {
+    "source": "backend/scripts/download_and_process_public_dataset.py (sección 5)",
+    "formula": "risk_score = spatial_risk + multimodal_risk + N(0, 3.8); BAJO<p45<=MEDIO<p78<=ALTO",
+    "spatial_risk": "(12/max(d,0.8))*2.0 + (8/max(ttc,0.5))*1.8 + in_restricted_zone*2.0",
+    "multimodal_risk": "1.8*fatiga + (max(bpm-60,0)/50) + CO/40 + 0.6*polvo/5 - 0.5*luz/120",
+    "baseline_inputs": [
+      "ttc",
+      "in_restricted_zone"
+    ],
+    "shared_variables_with_label": [
+      "distance_3d",
+      "ttc",
+      "in_restricted_zone"
+    ]
+  },
+  "variance_decomposition": {
+    "spatial_share": 0.8206931955342383,
+    "multimodal_share": 0.004818178768236039,
+    "covariance_share": 0.0001546536006391481,
+    "noise_share": 0.17433397209688653
+  },
+  "baseline_label_concordance": {
+    "baseline_fixed": {
+      "kappa_alto_vs_resto": 0.781408313373042,
+      "accuracy_alto_vs_resto": 0.9175,
+      "precision_alto": 0.744574884382782,
+      "recall_alto": 0.9513636363636364,
+      "f1_alto": 0.8353622031530633,
+      "f2_alto": 0.9013004909137888
+    },
+    "baseline_tuned_full_data": {
+      "kappa_alto_vs_resto": 0.8031687929129936,
+      "accuracy_alto_vs_resto": 0.9273,
+      "precision_alto": 0.7761529808773904,
+      "recall_alto": 0.9409090909090909,
+      "f1_alto": 0.8506266694062051,
+      "f2_alto": 0.9025900409871808
+    },
+    "spearman_inv_ttc_vs_spatial_component": 0.9997282936172751,
+    "spearman_spatial_component_vs_label": 0.6110813635057405,
+    "spearman_multimodal_component_vs_label": 0.08562688347740084
+  },
+  "noise_sensitivity": {
+    "sigma_1.90": {
+      "bayes_ceiling_alto": {
+        "f2": 0.9589866405548273,
+        "precision": 0.8596921210200976,
+        "recall": 0.9875007474845606,
+        "n_flagged": 2527
+      },
+      "baseline_fixed_kappa_vs_simulated_label": 0.8381096720859741,
+      "baseline_fixed_f2_vs_simulated_label": 0.9473774868659031
+    },
+    "sigma_3.80": {
+      "bayes_ceiling_alto": {
+        "f2": 0.9004897950703145,
+        "precision": 0.7679447243483044,
+        "recall": 0.9410974808178679,
+        "n_flagged": 2691
+      },
+      "baseline_fixed_kappa_vs_simulated_label": 0.7723996862878098,
+      "baseline_fixed_f2_vs_simulated_label": 0.8939798466970976
+    },
+    "sigma_7.60": {
+      "bayes_ceiling_alto": {
+        "f2": 0.7271614651076302,
+        "precision": 0.600645423383226,
+        "recall": 0.7675810330523586,
+        "n_flagged": 2805
+      },
+      "baseline_fixed_kappa_vs_simulated_label": 0.5556627170019288,
+      "baseline_fixed_f2_vs_simulated_label": 0.7178537593661184
+    }
+  },
+  "alternative_labels": {
+    "label_original": {
+      "prevalence_alto": 0.22,
+      "xgboost_calibrated": {
+        "precision_alto": 0.7576853526220615,
+        "recall_alto": 0.9522727272727273,
+        "f1_alto": 0.8439073514602216,
+        "f2_alto": 0.9057501080847384
+      },
+      "baseline_fixed": {
+        "precision_alto": 0.7567567567567568,
+        "recall_alto": 0.9545454545454546,
+        "f1_alto": 0.8442211055276383,
+        "f2_alto": 0.9071274298056157
+      },
+      "baseline_tuned": {
+        "precision_alto": 0.7798507462686567,
+        "recall_alto": 0.95,
+        "f1_alto": 0.8565573770491803,
+        "f2_alto": 0.9102787456445993,
+        "ttc_threshold_s": 3.0
+      },
+      "xgb_minus_baseline_tuned_f2_pp": -0.4528637559860882
+    },
+    "label_multimodal_only": {
+      "prevalence_alto": 0.22,
+      "xgboost_calibrated": {
+        "precision_alto": 0.337037037037037,
+        "recall_alto": 0.8272727272727273,
+        "f1_alto": 0.4789473684210527,
+        "f2_alto": 0.6408450704225352
+      },
+      "baseline_fixed": {
+        "precision_alto": 0.23529411764705882,
+        "recall_alto": 0.2818181818181818,
+        "f1_alto": 0.25646328852119954,
+        "f2_alto": 0.2710975076519458
+      },
+      "baseline_tuned": {
+        "precision_alto": 0.22,
+        "recall_alto": 1.0,
+        "f1_alto": 0.36065573770491804,
+        "f2_alto": 0.5851063829787235,
+        "ttc_threshold_s": 113.0
+      },
+      "xgb_minus_baseline_tuned_f2_pp": 5.573868744381172
+    },
+    "label_spatial_only": {
+      "prevalence_alto": 0.22,
+      "xgboost_calibrated": {
+        "precision_alto": 0.3594624860022396,
+        "recall_alto": 0.7295454545454545,
+        "f1_alto": 0.48162040510127535,
+        "f2_alto": 0.6049754994346023
+      },
+      "baseline_fixed": {
+        "precision_alto": 0.5113438045375218,
+        "recall_alto": 0.6659090909090909,
+        "f1_alto": 0.5784797630799605,
+        "f2_alto": 0.6279468495499357
+      },
+      "baseline_tuned": {
+        "precision_alto": 0.4925864909390445,
+        "recall_alto": 0.6795454545454546,
+        "f1_alto": 0.5711556829035339,
+        "f2_alto": 0.6316011829319814,
+        "ttc_threshold_s": 12.0
+      },
+      "xgb_minus_baseline_tuned_f2_pp": -2.662568349737915
+    },
+    "label_balanced_50_50": {
+      "prevalence_alto": 0.22,
+      "xgboost_calibrated": {
+        "precision_alto": 0.3016496465043205,
+        "recall_alto": 0.8727272727272727,
+        "f1_alto": 0.4483362521891419,
+        "f2_alto": 0.6330365974282888
+      },
+      "baseline_fixed": {
+        "precision_alto": 0.4029038112522686,
+        "recall_alto": 0.5045454545454545,
+        "f1_alto": 0.44803229061553984,
+        "f2_alto": 0.48031155344006926
+      },
+      "baseline_tuned": {
+        "precision_alto": 0.220160481444333,
+        "recall_alto": 0.9977272727272727,
+        "f1_alto": 0.36072308956450283,
+        "f2_alto": 0.5847096430474161,
+        "ttc_threshold_s": 93.0
+      },
+      "xgb_minus_baseline_tuned_f2_pp": 4.832695438087264
+    }
+  },
+  "interpretation": [
+    "risk_level es un target SINTÉTICO por diseño; cualquier modelo que alcance el techo de Bayes sólo reproduce la función generadora, no valida seguridad real.",
+    "El componente espacial explica 82% de la varianza del score y comparte distance_3d/ttc/zona restringida con el baseline: la comparación ML vs baseline NO es independiente.",
+    "Con etiqueta sólo-multimodal el baseline pierde capacidad y el ML se separa; con etiqueta sólo-espacial ocurre lo contrario. La conclusión 'ML supera reglas' depende de la definición de la etiqueta.",
+    "Δ F2 (XGBoost − baseline ajustado, pp) por etiqueta: label_original: -0.5, label_multimodal_only: +5.6, label_spatial_only: -2.7, label_balanced_50_50: +4.8"
+  ]
+}

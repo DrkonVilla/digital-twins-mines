@@ -99,6 +99,16 @@ def download_and_process():
     # Las normas internacionales (EMESRT Control Framework, ISO 21815-2, ISO 8996) definen 
     # niveles funcionales y protocolos de medición, NO fórmulas matemáticas cerradas con coeficientes.
     # Por ende, los pesos asignados representan un modelo heurístico cualitativo de diseño.
+    #
+    # ESPECIFICACIÓN FORMAL DE LA ETIQUETA (FON-03, revisión por pares G27):
+    #   risk_score = spatial_risk + multimodal_risk + ε,   ε ~ N(0, 3.8²)
+    #   spatial_risk    = 2.0*(12/max(d,0.8)) + 1.8*(8/max(ttc,0.5)) + 2.0*in_restricted_zone
+    #   multimodal_risk = 1.8*fatiga + (max(bpm-60,0)/50) + CO/40 + 0.6*polvo/5 - 0.5*luz/120
+    #   BAJO: score < p45 | MEDIO: p45 <= score < p78 | ALTO: score >= p78  (45 / 33 / 22 %)
+    # CIRCULARIDAD: distance_3d, ttc e in_restricted_zone intervienen tanto en la etiqueta como
+    # en la regla determinista (baseline) y en los modelos. Por eso la comparación ML vs baseline
+    # NO es independiente; ver backend/scripts/audit_label_circularity.py (concordancia, techo de
+    # Bayes, sensibilidad al ruido y etiquetas alternativas). El dataset oficial NO se regenera.
 
     spatial_risk = (
         (12.0 / np.maximum(distance_3d, 0.8)) * 2.0 +
