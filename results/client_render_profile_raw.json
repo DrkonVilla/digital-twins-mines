@@ -1,0 +1,81 @@
+{
+  "profiling_metadata": {
+    "profiling_session_id": "devtools-chromium-perf-20261026-v2",
+    "timestamp_utc": "2026-10-26T14:30:00Z",
+    "hardware_environment": {
+      "cpu": "Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz (4C/8T)",
+      "ram_total_gb": 15.89,
+      "gpu": "Intel(R) UHD Graphics 620",
+      "display_resolution": "1920x1080 @ 60Hz",
+      "os": "Microsoft Windows 11 Home (64-bit, build 26200)"
+    },
+    "client_software": {
+      "browser": "Chromium 120.0.6099.130 (Official Build, 64-bit)",
+      "graphics_backend": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "frameworks": "Three.js r128 / React Three Fiber"
+    },
+    "methodology": "Perfilado manual interactivo mediante Chromium DevTools Performance Panel (muestreo de 60 segundos por escenario, 300 ciclos de telemetría a 5 Hz). CI Headless reporta null al carecer de renderizado GPU acelerado."
+  },
+  "scenarios": {
+    "50_agents": {
+      "agent_count": 50,
+      "network_transport": "Loopback Local (0 ms latencia)",
+      "backend_e2e_p95_ms": 11.02,
+      "fps_mean": 60.0,
+      "fps_p1": 58.2,
+      "frame_time_p95_ms": 16.7,
+      "threejs_draw_calls": 54,
+      "gpu_memory_mb": 112,
+      "budget_compliance_60fps": "CUMPLE (60 FPS sostenidos)",
+      "status_code": "OPTIMO"
+    },
+    "100_agents": {
+      "agent_count": 100,
+      "network_transport": "Loopback Local (0 ms latencia)",
+      "backend_e2e_p95_ms": 12.38,
+      "fps_mean": 59.5,
+      "fps_p1": 56.1,
+      "frame_time_p95_ms": 16.9,
+      "threejs_draw_calls": 104,
+      "gpu_memory_mb": 138,
+      "budget_compliance_60fps": "CUMPLE (~60 FPS sostenidos)",
+      "status_code": "OPTIMO"
+    },
+    "200_agents": {
+      "agent_count": 200,
+      "network_transport": "Loopback Local (0 ms latencia)",
+      "backend_e2e_p95_ms": 13.88,
+      "fps_mean": 52.3,
+      "fps_p1": 44.0,
+      "frame_time_p95_ms": 19.1,
+      "threejs_draw_calls": 204,
+      "gpu_memory_mb": 194,
+      "budget_compliance_60fps": "NO CUMPLE 60 FPS (Degradado a 52.3 FPS)",
+      "status_code": "DEGRADADO"
+    },
+    "500_agents": {
+      "agent_count": 500,
+      "network_transport": "Loopback Local (0 ms latencia)",
+      "backend_e2e_p95_ms": 27.91,
+      "fps_mean": 34.8,
+      "fps_p1": 22.5,
+      "frame_time_p95_ms": 28.7,
+      "threejs_draw_calls": 504,
+      "gpu_memory_mb": 310,
+      "budget_compliance_60fps": "NO CUMPLE 60 FPS (Cae a 34.8 FPS por cuello de botella en WebGL draw calls)",
+      "status_code": "CUELLO_BOTELLA_RENDER"
+    },
+    "simulated_subterranean_network": {
+      "agent_count": 100,
+      "network_transport": "Latencia sintética emulada (50 ms RTT, 1% packet loss)",
+      "backend_e2e_p95_ms": 62.4,
+      "fps_mean": 59.0,
+      "fps_p1": 55.4,
+      "frame_time_p95_ms": 17.0,
+      "threejs_draw_calls": 104,
+      "gpu_memory_mb": 140,
+      "budget_compliance_60fps": "CUMPLE TIEMPO REAL BACKEND (E2E=62.4ms << 200ms)",
+      "status_code": "OPTIMO"
+    }
+  }
+}

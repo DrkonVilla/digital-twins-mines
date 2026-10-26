@@ -53,3 +53,38 @@ def test_fatigue_mandate():
     }
     res = DeterministicSafetyInterlock.evaluate_rules(alert)
     assert any("RELEVO OBLIGATORIO" in m for m in res["deterministic_mandates"])
+
+
+def test_no_false_positive_gas_on_collision_message():
+    """Verifies that words containing 'co' like 'colisión' or 'correcto' do NOT trigger gas evacuation (Differential Audit 773554b)."""
+    alert = {
+        "alert_level": "ALTO",
+        "hazard": "colision_proximidad",
+        "message": "Se detectó colisión inminente entre vehículos y equipo en estado correcto a 2.1 m",
+        "worker_id": 4,
+        "machine_id": 1,
+    }
+    res = DeterministicSafetyInterlock.evaluate_rules(alert)
+    assert res["safety_lockout_active"] is True
+    assert any("PARADA DE EMERGENCIA" in m for m in res["deterministic_mandates"])
+    # MUST NOT trigger gas evacuation protocol
+    assert not any("EVACUACIÓN" in m for m in res["deterministic_mandates"])
+    assert not any("REFUGIO MINERO" in m for m in res["deterministic_mandates"])
+    assert not any("252" in r for r in res["normative_references"])
+
+
+def test_pure_gas_alert_does_not_trigger_collision_stop():
+    """Verifies that pure gas alert triggers evacuation without falsely triggering collision/proximity lockout."""
+    alert = {
+        "alert_level": "CRITICO",
+        "hazard": "gas_co",
+        "message": "Concentración de gas monóxido CO de 76 ppm en galería norte",
+        "worker_id": 5,
+        "machine_id": 2,
+    }
+    res = DeterministicSafetyInterlock.evaluate_rules(alert)
+    assert res["safety_lockout_active"] is True
+    assert any("EVACUACIÓN" in m for m in res["deterministic_mandates"])
+    # MUST NOT trigger proximity exclusion zone stop
+    assert not any("PARADA DE EMERGENCIA INMEDIATA: Desconexión" in m for m in res["deterministic_mandates"])
+    assert not any("272" in r for r in res["normative_references"])

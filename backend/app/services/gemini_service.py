@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 from dotenv import load_dotenv
 from app.core.config import settings
@@ -115,38 +116,68 @@ class GeminiService:
         return f"⚠️ Error en LangChain / Gemini: {msg}"
 
 class DeterministicSafetyInterlock:
-    """Motor de Reglas Deterministas de Seguridad Minera (D.S. 024-2016-EM).
+    """Motor de Directivas Mandatorias de Seguridad Operacional (D.S. 024-2016-EM).
     
-    Garantiza que ninguna recomendación de lenguaje natural pueda anular o relajar
-    una parada de emergencia o protocolo crítico operacional.
+    Actúa como capa de salvaguarda y directivas mandatorias (Safety Protocol Advisory Engine).
+    Garantiza que ninguna recomendación generada por el LLM pueda anular o relajar
+    una orden de parada de emergencia, evacuación a refugio o relevo de turno.
+    Nota: Genera directivas mandatorias de protocolo operacional; no sustituye el cableado
+    físico de relés de parada en el PLC/SCADA de maquinaria.
     """
     @staticmethod
     def evaluate_rules(alert_data: dict) -> dict:
         level = str(alert_data.get("alert_level", "")).upper()
         msg = str(alert_data.get("message", "")).lower()
+        hazard = str(alert_data.get("hazard", "")).lower()
+        gases = [str(g).lower() for g in alert_data.get("gases_present", [])]
 
         actions = []
         regulations = []
         lockout_engaged = False
 
-        # Regla 1: Proximidad Crítica / Zona Restringida / Colisión
-        if any(w in msg for w in ["zona restringida", "distancia", "colisión", "ttc", "proximidad"]) or level in ["ALTO", "CRITICO"]:
+        # Regla 1: Proximidad Crítica / Zona Restringida / Colisión (D.S. 024-2016-EM Art. 272/274)
+        is_proximity_hazard = (
+            hazard in ["colision_proximidad", "zona_restringida", "punto_ciego_retroceso"]
+            or any(w in msg for w in ["zona restringida", "in_restricted_zone", "colisión", "colision", "atropello", "punto ciego"])
+            or bool(re.search(r"\b(ttc|distancia|proximidad)\b", msg))
+        )
+        if is_proximity_hazard and level in ["ALTO", "CRITICO"]:
             lockout_engaged = True
             actions.append("PARADA DE EMERGENCIA INMEDIATA: Desconexión de energía motriz del equipo LHD/Scoop (Art. 272 D.S. 024-2016-EM).")
             actions.append("INMOVILIZACIÓN MECÁNICA: Accionamiento de frenos de parqueo y traba de articulación central.")
             regulations.append("D.S. 024-2016-EM Art. 272 / Art. 274 (Zonas de Exclusión)")
 
-        # Regla 2: Gases Asfixiantes / Tóxicos (Monóxido de Carbono CO)
-        if any(w in msg for w in ["co", "gas", "monóxido", "ppm"]):
+        # Regla 2: Gases Asfixiantes / Tóxicos (Monóxido de Carbono CO) (Art. 103/252)
+        # Uso estricto de \b para evitar falsos positivos con "colisión", "correcto", etc.
+        is_gas_hazard = (
+            hazard in ["gas_co", "gas", "combinado_gas_fatiga"]
+            or "co" in gases
+            or bool(re.search(r"\b(co|gas|gases|monóxido|monoxido|ppm)\b", msg))
+        )
+        if is_gas_hazard and level in ["MEDIO", "ALTO", "CRITICO"]:
             lockout_engaged = True
             actions.append("EVACUACIÓN INMEDIATA A REFUGIO MINERO hacia labor con ventilación forzada en tiro positivo (Art. 252).")
             actions.append("ACTIVACIÓN DE VENTILACIÓN SECUNDARIA AUXILIAR al 100 % de capacidad.")
             regulations.append("D.S. 024-2016-EM Art. 103 / Art. 252 (LMP CO 25 ppm)")
 
-        # Regla 3: Fatiga Crítica del Personal
-        if any(w in msg for w in ["fatiga", "bpm", "somnolencia", "cardíaco"]):
+        # Regla 3: Fatiga Crítica del Personal (Art. 138)
+        is_fatigue_hazard = (
+            hazard in ["fatiga_operador", "combinado_gas_fatiga"]
+            or bool(re.search(r"\b(fatiga|bpm|somnolencia|cardíaco|cardiaco|sueño)\b", msg))
+        )
+        if is_fatigue_hazard and level in ["MEDIO", "ALTO", "CRITICO"]:
             actions.append("RELEVO OBLIGATORIO DE TURNO: Suspensión preventiva de operación manual de maquinaria pesada.")
             regulations.append("D.S. 024-2016-EM Art. 138 (Control de Fatiga y Turnos)")
+
+        # Regla 4: Falla Mecánica Catastrófica (Art. 367/368)
+        is_mech_hazard = (
+            hazard in ["falla_maquina", "falla_mecanica"]
+            or bool(re.search(r"\b(vibración|vibracion|falla mecánica|falla mecanica|temperatura motor)\b", msg))
+        )
+        if is_mech_hazard and level in ["ALTO", "CRITICO"]:
+            lockout_engaged = True
+            actions.append("PARADA DE MOTOR Y BLOQUEO LOTO: Prohibición de arranque hasta inspección mecánica certificada.")
+            regulations.append("D.S. 024-2016-EM Art. 367 / Art. 368 (Mantenimiento Mecánico y LOTO)")
 
         if not actions:
             actions.append("Monitoreo visual continuo y verificación de distanciamiento mínimo de 3 metros en galería.")

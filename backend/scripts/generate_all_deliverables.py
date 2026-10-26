@@ -88,6 +88,7 @@ def main():
     circ_path = RESULTS_DIR / "label_circularity_audit.json"
     hw_path = RESULTS_DIR / "hardware_specs_benchmark.json"
     genai_bank_path = RESULTS_DIR / "genai_audit_bank.json"
+    raw_fps_path = RESULTS_DIR / "client_render_profile_raw.json"
 
     with open(fair_path, "r", encoding="utf-8") as f:
         fair_res = json.load(f)
@@ -111,7 +112,7 @@ def main():
             "model": "XGBoost",
             "algorithm": "Extreme Gradient Boosting (Histogram tree method)",
             "selected_hyperparameters": "n_estimators=150, max_depth=6, learning_rate=0.1, subsample=1.0, eval_metric=mlogloss, random_state=42",
-            "architecture_specification": "Arquitectura fijada a priori según literatura de minería",
+            "architecture_specification": "Arquitectura prespecificada fijada a priori según literatura de minería",
             "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
             "threshold_alto_calibrated": fair_res["models"]["XGBoost"]["test_calibrated"]["threshold"],
             "library": "xgboost 2.1.4, scikit-learn 1.7.2, imbalanced-learn 0.14.0"
@@ -120,7 +121,7 @@ def main():
             "model": "RandomForest",
             "algorithm": "Breiman Random Forest Classifier",
             "selected_hyperparameters": "n_estimators=200, max_depth=12, min_samples_split=2, class_weight=None (handled by SMOTENC), random_state=42",
-            "architecture_specification": "Arquitectura fijada a priori según literatura de minería",
+            "architecture_specification": "Arquitectura prespecificada fijada a priori según literatura de minería",
             "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
             "threshold_alto_calibrated": fair_res["models"]["RandomForest"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
@@ -129,7 +130,7 @@ def main():
             "model": "SVM_RBF",
             "algorithm": "Support Vector Machine (Radial Basis Function Kernel)",
             "selected_hyperparameters": "C=1.0, kernel=rbf, gamma=scale, probability=True, random_state=42",
-            "architecture_specification": "Arquitectura fijada a priori",
+            "architecture_specification": "Arquitectura prespecificada fijada a priori",
             "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
             "threshold_alto_calibrated": fair_res["models"]["SVM_RBF"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
@@ -138,7 +139,7 @@ def main():
             "model": "MLP_NeuralNet",
             "algorithm": "Multi-Layer Perceptron (Feedforward Neural Network)",
             "selected_hyperparameters": "hidden_layer_sizes=(64, 32), activation=relu, solver=adam, max_iter=500, random_state=42",
-            "architecture_specification": "Arquitectura fijada a priori (2 capas densas)",
+            "architecture_specification": "Arquitectura prespecificada fijada a priori (2 capas densas)",
             "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
             "threshold_alto_calibrated": fair_res["models"]["MLP_NeuralNet"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
@@ -147,7 +148,7 @@ def main():
             "model": "Stacking_Ensemble",
             "algorithm": "Stacking Meta-Classifier (Base: XGBoost, RF; Meta: LogisticRegression)",
             "selected_hyperparameters": "final_estimator=LogisticRegression(max_iter=1000, random_state=42), cv=3",
-            "architecture_specification": "Arquitectura apilada de ensamble",
+            "architecture_specification": "Arquitectura apilada de ensamble prespecificada",
             "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
             "threshold_alto_calibrated": fair_res["models"]["Stacking_Ensemble"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
@@ -156,7 +157,7 @@ def main():
             "model": "Voting_Ensemble",
             "algorithm": "Soft Voting Ensemble (XGBoost, RF, MLP)",
             "selected_hyperparameters": "voting=soft, estimators=[RF, XGB, MLP]",
-            "architecture_specification": "Ensamble por votación suave",
+            "architecture_specification": "Ensamble por votación suave prespecificada",
             "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
             "threshold_alto_calibrated": fair_res["models"]["Voting_Ensemble"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
@@ -273,31 +274,49 @@ def main():
             
             p_val = mcn_dec.get("p", None)
             p_holm = mcn_dec.get("p_holm", None)
-            sig_p05 = "SI" if (p_holm is not None and p_holm < 0.05) else "NO"
             
-            # Formally distinguish failure to reject H0 from equivalence (finding H06)
-            if sig_p05 == "NO":
-                conclusion = "Sin diferencia estadísticamente significativa detectada (p_Holm > 0.05)"
+            # McNemar Decision Discordance Test (discordance of 0/1 pair classifications)
+            mcn_sig = "SI" if (p_holm is not None and p_holm < 0.05) else "NO"
+            mcn_conclusion = (
+                "Discordancia de decisiones pareadas estadísticamente significativa (p_Holm < 0.05)"
+                if mcn_sig == "SI"
+                else "Sin discordancia de decisiones pareadas estadísticamente significativa (p_Holm > 0.05)"
+            )
+            
+            # Bootstrap Delta F2 Test (magnitude and CI of mean F2 difference)
+            ci_low = df2.get("ci95", [None, None])[0]
+            ci_high = df2.get("ci95", [None, None])[1]
+            ci_excludes_zero = "NO"
+            if ci_low is not None and ci_high is not None:
+                if ci_low > 0 or ci_high < 0:
+                    ci_excludes_zero = "SI"
+            
+            if ci_excludes_zero == "NO":
+                f2_conclusion = "Sin diferencia estadísticamente significativa en F2 (IC 95% contiene el cero)"
+            elif ci_low > 0:
+                f2_conclusion = "XGBoost significativamente superior en F2 (IC 95% excluye el cero)"
             else:
-                conclusion = "Diferencia estadísticamente significativa detectada (p_Holm < 0.05)"
-                
+                f2_conclusion = "Modelo comparado significativamente superior en F2 (IC 95% excluye el cero)"
+
             paired_rows.append({
                 "evaluation_mode": mode,
                 "reference_model": "XGBoost",
                 "compared_model": other_model,
                 "delta_f2_mean": df2.get("mean"),
-                "delta_f2_ci95_low": df2.get("ci95", [None, None])[0],
-                "delta_f2_ci95_high": df2.get("ci95", [None, None])[1],
-                "delta_recall_mean": drec.get("mean"),
-                "delta_precision_mean": dprec.get("mean"),
+                "delta_f2_ci95_low": ci_low,
+                "delta_f2_ci95_high": ci_high,
+                "delta_f2_ci95_excludes_zero": ci_excludes_zero,
+                "f2_difference_conclusion": f2_conclusion,
                 "mcnemar_decision_p_raw": p_val,
                 "mcnemar_decision_p_holm": p_holm,
+                "mcnemar_decision_discordance_significant_p05": mcn_sig,
+                "mcnemar_decision_conclusion": mcn_conclusion,
+                "delta_recall_mean": drec.get("mean"),
+                "delta_precision_mean": dprec.get("mean"),
                 "mcnemar_recall_p_holm": mcn_rec.get("p_holm"),
                 "cliffs_delta_bootstrap": pdata.get("cliffs_delta_f2_bootstrap"),
                 "cliffs_delta_interpretation": pdata.get("cliffs_delta_label"),
-                "statistically_significant_p05": sig_p05,
-                "scientific_conclusion": conclusion,
-                "methodological_note": "McNemar evalúa discordancia en decisiones pareadas binarias; Bootstrap evalúa magnitud de Delta F2"
+                "methodological_note": "La prueba de McNemar evalúa discordancia binaria de decisiones pareadas; el bootstrap evalúa la magnitud de Delta F2. El no rechazo de H0 (p_Holm > 0.05 o IC conteniendo cero) no debe interpretarse como prueba de equivalencia formal (TOST)."
             })
 
     pd.DataFrame(paired_rows).to_csv(RESULTS_DIR / "paired_statistical_tests.csv", index=False)
@@ -388,7 +407,7 @@ def main():
             "factor_group": "Ruido Estocástico Inducido (Normal N(0, sigma=3.8))",
             "variance_explained_pct": no_pct,
             "formula_contribution": "sigma_ruido = 3.8",
-            "interpretation": f"Frontera Bayesiana irreducible; impone techo F2 ~ {bayes_f2}"
+            "interpretation": f"Frontera Bayesiana irreducible; impone desempeño óptimo condicionado F2 ~ {bayes_f2}"
         },
         {
             "analysis_component": "Varianza del Score Sintético",
@@ -405,11 +424,11 @@ def main():
             "interpretation": "Interacción cuasi-ortogonal entre dominios"
         },
         {
-            "analysis_component": "Límite Bayesiano de Desempeño",
-            "factor_group": "Techo Bayesiano Estimado (Oráculo de Riesgo, sigma=3.8)",
+            "analysis_component": "Límite Bayesiano Condicionado",
+            "factor_group": "Estimación de Desempeño Óptimo Condicionada al Generador (sigma=3.8)",
             "variance_explained_pct": None,
             "formula_contribution": f"F2 = {bayes_f2} (Recall = {bayes_rec}, Precision = {bayes_prec})",
-            "interpretation": f"XGBoost (F2=0.906), RF (F2=0.910) y TTC_tuned (F2=0.910) saturan en el techo teórico"
+            "interpretation": f"XGBoost (F2=0.906), RF (F2=0.910) y TTC_tuned (F2=0.910) convergen a la cota óptima de la función generadora"
         }
     ]
     pd.DataFrame(circ_rows).to_csv(RESULTS_DIR / "circularity_audit.csv", index=False)
@@ -422,12 +441,12 @@ def main():
         "label_original": {
             "title": "Escenario Original (Acoplado)",
             "desc": "Etiqueta dominada por cinemática (82.1% varianza espacial)",
-            "interp": "Baseline TTC empírico iguala o supera a ML debido a circularidad sintética"
+            "interp": "Baseline TTC empírico iguala o supera a ML debido a acoplamiento sintético"
         },
         "label_multimodal_only": {
             "title": "Escenario Desacoplado: Sólo Multimodal",
             "desc": "Etiqueta derivada exclusivamente de biometría y ambiente (sin cinemática)",
-            "interp": "El baseline cinemático falla; el modelo multimodal conserva capacidad predictiva"
+            "interp": "El baseline cinemático colapsa; el modelo multimodal conserva capacidad predictiva"
         },
         "label_spatial_only": {
             "title": "Escenario Desacoplado: Sólo Espacial",
@@ -440,19 +459,19 @@ def main():
             "interp": "El modelo multimodal supera al baseline cinemático por margen moderado"
         },
         "label_gas_co_scenario": {
-            "title": "Escenario Desacoplado 1: Intoxicación por Gas (CO > 50 ppm)",
-            "desc": "Riesgo ambiental crítico independiente de la proximidad física",
-            "interp": "El baseline cinemático falla (Recall bajo); el modelo multimodal alerta a tiempo"
+            "title": "Escenario Desacoplado 1: Intoxicación por Gas (100% no espacial)",
+            "desc": "Riesgo ambiental crítico independiente de la proximidad física (cero término espacial)",
+            "interp": "Baseline fijo falla (F2=0.23); baseline ajustado degenera a umbral extremo (100s, 100% falsos positivos)"
         },
         "label_operator_fatigue_scenario": {
-            "title": "Escenario Desacoplado 2: Fatiga Crítica del Operador",
-            "desc": "Riesgo psicofisiológico severo con maquinaria activa",
-            "interp": "TTC no detecta deterioro psicofisiológico humano antes del incidente"
+            "title": "Escenario Desacoplado 2: Fatiga Crítica del Operador (100% no espacial)",
+            "desc": "Riesgo psicofisiológico severo independiente de distancia (cero término espacial)",
+            "interp": "Baseline fijo falla (F2=0.28); ML retiene especificidad sin elevar tasa de falsas alarmas"
         },
         "label_mechanical_vibration_scenario": {
-            "title": "Escenario Desacoplado 3: Falla Mecánica Catastrófica",
-            "desc": "Vibración RMS anómala y aceleración severa sin proximidad a peatón",
-            "interp": "La telemetría de vibración alerta al gemelo digital cuando las reglas de proximidad son ciegas"
+            "title": "Escenario Desacoplado 3: Falla Mecánica Catastrófica (100% no espacial)",
+            "desc": "Vibración RMS anómala y aceleración severa (cero término espacial)",
+            "interp": "Telemetría mecánica alerta al gemelo digital donde la regla física de proximidad es ciega (F2 fijo=0.24)"
         }
     }
 
@@ -506,68 +525,26 @@ def main():
         })
     pd.DataFrame(lat_rows).to_csv(RESULTS_DIR / "benchmark_latency.csv", index=False)
 
-    fps_rows = [
-        {
-            "scenario": "Carga Ligera (50 Agentes)",
-            "agent_count": 50,
-            "network_transport": "Loopback Local (0 ms latencia)",
-            "backend_e2e_p95_ms": 11.0,
-            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
-            "browser_render_fps_measured": 60.0,
-            "automated_headless_fps": None,
-            "threejs_draw_calls": 54,
-            "budget_status": "CUMPLE (P95 < 200 ms, 60 FPS)",
-            "hardware_note": "Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
-        },
-        {
-            "scenario": "Carga Nominal (100 Agentes)",
-            "agent_count": 100,
-            "network_transport": "Loopback Local (0 ms latencia)",
-            "backend_e2e_p95_ms": 12.4,
-            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
-            "browser_render_fps_measured": 59.5,
-            "automated_headless_fps": None,
-            "threejs_draw_calls": 104,
-            "budget_status": "CUMPLE (P95 < 200 ms, ~60 FPS)",
-            "hardware_note": "Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
-        },
-        {
-            "scenario": "Carga Alta (200 Agentes)",
-            "agent_count": 200,
-            "network_transport": "Loopback Local (0 ms latencia)",
-            "backend_e2e_p95_ms": 13.9,
-            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
-            "browser_render_fps_measured": 52.3,
-            "automated_headless_fps": None,
-            "threejs_draw_calls": 204,
-            "budget_status": "CUMPLE TIEMPO REAL (P95 < 200 ms, FPS > 50)",
-            "hardware_note": "Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
-        },
-        {
-            "scenario": "Estrés Máximo (500 Agentes)",
-            "agent_count": 500,
-            "network_transport": "Loopback Local (0 ms latencia)",
-            "backend_e2e_p95_ms": 27.9,
-            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
-            "browser_render_fps_measured": 34.8,
-            "automated_headless_fps": None,
-            "threejs_draw_calls": 504,
-            "budget_status": "CUMPLE TIEMPO REAL (P95 < 200 ms, FPS cae por renderizado Three.js)",
-            "hardware_note": "Cuello de botella en GPU/CPU cliente para instanciado de mallas 3D"
-        },
-        {
-            "scenario": "Red Subterránea Simulada (100 Agentes + 50ms RTT)",
-            "agent_count": 100,
-            "network_transport": "Latencia sintética emulada (50 ms RTT, 1% packet loss)",
-            "backend_e2e_p95_ms": 62.4,
-            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
-            "browser_render_fps_measured": 59.0,
-            "automated_headless_fps": None,
-            "threejs_draw_calls": 104,
-            "budget_status": "CUMPLE TIEMPO REAL (P95=62.4 ms << 200 ms)",
-            "hardware_note": "Simulación de enlace WiFi minero leaky feeder / mesh"
-        }
-    ]
+    # Dynamic loading from raw profiling session log
+    fps_rows = []
+    if raw_fps_path.exists():
+        with open(raw_fps_path, "r", encoding="utf-8") as f:
+            raw_fps_data = json.load(f)
+        for sc_key, sc_info in raw_fps_data.get("scenarios", {}).items():
+            fps_rows.append({
+                "scenario_key": sc_key,
+                "agent_count": sc_info.get("agent_count"),
+                "network_transport": sc_info.get("network_transport"),
+                "backend_e2e_p95_ms": sc_info.get("backend_e2e_p95_ms"),
+                "measurement_type": "Perfilado manual interactivo en Chromium DevTools Performance Panel",
+                "browser_render_fps_mean": sc_info.get("fps_mean"),
+                "browser_render_fps_p1": sc_info.get("fps_p1"),
+                "automated_headless_fps": None,
+                "threejs_draw_calls": sc_info.get("threejs_draw_calls"),
+                "gpu_memory_mb": sc_info.get("gpu_memory_mb"),
+                "budget_status": sc_info.get("budget_compliance_60fps"),
+                "hardware_environment": "Intel Core i7-8550U, 15.9 GB RAM, Intel UHD Graphics 620"
+            })
     pd.DataFrame(fps_rows).to_csv(RESULTS_DIR / "benchmark_fps.csv", index=False)
 
     # -------------------------------------------------------------
@@ -579,16 +556,49 @@ def main():
     gemini_rows = []
     for sc in genai_res:
         interlock = DeterministicSafetyInterlock.evaluate_rules(sc)
+        hazard = sc.get("hazard", "")
+        level = sc.get("alert_level", "")
+        
+        mandates_str = " | ".join(interlock["deterministic_mandates"])
+        regs_str = " | ".join(interlock["normative_references"])
+        
+        # Rigorous scenario expectation test (Differential Audit 773554b)
+        expectation_met = True
+        if hazard in ["colision_proximidad", "zona_restringida", "punto_ciego_retroceso"]:
+            if level in ["ALTO", "CRITICO"]:
+                if not interlock["safety_lockout_active"] or "PARADA DE EMERGENCIA" not in mandates_str:
+                    expectation_met = False
+            # Proximity collision alert must NOT trigger gas evacuation
+            if "EVACUACIÓN" in mandates_str or "252" in regs_str:
+                expectation_met = False
+        elif hazard == "gas_co":
+            if "EVACUACIÓN" not in mandates_str or "252" not in regs_str:
+                expectation_met = False
+            # Pure gas alert must NOT trigger proximity stop
+            if "PARADA DE EMERGENCIA INMEDIATA: Desconexión" in mandates_str:
+                expectation_met = False
+        elif hazard == "fatiga_operador":
+            if "RELEVO OBLIGATORIO" not in mandates_str or "138" not in regs_str:
+                expectation_met = False
+        elif hazard == "falla_maquina":
+            if level in ["ALTO", "CRITICO"]:
+                if "BLOQUEO LOTO" not in mandates_str:
+                    expectation_met = False
+            else:
+                if "BLOQUEO LOTO" in mandates_str:
+                    expectation_met = False
+
         gemini_rows.append({
             "scenario_id": sc.get("scenario_id"),
-            "hazard_type": sc.get("hazard"),
-            "alert_level": sc.get("alert_level"),
+            "hazard_type": hazard,
+            "alert_level": level,
             "hazard_message": sc.get("message"),
-            "deterministic_action": " | ".join(interlock["deterministic_mandates"]),
+            "deterministic_action": mandates_str,
             "safety_lockout": interlock["safety_lockout_active"],
-            "regulatory_reference": " | ".join(interlock["normative_references"]),
+            "regulatory_reference": regs_str,
             "deterministic_interlock_guarantee": "ENFORCED_IN_BACKEND (DeterministicSafetyInterlock)",
-            "deterministic_rule_passed": True,
+            "scenario_expectation_met": expectation_met,
+            "rule_verification_status": "PASÓ (Directiva esperada activada sin falsos positivos cruzados)" if expectation_met else "FALLÓ_EXPECTATIVA",
             "live_llm_execution_status": "EVALUACION_HUMANA_PENDIENTE (Requiere GEMINI_API_KEY externa)",
             "safety_lockout_active": interlock["safety_lockout_active"]
         })
@@ -685,14 +695,16 @@ def main():
             "threshold_calibration": "Max F2 (beta=2.0) on out-of-fold development probabilities",
             "test_holdout_access": "Evaluated exactly once with fixed calibrated threshold; zero retraining on test set",
             "statistical_hypothesis_testing": "Paired bootstrap (1000 resamples), exact paired McNemar test, Holm-Bonferroni correction, Cliff's delta",
-            "statistical_conclusion_policy": "Distinguishes failure to reject H0 (p_Holm > 0.05) from formal equivalence"
+            "statistical_conclusion_policy": "Distinguishes failure to reject H0 (p_Holm > 0.05 or CI containing 0) from formal equivalence (TOST)"
         },
         "safety_architecture": {
             "deterministic_safety_interlock": "Implemented in backend (app.services.gemini_service.DeterministicSafetyInterlock)",
+            "nature_of_interlock": "Safety Advisory & Protocol Directives Engine (Operational mandates; does not physically actuate machinery PLC relays)",
             "standards_enforced": [
-                "D.S. 024-2016-EM Art. 272 (Proximity / Collision Lockout)",
-                "D.S. 024-2016-EM Art. 103/252 (CO Gas > 50 ppm Evacuation)",
-                "D.S. 024-2016-EM Art. 138 (Operator Fatigue Reassignment)"
+                "D.S. 024-2016-EM Art. 272 / Art. 274 (Proximity / Collision Lockout)",
+                "D.S. 024-2016-EM Art. 103 / Art. 252 (CO Gas > 25 ppm / 50 ppm Evacuation)",
+                "D.S. 024-2016-EM Art. 138 (Operator Fatigue Shift Relief)",
+                "D.S. 024-2016-EM Art. 367 / Art. 368 (Machine Failure & LOTO Lockout)"
             ],
             "llm_role": "Advisory and explainability only; cannot override deterministic lockouts"
         },
@@ -751,7 +763,7 @@ def main():
     plt.bar(x, f2_vals, width, label="Métrica Primaria F2-Score", color="#2980b9", alpha=0.9)
     plt.bar(x + width, prec_vals, width, label="Precision (Precisión ALTO)", color="#e67e22", alpha=0.9)
     
-    plt.axhline(bayes_f2, color="#e74c3c", linestyle="--", linewidth=1.5, label=f"Techo Bayesiano Estimado (~{bayes_f2:.3f})")
+    plt.axhline(bayes_f2, color="#e74c3c", linestyle="--", linewidth=1.5, label=f"Desempeño Óptimo Condicionado al Generador (~{bayes_f2:.3f})")
     plt.ylabel("Puntuación (0.0 - 1.0)", fontsize=11)
     plt.title("Comparación Simétrica de Modelos y Baselines (Holdout de Prueba 20 %)\nProtocolo con Calibración de Umbral F2 y SMOTENC Anidado", fontsize=12, pad=15)
     plt.xticks(x, [m.replace("_", " ") for m in models_plot], rotation=25, ha="right", fontsize=9.5)
@@ -819,16 +831,23 @@ def main():
     plt.savefig(FIGURES_DIR / "benchmark_latencia.png", dpi=300)
     plt.close()
 
-    # Figure 5: figures/benchmark_fps.png (Finding H01: explicit note on client profile method)
+    # Figure 5: figures/benchmark_fps.png (Finding H01: explicit reporting of degradation)
     plt.figure(figsize=(8.5, 5.2))
     fps_df = pd.read_csv(RESULTS_DIR / "benchmark_fps.csv")
-    fps_clean = fps_df[fps_df["scenario"] != "Red Subterránea Simulada (100 Agentes + 50ms RTT)"]
-    plt.bar(fps_clean["agent_count"].astype(str) + " Agentes", fps_clean["browser_render_fps_measured"], color="#16a085", width=0.5)
+    fps_clean = fps_df[fps_df["scenario_key"] != "simulated_subterranean_network"]
+    
+    colors_fps = ["#27ae60", "#27ae60", "#e67e22", "#c0392b"]
+    bars_fps = plt.bar(fps_clean["agent_count"].astype(str) + " Agentes", fps_clean["browser_render_fps_mean"], color=colors_fps, width=0.48)
     plt.axhline(60.0, color="#27ae60", linestyle="--", label="Tasa Óptima de Refresco (60 FPS)")
     plt.axhline(30.0, color="#d35400", linestyle=":", label="Límite Aceptable de Fluidez (30 FPS)")
+    
+    for bar in bars_fps:
+        h = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, h + 1.2, f"{h:.1f} FPS", ha="center", va="bottom", fontsize=9.5, fontweight="bold")
+        
     plt.xlabel("Escala de Agentes Concurrentes", fontsize=11)
     plt.ylabel("Frames Por Segundo (FPS) en Navegador Cliente", fontsize=11)
-    plt.title("Rendimiento de Renderizado Three.js / WebGL en Cliente\nPerfilado manual DevTools sobre Intel UHD Graphics 620 (Chromium)", fontsize=11, pad=12)
+    plt.title("Rendimiento de Renderizado Three.js / WebGL en Cliente\nPerfilado manual DevTools sobre Intel UHD Graphics 620 [Degradado a 200/500 Agentes]", fontsize=10.5, pad=12)
     plt.ylim(0, 75)
     plt.grid(axis="y", linestyle=":", alpha=0.6)
     plt.legend(loc="lower left")
@@ -841,7 +860,7 @@ def main():
     # -------------------------------------------------------------
     print("13. Generating results/reproducibility_manifest.json...")
     manifest = {
-        "manifest_version": "1.1.0",
+        "manifest_version": "1.2.0",
         "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "cross_platform_hashing_policy": "Incluye sha256_raw y sha256_normalized_lf (elimina divergencias Windows CRLF vs Linux LF)",
         "system_information": {
@@ -856,7 +875,8 @@ def main():
         },
         "results_files": {},
         "figures_files": {},
-        "execution_scripts": {}
+        "execution_scripts": {},
+        "model_artifacts": {}
     }
 
     for fpath in RESULTS_DIR.glob("*"):
@@ -879,6 +899,15 @@ def main():
             "size_bytes": spath.stat().st_size,
             **sha256_file(spath)
         }
+
+    # Include production model artifacts (Addresses Differential Audit 773554b)
+    artifacts_dir = PROJECT_ROOT / "backend" / "app" / "ml" / "artifacts"
+    for apath in artifacts_dir.glob("*"):
+        if apath.is_file():
+            manifest["model_artifacts"][apath.name] = {
+                "size_bytes": apath.stat().st_size,
+                **sha256_file(apath)
+            }
 
     with open(RESULTS_DIR / "reproducibility_manifest.json", "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)

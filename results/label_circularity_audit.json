@@ -169,77 +169,77 @@
     "label_gas_co_scenario": {
       "prevalence_alto": 0.22,
       "xgboost_calibrated": {
-        "precision_alto": 0.22337662337662337,
-        "recall_alto": 0.9772727272727273,
-        "f1_alto": 0.36363636363636365,
-        "f2_alto": 0.5834464043419266
+        "precision_alto": 0.2245005257623554,
+        "recall_alto": 0.9704545454545455,
+        "f1_alto": 0.3646456020495303,
+        "f2_alto": 0.583014746040415
       },
       "baseline_fixed": {
-        "precision_alto": 0.27336860670194,
-        "recall_alto": 0.3522727272727273,
-        "f1_alto": 0.307845084409136,
-        "f2_alto": 0.3330468414267297
+        "precision_alto": 0.18166383701188454,
+        "recall_alto": 0.2431818181818182,
+        "f1_alto": 0.20796890184645286,
+        "f2_alto": 0.22775649212430824
       },
       "baseline_tuned": {
-        "precision_alto": 0.2197197197197197,
-        "recall_alto": 0.9977272727272727,
-        "f1_alto": 0.3601312551271534,
-        "f2_alto": 0.5840872804683344,
-        "ttc_threshold_s": 94.0
+        "precision_alto": 0.22055137844611528,
+        "recall_alto": 1.0,
+        "f1_alto": 0.36139630390143734,
+        "f2_alto": 0.5858854860186418,
+        "ttc_threshold_s": 100.0
       },
-      "xgb_minus_baseline_tuned_f2_pp": -0.064087612640773
+      "xgb_minus_baseline_tuned_f2_pp": -0.2870739978226733
     },
     "label_operator_fatigue_scenario": {
       "prevalence_alto": 0.22,
       "xgboost_calibrated": {
-        "precision_alto": 0.22025316455696203,
-        "recall_alto": 0.9886363636363636,
-        "f1_alto": 0.36024844720496896,
-        "f2_alto": 0.5823293172690763
+        "precision_alto": 0.22154779969650987,
+        "recall_alto": 0.9954545454545455,
+        "f1_alto": 0.3624327678940836,
+        "f2_alto": 0.5860315761305861
       },
       "baseline_fixed": {
-        "precision_alto": 0.2719449225473322,
-        "recall_alto": 0.35909090909090907,
-        "f1_alto": 0.3095004897159648,
-        "f2_alto": 0.3374626228107646
+        "precision_alto": 0.22847100175746923,
+        "recall_alto": 0.29545454545454547,
+        "f1_alto": 0.2576808721506442,
+        "f2_alto": 0.279089738085015
       },
       "baseline_tuned": {
-        "precision_alto": 0.22,
-        "recall_alto": 1.0,
-        "f1_alto": 0.36065573770491804,
-        "f2_alto": 0.5851063829787235,
-        "ttc_threshold_s": 113.0
+        "precision_alto": 0.22038152610441766,
+        "recall_alto": 0.9977272727272727,
+        "f1_alto": 0.36101973684210525,
+        "f2_alto": 0.5850213219616205,
+        "ttc_threshold_s": 92.0
       },
-      "xgb_minus_baseline_tuned_f2_pp": -0.27770657096471973
+      "xgb_minus_baseline_tuned_f2_pp": 0.10102541689656075
     },
     "label_mechanical_vibration_scenario": {
       "prevalence_alto": 0.22,
       "xgboost_calibrated": {
-        "precision_alto": 0.2318760376314333,
-        "recall_alto": 0.9522727272727273,
-        "f1_alto": 0.3729417000445037,
-        "f2_alto": 0.5873282870759743
+        "precision_alto": 0.24233490566037735,
+        "recall_alto": 0.9340909090909091,
+        "f1_alto": 0.3848314606741573,
+        "f2_alto": 0.5946180555555556
       },
       "baseline_fixed": {
-        "precision_alto": 0.29038112522686027,
-        "recall_alto": 0.36363636363636365,
-        "f1_alto": 0.3229061553985873,
-        "f2_alto": 0.34617048896581565
+        "precision_alto": 0.20512820512820512,
+        "recall_alto": 0.2545454545454545,
+        "f1_alto": 0.22718052738336714,
+        "f2_alto": 0.24284475281873366
       },
       "baseline_tuned": {
-        "precision_alto": 0.22088353413654618,
+        "precision_alto": 0.22066198595787362,
         "recall_alto": 1.0,
-        "f1_alto": 0.36184210526315785,
-        "f2_alto": 0.5863539445628998,
+        "f1_alto": 0.361544782251438,
+        "f2_alto": 0.5860415556739478,
         "ttc_threshold_s": 93.0
       },
-      "xgb_minus_baseline_tuned_f2_pp": 0.09743425130744887
+      "xgb_minus_baseline_tuned_f2_pp": 0.8576499881607802
     }
   },
   "interpretation": [
     "risk_level es un target SINTÉTICO por diseño; cualquier modelo que alcance el techo de Bayes sólo reproduce la función generadora, no valida seguridad real.",
     "El componente espacial explica 82% de la varianza del score y comparte distance_3d/ttc/zona restringida con el baseline: la comparación ML vs baseline NO es independiente.",
     "Con etiqueta sólo-multimodal el baseline pierde capacidad y el ML se separa; con etiqueta sólo-espacial ocurre lo contrario. La conclusión 'ML supera reglas' depende de la definición de la etiqueta.",
-    "Δ F2 (XGBoost − baseline ajustado, pp) por etiqueta: label_original: -0.5, label_multimodal_only: +5.6, label_spatial_only: -2.7, label_balanced_50_50: +4.8, label_gas_co_scenario: -0.1, label_operator_fatigue_scenario: -0.3, label_mechanical_vibration_scenario: +0.1"
+    "Δ F2 (XGBoost − baseline ajustado, pp) por etiqueta: label_original: -0.5, label_multimodal_only: +5.6, label_spatial_only: -2.7, label_balanced_50_50: +4.8, label_gas_co_scenario: -0.3, label_operator_fatigue_scenario: +0.1, label_mechanical_vibration_scenario: +0.9"
   ]
 }

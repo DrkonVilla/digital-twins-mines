@@ -55,36 +55,11 @@ def main():
     print(f"Features in pipeline ({len(fe.FEATURES)}): {fe.FEATURES}")
     print(f"Calibrated threshold for ALTO: {calibrated_threshold}")
 
-    # 2. Build and fit pipeline on 80% development set
+    # 2. Build and fit pipeline on 80% development set using the exact research pipeline
+    # Guarantees 100% identical preprocessing and model weights as evaluated in fair_eval.py
     num_cols = [f for f in fe.FEATURES if f not in fe.CATEGORICAL]
-    cat_cols = fe.CATEGORICAL
-
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ("num", StandardScaler(), num_cols),
-            ("cat", OneHotEncoder(drop="first", sparse_output=False, handle_unknown="ignore"), cat_cols),
-        ]
-    )
-
-    X_train_proc = preprocessor.fit_transform(X_train)
-    smote = SMOTE(random_state=42)
-    X_train_res, y_train_res = smote.fit_resample(X_train_proc, y_train)
-
-    xgb = XGBClassifier(
-        n_estimators=150,
-        max_depth=6,
-        learning_rate=0.1,
-        eval_metric="mlogloss",
-        random_state=42,
-        n_jobs=-1
-    )
-    xgb.fit(X_train_res, y_train_res)
-
-    # 3. Encapsulate into an end-to-end inference pipeline: preprocessor + classifier
-    prod_pipeline = Pipeline([
-        ("preprocessor", preprocessor),
-        ("classifier", xgb)
-    ])
+    prod_pipeline = fe.make_pipeline("XGBoost")
+    prod_pipeline.fit(X_train, y_train)
 
     # 4. Verify test holdout metrics with calibrated threshold
     probas = prod_pipeline.predict_proba(X_test)

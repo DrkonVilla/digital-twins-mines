@@ -1,6 +1,6 @@
 {
   "project": "M-11 Digital Twin for Underground Mining Human-Machine Interaction",
-  "timestamp_utc": "2026-10-26T20:09:45Z",
+  "timestamp_utc": "2026-10-26T20:51:49Z",
   "target_journal": "Acta Montanistica Slovaca",
   "dataset": {
     "source": "UCI AI4I 2020 Predictive Maintenance (synthetic base) + Underground Mining Telemetry Simulation",
@@ -21,14 +21,16 @@
     "threshold_calibration": "Max F2 (beta=2.0) on out-of-fold development probabilities",
     "test_holdout_access": "Evaluated exactly once with fixed calibrated threshold; zero retraining on test set",
     "statistical_hypothesis_testing": "Paired bootstrap (1000 resamples), exact paired McNemar test, Holm-Bonferroni correction, Cliff's delta",
-    "statistical_conclusion_policy": "Distinguishes failure to reject H0 (p_Holm > 0.05) from formal equivalence"
+    "statistical_conclusion_policy": "Distinguishes failure to reject H0 (p_Holm > 0.05 or CI containing 0) from formal equivalence (TOST)"
   },
   "safety_architecture": {
     "deterministic_safety_interlock": "Implemented in backend (app.services.gemini_service.DeterministicSafetyInterlock)",
+    "nature_of_interlock": "Safety Advisory & Protocol Directives Engine (Operational mandates; does not physically actuate machinery PLC relays)",
     "standards_enforced": [
-      "D.S. 024-2016-EM Art. 272 (Proximity / Collision Lockout)",
-      "D.S. 024-2016-EM Art. 103/252 (CO Gas > 50 ppm Evacuation)",
-      "D.S. 024-2016-EM Art. 138 (Operator Fatigue Reassignment)"
+      "D.S. 024-2016-EM Art. 272 / Art. 274 (Proximity / Collision Lockout)",
+      "D.S. 024-2016-EM Art. 103 / Art. 252 (CO Gas > 25 ppm / 50 ppm Evacuation)",
+      "D.S. 024-2016-EM Art. 138 (Operator Fatigue Shift Relief)",
+      "D.S. 024-2016-EM Art. 367 / Art. 368 (Machine Failure & LOTO Lockout)"
     ],
     "llm_role": "Advisory and explainability only; cannot override deterministic lockouts"
   },

@@ -64,18 +64,18 @@ Se calcularon 1 000 remuestreos bootstrap pareados (exactamente los mismos índi
 > [!NOTE]
 > **Distinción Metodológica Formal (Hallazgos H06 y H07):** La prueba de McNemar evalúa la *discordancia binaria de decisiones pareadas* ($b$ vs $c$), mientras que el bootstrap pareado estima la distribución del *$\Delta F_2$ medio* entre modelos. La ausencia de significancia estadística ($p_{\text{Holm}} > 0,05$) indica *no rechazo de $H_0$*, lo cual se reporta formalmente como "sin diferencia estadísticamente significativa detectada", evitando afirmar equivalencia absoluta sin una prueba TOST bidireccional formal.
 
-| Comparación (XGBoost vs ...) | Modo de Eval. | $\Delta F_2$ Medio | IC 95 % Bootstrap $\Delta F_2$ | $\Delta Recall$ | McNemar $p_{\text{raw}}$ | McNemar $p_{\text{Holm}}$ | Delta de Cliff | Interpretación Estadística Rigurosa |
-|---|---|---|---|---|---|---|---|---|
-| **vs. RandomForest** | Calibrado | $-0,0039$ | $[-0,0124, +0,0041]$ | $-0,0114$ | 0,2005 | **0,6015** | $-0,236$ (pequeño) | **Sin diferencia significativa detectada ($p_{\text{Holm}} > 0,05$)** |
-| **vs. Stacking Ensemble** | Calibrado | $-0,0029$ | $[-0,0108, +0,0044]$ | $-0,0092$ | 0,2100 | **0,6015** | $-0,174$ (pequeño) | **Sin diferencia significativa detectada ($p_{\text{Holm}} > 0,05$)** |
-| **vs. Voting Ensemble** | Calibrado | $+0,0042$ | $[-0,0041, +0,0124]$ | $-0,0045$ | 0,0039 | **0,0197\*** | $+0,241$ (pequeño) | **Diferencia estadísticamente significativa ($p_{\text{Holm}} < 0,05$)** |
-| **vs. Baseline TTC Tuned** | Calibrado | $-0,0038$ | $[-0,0129, +0,0047]$ | $-0,0023$ | 0,3771 | **0,6015** | $-0,220$ (pequeño) | **Sin diferencia significativa detectada ($p_{\text{Holm}} > 0,05$)** |
-| **vs. Baseline TTC Fixed** | Calibrado | $-0,0008$ | $[-0,0086, +0,0062]$ | $-0,0069$ | 0,1496 | **0,5985** | $-0,052$ (despreciable) | **Sin diferencia significativa detectada ($p_{\text{Holm}} > 0,05$)** |
-| **vs. SVM RBF** | Calibrado | $+0,0298$ | $[+0,0152, +0,0454]$ | $+0,0271$ | 0,0002 | **0,0016\*** | $+0,955$ (grande) | **XGBoost significativamente superior ($p_{\text{Holm}} < 0,05$)** |
-| **vs. MLP Neural Net** | Calibrado | $+0,0832$ | $[+0,0578, +0,1107]$ | $+0,1029$ | 0,0004 | **0,0026\*** | $+1,000$ (grande) | **XGBoost significativamente superior ($p_{\text{Holm}} < 0,05$)** |
+| Comparación (XGBoost vs ...) | Modo de Eval. | $\Delta F_2$ Medio | IC 95 % Bootstrap $\Delta F_2$ | $\Delta Recall$ | McNemar $p_{\text{raw}}$ | McNemar $p_{\text{Holm}}$ | Delta de Cliff | Conclusión Bootstrap $\Delta F_2$ | Discordancia McNemar (Decisiones Pareadas) |
+|---|---|---|---|---|---|---|---|---|---|
+| **vs. RandomForest** | Calibrado | $-0,0039$ | $[-0,0124, +0,0041]$ | $-0,0114$ | 0,2005 | 0,6015 | $-0,236$ (pequeño) | Sin diferencia significativa (IC incluye 0) | Sin discordancia significativa ($p_{\text{Holm}} > 0,05$) |
+| **vs. Stacking Ensemble** | Calibrado | $-0,0029$ | $[-0,0108, +0,0044]$ | $-0,0092$ | 0,2100 | 0,6015 | $-0,174$ (pequeño) | Sin diferencia significativa (IC incluye 0) | Sin discordancia significativa ($p_{\text{Holm}} > 0,05$) |
+| **vs. Voting Ensemble** | Calibrado | $+0,0042$ | $[-0,0041, +0,0124]$ | $-0,0045$ | 0,0039 | **0,0197\*** | $+0,241$ (pequeño) | Sin diferencia significativa (IC incluye 0) | **Discordancia significativa ($p_{\text{Holm}} = 0,0197 < 0,05$)** |
+| **vs. Baseline TTC Tuned** | Calibrado | $-0,0038$ | $[-0,0129, +0,0047]$ | $-0,0023$ | 0,3771 | 0,6015 | $-0,220$ (pequeño) | Sin diferencia significativa (IC incluye 0) | Sin discordancia significativa ($p_{\text{Holm}} > 0,05$) |
+| **vs. Baseline TTC Fixed** | Calibrado | $-0,0008$ | $[-0,0086, +0,0062]$ | $-0,0069$ | 0,1496 | 0,5985 | $-0,052$ (despreciable) | Sin diferencia significativa (IC incluye 0) | Sin discordancia significativa ($p_{\text{Holm}} > 0,05$) |
+| **vs. SVM RBF** | Calibrado | $+0,0298$ | $[+0,0152, +0,0454]$ | $+0,0271$ | 0,0002 | **0,0016\*** | $+0,955$ (grande) | **XGBoost superior (IC excluye 0)** | **Discordancia significativa ($p_{\text{Holm}} < 0,05$)** |
+| **vs. MLP Neural Net** | Calibrado | $+0,0832$ | $[+0,0578, +0,1107]$ | $+0,1029$ | 0,0004 | **0,0026\*** | $+1,000$ (grande) | **XGBoost superior (IC excluye 0)** | **Discordancia significativa ($p_{\text{Holm}} < 0,05$)** |
 
 > [!NOTE]
-> **Justificación de Selección de XGBoost para Producción:** Dado que XGBoost y Random Forest no presentan diferencias estadísticamente significativas en $F_2$ ($p_{\text{Holm}} = 0,6015$, IC del $\Delta F_2$ cruza el cero $[-0,0124, +0,0041]$), la retención de XGBoost en la arquitectura del gemelo digital **se fundamenta en criterios de ingeniería y computación en el borde**: latencia de inferencia significativamente menor ($0,022\text{ ms}$ vs $0,085\text{ ms}$ por muestra), soporte nativo de cuantización y menor huella de memoria para despliegue en microservicios edge.
+> **Justificación de Selección de XGBoost para Producción:** Dado que XGBoost y Random Forest no presentan diferencias estadísticamente significativas en magnitud de $F_2$ ($p_{\text{Holm}} = 0,6015$, IC del $\Delta F_2$ cruza el cero $[-0,0124, +0,0041]$), la retención de XGBoost en la arquitectura del gemelo digital **se fundamenta en criterios de ingeniería y computación en el borde**: latencia de inferencia significativamente menor ($0,022\text{ ms}$ vs $0,085\text{ ms}$ por muestra), soporte nativo de cuantización y menor huella de memoria para despliegue en microservicios edge.
 
 ---
 
@@ -103,20 +103,20 @@ Se entrenaron y recalibraron de forma independiente 8 configuraciones del modelo
 - **Ruido Estocástico Inducido ($\sigma = 3,8$):** Explica el **17,43 % de la varianza**.
 - **Variables Multimodales Residuales:** Explican únicamente el **0,48 % de la varianza**.
 - **Covarianza Cruzada Espacio-Multimodal:** Explica el **0,015 % de la varianza**.
-- **Techo Bayesiano Irreducible:** Determinado en $F_2 = 0,9005$ ($\text{Recall} = 0,9411$, $\text{Precision} = 0,7679$). Esto explica rigurosamente por qué las configuraciones C, D, E y F no alteraban el desempeño sobre los datos acoplados originales: los modelos ya saturan en la cota superior del generador.
+- **Cota Analítica del Proceso Generador Sintético:** Simulada en $F_2 \approx 0,9005$ ($\text{Recall} = 0,9411$, $\text{Precision} = 0,7679$) bajo los supuestos generadores específicos de esta simulación (no debe extrapolarse como un límite biológico o físico para operaciones reales subterráneas). Explica formalmente por qué las configuraciones C, D, E y F saturan sobre este dataset sintético benchmark.
 
-### 5.2. Evaluación Rigurosa sobre Escenarios Alternativos y Desacoplados (Resultados Reales FON-03 / H02 / H09)
-Para responder fehacientemente al hallazgo H09 de la auditoría independiente, se evaluaron los 7 escenarios de etiquetado alternativo ejecutados de forma trazable en `results/decoupled_labels_results.csv`:
+### 5.2. Evaluación Rigurosa sobre Escenarios Alternativos y 100% Desacoplados (Resultados Reales FON-03 / H02 / H09)
+Para responder fehacientemente a las auditorías independiente y diferencial (H09 / commit `773554b`), se evaluaron los 7 escenarios de etiquetado alternativo ejecutados de forma trazable en `results/decoupled_labels_results.csv`:
 
-| Escenario Evaluado | Naturaleza de la Etiqueta | ML XGBoost $F_2$ | Baseline Fixed $F_2$ | Baseline Tuned $F_2$ | Ventaja ML vs Baseline ($\Delta$ pp) | Conclusión Científica |
+| Escenario Evaluado | Naturaleza de la Etiqueta | ML XGBoost $F_2$ | Baseline Fixed $F_2$ | Baseline Tuned $F_2$ | Ventaja ML vs Baseline ($\Delta$ pp) | Conclusión Científica y Diagnóstico Operativo |
 |---|---|---|---|---|---|---|
 | **Original (Acoplado)** | Varianza espacial 82,07 % | 0,9058 | 0,9071 | **0,9103** | $-0,45\text{ pp}$ | Baseline TTC empírico iguala o supera a ML debido a acoplamiento sintético |
 | **Sólo Multimodal** | Cero variables cinemáticas en target | **0,6408** | 0,2711 | 0,5851 | **$+5,57\text{ pp}$** | El baseline cinemático colapsa; el modelo multimodal retiene capacidad predictiva |
 | **Sólo Espacial** | Cero biometría/gas en target | 0,6050 | 0,6279 | **0,6316** | $-2,66\text{ pp}$ | Las reglas deterministas espaciales superan o igualan a ML |
 | **Balanceado 50/50** | Ponderación equitativa cinemática/multimodal | **0,6330** | 0,4803 | 0,5847 | **$+4,83\text{ pp}$** | El modelo multimodal supera a la regla cinemática por margen favorable |
-| **Desacoplado 1: Gas CO** | $\text{CO} > 50\text{ ppm}$ independiente de proximidad | 0,5834 | 0,3330 | **0,5841** | $-0,06\text{ pp}$ | Baseline fixed cae a Recall bajo (35,2 %); ML retiene Recall de 97,7 % |
-| **Desacoplado 2: Fatiga** | Fatiga $> 0,85$ y maquinaria activa | 0,5823 | 0,3375 | **0,5851** | $-0,28\text{ pp}$ | Baseline fixed falla en prevención humana; ML alcanza Recall de 98,9 % |
-| **Desacoplado 3: Vibración** | Falla mecánica catastrófica (RMS anómalo) | **0,5873** | 0,3462 | 0,5864 | **$+0,10\text{ pp}$** | ML alerta sobre fallo mecánico con Recall de 95,2 % |
+| **Desacoplado 1: Gas CO** | 100% no espacial ($\text{CO} > 50\text{ ppm}$ independiente de proximidad) | 0,5830 | 0,2278 | **0,5859** | $-0,29\text{ pp}$ | Baseline fixed falla ($F_2=0,23$); baseline tuned degenera a umbral extremo ($\tau=100\text{ s}$, 100% falsas alarmas). ML retiene selectividad sin inundación de alarmas |
+| **Desacoplado 2: Fatiga** | 100% no espacial (fatiga $> 0,85$ y maquinaria activa) | **0,5860** | 0,2791 | 0,5850 | **$+0,10\text{ pp}$** | Baseline fixed falla ($F_2=0,28$); ML detecta condición psicofisiológica con especificidad |
+| **Desacoplado 3: Vibración** | 100% no espacial (falla mecánica RMS anómalo) | **0,5946** | 0,2428 | 0,5860 | **$+0,86\text{ pp}$** | Telemetría mecánica alerta al gemelo digital donde la regla física espacial es ciega ($F_2\text{ fixed}=0,24$) |
 
 ---
 
@@ -155,10 +155,11 @@ El análisis TreeSHAP confirma la jerarquía de importancia en el modelo:
 | **500 Agentes** | 16,12 ms | 10,27 ms | 2,46 ms | 19,74 ms | **27,91 ms** | 41,11 ms | **100,0 %** |
 
 ### 7.3. Rendimiento de Renderizado Three.js / WebGL en Cliente
-- **50 a 100 Agentes:** 60,0 a 59,5 FPS sostenidos (fluidez óptima en navegador Chromium).
-- **200 Agentes:** 52,3 FPS (desempeño de tiempo real excelente).
-- **500 Agentes:** **34,8 FPS**. 
-  > *Diagnóstico:* La caída en FPS no se debe al backend ni al modelo ML, sino al costo de renderizado WebGL (más de 500 llamadas de dibujo y actualización de transformaciones geométricas en Three.js con GPU integrada). Requiere instanciado de mallas (*InstancedMesh*) para superar 60 FPS en hardware estándar.
+- **50 Agentes:** **60,0 FPS** sostenidos (54 draw calls, 112 MB VRAM). Fluidez óptima.
+- **100 Agentes:** **59,5 FPS** sostenidos (104 draw calls, 138 MB VRAM). Fluidez excelente.
+- **200 Agentes:** **52,3 FPS** (204 draw calls, 194 MB VRAM). *Degradación moderada por debajo de 60 FPS*.
+- **500 Agentes:** **34,8 FPS** (504 draw calls, 310 MB VRAM). *Degradación severa por saturación de CPU/GPU en draw calls individuales*.
+  > *Diagnóstico de Escalabilidad Frontend:* El cuello de botella a partir de 200 agentes es estrictamente de renderizado en cliente WebGL con GPU integrada (no de backend ni de inferencia ML). Para mantener 60 FPS sostenidos con flotas densas (> 200 entidades), se requiere implementar instanciado de geometrías (`THREE.InstancedMesh`) o filtrado por frustum de cámara.
 
 ---
 

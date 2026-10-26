@@ -1,7 +1,7 @@
 {
   "model_name": "XGBoost (Calibrado)",
   "algorithm": "XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1)",
-  "timestamp_utc": "2026-10-26T19:46:19.580462+00:00",
+  "timestamp_utc": "2026-10-26T20:36:20.265907+00:00",
   "n_features": 16,
   "feature_names": [
     "distance_3d",
@@ -44,10 +44,10 @@
   "calibrated_threshold_alto": 0.18,
   "decision_rule": "Predice ALTO (2) si P(ALTO) >= 0.18, sino argmax(BAJO, MEDIO)",
   "test_holdout_metrics": {
-    "f2_alto": 0.9057180270624182,
-    "recall_alto": 0.9431818181818182,
-    "precision_alto": 0.7815442561205274,
-    "f1_alto": 0.8547888774459321
+    "f2_alto": 0.9065217391304349,
+    "recall_alto": 0.9477272727272728,
+    "precision_alto": 0.7722222222222223,
+    "f1_alto": 0.8510204081632654
   },
   "scientific_reference": "Protocolo simetrico con calibracion en OOF (M-11 Acta Montanistica Slovaca 2026)"
 }

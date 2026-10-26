@@ -170,10 +170,10 @@ def run_audit(run_alt_labels=True):
         noise = rng.normal(0, NOISE_SD, len(df))
         # La escala de cada componente se normaliza para que el ruido pese lo mismo en ambas
         z = lambda v: (v - v.mean()) / v.std()
-        # Escenarios de dominio específicos desacoplados de la proximidad física
-        gas_score = (df["gas_co_ppm"] / 35.0) * 3.0 + (df["dust_density_mg_m3"] / 4.0) * 1.5 + z(spatial) * 0.5 + noise
-        fatigue_score = df["fatigue_index"] * 3.5 + (np.maximum(df["worker_bpm"] - 80, 0) / 40.0) * 2.0 + z(spatial) * 0.5 + noise
-        vibration_score = (df["vibration_rms"] / 4.5) * 3.0 + (np.abs(df["acceleration_z"] - 9.81) / 3.0) * 2.0 + z(spatial) * 0.5 + noise
+        # Escenarios de dominio específicos 100% desacoplados de la proximidad física (cero componente espacial)
+        gas_score = (df["gas_co_ppm"] / 35.0) * 3.5 + (df["dust_density_mg_m3"] / 4.0) * 1.5 + noise
+        fatigue_score = df["fatigue_index"] * 4.0 + (np.maximum(df["worker_bpm"] - 80, 0) / 35.0) * 2.0 + noise
+        vibration_score = (df["vibration_rms"] / 4.5) * 3.5 + (np.abs(df["acceleration_z"] - 9.81) / 3.0) * 2.0 + noise
 
         alts = {
             "label_original": y,

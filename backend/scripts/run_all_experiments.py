@@ -25,7 +25,8 @@ EXPERIMENT_SCRIPTS = [
     ("4. TreeSHAP & Feature Collinearity Analysis", "run_shap_and_collinearity.py"),
     ("5. Hardware & Latency Benchmark Profiler", "benchmark_hardware_profiler.py"),
     ("6. GenAI Gemini Emergency Protocol Audit", "audit_genai_protocol.py"),
-    ("7. Master Deliverables & Figures Compiler", "generate_all_deliverables.py"),
+    ("7. Export Production Model Artifact (H05)", "export_production_model.py"),
+    ("8. Master Deliverables & Figures Compiler", "generate_all_deliverables.py"),
 ]
 
 
