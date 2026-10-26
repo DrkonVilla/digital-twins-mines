@@ -1,5 +1,6 @@
 analysis_component,factor_group,variance_explained_pct,formula_contribution,interpretation
-Varianza del Score Sintético,"Cinemático / Espacial (distance_3d, ttc, in_restricted_zone, rel_speed)",82.1,Peso dominante en risk_score heurístico original,Generación sintética con fuerte acoplamiento a física de proximidad
-Varianza del Score Sintético,Ruido Estocástico Inducido (Normal truncada),17.4,sigma_ruido = 0.15,Frontera Bayesiana irreducible (techo Bayesiano F2 ~ 0.908)
-Varianza del Score Sintético,"Variables Multimodales Residuales (gas, fatiga, vibración)",0.5,Contribución menor en fórmula original de simulación,Explica por qué la ablación de biometría o ambiente produce deltas < 0.5 pp
-Límite Bayesiano de Desempeño,Techo Bayesiano Estimado (Oráculo de Riesgo),,"F2 = 0.908 (Recall = 0.952, Precision = 0.768)",Tanto XGBoost (F2=0.906) como RandomForest (F2=0.910) y TTC_calibrado (F2=0.910) saturan en el techo
+Varianza del Score Sintético,"Cinemático / Espacial (distance_3d, ttc, in_restricted_zone)",82.07,Peso dominante en risk_score heurístico (FON-03),Generación sintética con fuerte acoplamiento a física de proximidad (82.07%)
+Varianza del Score Sintético,"Ruido Estocástico Inducido (Normal N(0, sigma=3.8))",17.43,sigma_ruido = 3.8,Frontera Bayesiana irreducible; impone techo F2 ~ 0.9005
+Varianza del Score Sintético,"Variables Multimodales Residuales (gas, fatiga, vibración)",0.48,Contribución menor en fórmula original de simulación,Explica por qué la ablación multimodal produce deltas < 0.5 pp (0.48% de varianza)
+Varianza del Score Sintético,Covarianza Espacial-Multimodal Cruzada,0.015,Interacción residual entre factores sintéticos,Interacción cuasi-ortogonal entre dominios
+Límite Bayesiano de Desempeño,"Techo Bayesiano Estimado (Oráculo de Riesgo, sigma=3.8)",,"F2 = 0.9005 (Recall = 0.9411, Precision = 0.7679)","XGBoost (F2=0.906), RF (F2=0.910) y TTC_tuned (F2=0.910) saturan en el techo teórico"

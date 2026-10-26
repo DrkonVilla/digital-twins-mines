@@ -114,25 +114,91 @@ class GeminiService:
             return "⚠️ **Límite de solicitudes alcanzado (429)**: Se ha superado temporalmente la cuota de la API de Gemini. Espera unos momentos antes de volver a consultar."
         return f"⚠️ Error en LangChain / Gemini: {msg}"
 
+class DeterministicSafetyInterlock:
+    """Motor de Reglas Deterministas de Seguridad Minera (D.S. 024-2016-EM).
+    
+    Garantiza que ninguna recomendación de lenguaje natural pueda anular o relajar
+    una parada de emergencia o protocolo crítico operacional.
+    """
+    @staticmethod
+    def evaluate_rules(alert_data: dict) -> dict:
+        level = str(alert_data.get("alert_level", "")).upper()
+        msg = str(alert_data.get("message", "")).lower()
+
+        actions = []
+        regulations = []
+        lockout_engaged = False
+
+        # Regla 1: Proximidad Crítica / Zona Restringida / Colisión
+        if any(w in msg for w in ["zona restringida", "distancia", "colisión", "ttc", "proximidad"]) or level in ["ALTO", "CRITICO"]:
+            lockout_engaged = True
+            actions.append("PARADA DE EMERGENCIA INMEDIATA: Desconexión de energía motriz del equipo LHD/Scoop (Art. 272 D.S. 024-2016-EM).")
+            actions.append("INMOVILIZACIÓN MECÁNICA: Accionamiento de frenos de parqueo y traba de articulación central.")
+            regulations.append("D.S. 024-2016-EM Art. 272 / Art. 274 (Zonas de Exclusión)")
+
+        # Regla 2: Gases Asfixiantes / Tóxicos (Monóxido de Carbono CO)
+        if any(w in msg for w in ["co", "gas", "monóxido", "ppm"]):
+            lockout_engaged = True
+            actions.append("EVACUACIÓN INMEDIATA A REFUGIO MINERO hacia labor con ventilación forzada en tiro positivo (Art. 252).")
+            actions.append("ACTIVACIÓN DE VENTILACIÓN SECUNDARIA AUXILIAR al 100 % de capacidad.")
+            regulations.append("D.S. 024-2016-EM Art. 103 / Art. 252 (LMP CO 25 ppm)")
+
+        # Regla 3: Fatiga Crítica del Personal
+        if any(w in msg for w in ["fatiga", "bpm", "somnolencia", "cardíaco"]):
+            actions.append("RELEVO OBLIGATORIO DE TURNO: Suspensión preventiva de operación manual de maquinaria pesada.")
+            regulations.append("D.S. 024-2016-EM Art. 138 (Control de Fatiga y Turnos)")
+
+        if not actions:
+            actions.append("Monitoreo visual continuo y verificación de distanciamiento mínimo de 3 metros en galería.")
+            regulations.append("Procedimiento Escrito de Trabajo Seguro (PETS)")
+
+        return {
+            "safety_lockout_active": lockout_engaged,
+            "deterministic_mandates": actions,
+            "normative_references": regulations,
+            "override_allowed_by_llm": False,
+            "requires_supervisor_signoff": True
+        }
+
+
     async def analyze_alert(self, alert_data: dict) -> str:
-        """Analiza una alerta operacional usando LangChain LCEL."""
+        """Analiza un evento de alerta aplicando PRIMERO las barreras deterministas duras y luego la asistencia LLM."""
+        # 1. Evaluación de barrera determinista independiente del LLM (FON-12 / H12)
+        interlock = DeterministicSafetyInterlock.evaluate_rules(alert_data)
+        
+        mandatory_block = "## 🛡️ Protocolo de Seguridad Determinista (D.S. 024-2016-EM)\n\n"
+        if interlock["safety_lockout_active"]:
+            mandatory_block += "**⚠️ BLOQUEO CRÍTICO DE SEGURIDAD (SAFETY LOCKOUT ACTIVADO)**\n\n"
+        
+        mandatory_block += "### Directivas Obligatorias Inmediatas:\n"
+        for act in interlock["deterministic_mandates"]:
+            mandatory_block += f"- {act}\n"
+            
+        mandatory_block += "\n### Referencias Normativas Aplicables:\n"
+        for reg in interlock["normative_references"]:
+            mandatory_block += f"- `{reg}`\n"
+            
+        mandatory_block += "\n*Nota de Seguridad: Estas directivas son mandatorias por diseño y no pueden ser anuladas por el modelo de lenguaje.*\n\n---\n\n"
+
         llm = self._get_llm_with_fallbacks()
         if not llm or not self._alert_chain:
             return (
-                "⚠️ **Análisis no disponible**: No se ha configurado `GEMINI_API_KEY` en el archivo `backend/.env`.\n"
-                "Obtén una clave en [Google AI Studio](https://aistudio.google.com/app/apikey)."
+                mandatory_block +
+                "ℹ️ *Análisis complementario de IA generativa no disponible (clave API de Gemini no configurada). "
+                "Las directivas deterministas superiores rigen la operación.*"
             )
 
         try:
-            response = await self._alert_chain.ainvoke({
+            llm_response = await self._alert_chain.ainvoke({
                 "alert_level": alert_data.get("alert_level", "UNKNOWN"),
                 "message": alert_data.get("message", "Sin descripción"),
                 "created_at": str(alert_data.get("created_at", "N/A"))
             })
-            return response
+            return mandatory_block + "## 🤖 Asistencia Complementaria de IA Generativa\n\n" + llm_response
         except Exception as e:
             logger.error(f"Error in LangChain analyze_alert: {e}")
-            return self._format_error(e)
+            return mandatory_block + f"⚠️ *Error consultando el servicio Gemini: {e}*"
+
 
     async def chat(self, user_message: str) -> str:
         """Procesa una consulta del operador a través de la cadena LangChain."""

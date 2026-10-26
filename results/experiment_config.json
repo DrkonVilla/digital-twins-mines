@@ -1,6 +1,6 @@
 {
   "project": "M-11 Digital Twin for Underground Mining Human-Machine Interaction",
-  "timestamp_utc": "2026-10-26T19:04:46Z",
+  "timestamp_utc": "2026-10-26T20:09:45Z",
   "target_journal": "Acta Montanistica Slovaca",
   "dataset": {
     "source": "UCI AI4I 2020 Predictive Maintenance (synthetic base) + Underground Mining Telemetry Simulation",
@@ -13,14 +13,24 @@
     "features_in_ml_pipeline": 16,
     "target_variable": "risk_level (0=BAJO, 1=MEDIO, 2=ALTO)",
     "target_prevalence_alto": 0.22,
-    "target_nature": "Heuristic synthetic formula (82.1% spatial/kinematic variance explained)"
+    "target_nature": "Heuristic synthetic formula (82.07% spatial/kinematic variance explained; sigma=3.8)"
   },
   "ml_validation_protocol": {
     "cv_method": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
     "resampling_strategy": "SMOTENC (nested inside fold pipeline; never touches test or validation fold)",
     "threshold_calibration": "Max F2 (beta=2.0) on out-of-fold development probabilities",
     "test_holdout_access": "Evaluated exactly once with fixed calibrated threshold; zero retraining on test set",
-    "statistical_hypothesis_testing": "Paired bootstrap (1000 resamples), exact paired McNemar test, Holm-Bonferroni correction, Cliff's delta"
+    "statistical_hypothesis_testing": "Paired bootstrap (1000 resamples), exact paired McNemar test, Holm-Bonferroni correction, Cliff's delta",
+    "statistical_conclusion_policy": "Distinguishes failure to reject H0 (p_Holm > 0.05) from formal equivalence"
+  },
+  "safety_architecture": {
+    "deterministic_safety_interlock": "Implemented in backend (app.services.gemini_service.DeterministicSafetyInterlock)",
+    "standards_enforced": [
+      "D.S. 024-2016-EM Art. 272 (Proximity / Collision Lockout)",
+      "D.S. 024-2016-EM Art. 103/252 (CO Gas > 50 ppm Evacuation)",
+      "D.S. 024-2016-EM Art. 138 (Operator Fatigue Reassignment)"
+    ],
+    "llm_role": "Advisory and explainability only; cannot override deterministic lockouts"
   },
   "hardware_environment": {
     "processor": "Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz",

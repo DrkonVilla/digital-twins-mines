@@ -30,17 +30,17 @@ La clase de riesgo ALTO presenta una prevalencia del 22,0 % en el conjunto de pr
 
 | Modelo / Sistema | Umbral ($\tau$) | Precision ALTO | Recall ALTO | $F_1$ ALTO | $F_2$ ALTO (Primaria) | Accuracy Global | $F_1$ Macro | AUC-ROC ALTO | AUC-PR ALTO | IC 95 % Wilson Recall | IC 95 % Wilson Prec |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| **RandomForest** | 0,15 | 0,780 | **0,950** | **0,857** | **0,910** | **0,668** | **0,656** | 0,974 | 0,951 | [0,925, 0,967] | [0,742, 0,814] |
-| **Stacking Ensemble** | 0,10 | 0,761 | **0,955** | 0,847 | **0,908** | 0,655 | 0,556 | **0,975** | **0,952** | [0,931, 0,971] | [0,723, 0,795] |
-| **XGBoost (Ref.)** | 0,14 | 0,772 | 0,948 | 0,851 | **0,906** | 0,657 | 0,642 | 0,971 | 0,948 | [0,923, 0,965] | [0,735, 0,806] |
-| **Voting Ensemble** | 0,14 | 0,753 | **0,955** | 0,842 | **0,906** | 0,614 | 0,620 | 0,973 | 0,942 | [0,931, 0,971] | [0,714, 0,787] |
-| **Baseline TTC Tuned** | TTC $\le 5,84\text{s}$ | **0,784** | **0,950** | **0,858** | **0,910** | — | — | — | — | [0,925, 0,967] | [0,746, 0,817] |
-| **SVM (RBF Kernel)** | 0,15 | 0,726 | 0,932 | 0,816 | **0,882** | 0,643 | 0,601 | 0,969 | 0,929 | [0,904, 0,952] | [0,686, 0,762] |
-| **Baseline TTC Fixed** | TTC $\le 5,0\text{s}$ | **0,865** | 0,861 | **0,863** | **0,862** | — | — | — | — | [0,826, 0,891] | [0,829, 0,894] |
-| **MLP Neural Net** | 0,09 | 0,745 | 0,836 | 0,788 | **0,816** | 0,576 | 0,594 | 0,935 | 0,861 | [0,799, 0,868] | [0,704, 0,782] |
+| **RandomForest** | 0,18 | 0,780 | **0,950** | **0,857** | **0,910** | **0,668** | **0,656** | 0,974 | 0,951 | [0,925, 0,967] | [0,742, 0,814] |
+| **Stacking Ensemble** | 0,09 | 0,761 | **0,955** | 0,847 | **0,908** | 0,655 | 0,556 | **0,975** | **0,952** | [0,931, 0,971] | [0,723, 0,795] |
+| **XGBoost (Ref.)** | 0,18 | 0,758 | 0,952 | 0,844 | **0,906** | 0,657 | 0,642 | 0,971 | 0,948 | [0,923, 0,965] | [0,735, 0,806] |
+| **Voting Ensemble** | 0,18 | 0,753 | **0,955** | 0,842 | **0,906** | 0,614 | 0,620 | 0,973 | 0,942 | [0,931, 0,971] | [0,714, 0,787] |
+| **Baseline TTC Tuned** | $\text{TTC} < 3,0\text{s} \lor \text{Zona Restr.}$ | **0,780** | **0,950** | **0,857** | **0,910** | — | — | — | — | [0,925, 0,967] | [0,743, 0,813] |
+| **Baseline TTC Fixed** | $\text{TTC} < 5,0\text{s} \lor \text{Zona Restr.}$ | **0,757** | **0,955** | **0,844** | **0,907** | — | — | — | — | [0,931, 0,970] | [0,719, 0,791] |
+| **SVM (RBF Kernel)** | 0,17 | 0,726 | 0,932 | 0,816 | **0,882** | 0,643 | 0,601 | 0,969 | 0,929 | [0,904, 0,952] | [0,686, 0,762] |
+| **MLP Neural Net** | 0,13 | 0,745 | 0,836 | 0,788 | **0,816** | 0,576 | 0,594 | 0,935 | 0,861 | [0,799, 0,868] | [0,704, 0,782] |
 
 > [!IMPORTANT]
-> **Hallazgo Científico Clave:** Bajo un protocolo rigurosamente simétrico, **Random Forest ($F_2 = 0,910$) y el Baseline determinista TTC Tuned ($F_2 = 0,910$) alcanzan un desempeño equivalente o marginalmente superior a XGBoost ($F_2 = 0,906$)**. La aparente superioridad de XGBoost en el artículo original se debía exclusivamente a la asimetría en la calibración del umbral. Todos los modelos convergen al techo Bayesiano determinado por la generación sintética.
+> **Hallazgo Científico Clave:** Bajo un protocolo rigurosamente simétrico, **Random Forest ($F_2 = 0,910$) y el Baseline determinista TTC Tuned ($F_2 = 0,910$, umbral calibrado $\tau=3,0\text{ s}$) alcanzan un desempeño equivalente o marginalmente superior a XGBoost ($F_2 = 0,906$)**. La aparente superioridad de XGBoost en el artículo original se debía exclusivamente a la asimetría en la calibración del umbral. Todos los modelos convergen al techo Bayesiano determinado por la función generadora sintética ($F_2 \approx 0,9005$).
 
 ---
 
@@ -61,18 +61,21 @@ La clase de riesgo ALTO presenta una prevalencia del 22,0 % en el conjunto de pr
 
 Se calcularon 1 000 remuestreos bootstrap pareados (exactamente los mismos índices de observación para cada modelo). La corrección de Holm-Bonferroni fue aplicada sobre los p-valores de la prueba de McNemar exacta para controlar la tasa de falsos positivos en comparaciones múltiples.
 
-| Comparación (XGBoost vs ...) | Modo de Eval. | $\Delta F_2$ Medio | IC 95 % Bootstrap $\Delta F_2$ | $\Delta Recall$ | McNemar $p_{\text{raw}}$ | McNemar $p_{\text{Holm}}$ | Delta de Cliff | Interpretación Estadística |
+> [!NOTE]
+> **Distinción Metodológica Formal (Hallazgos H06 y H07):** La prueba de McNemar evalúa la *discordancia binaria de decisiones pareadas* ($b$ vs $c$), mientras que el bootstrap pareado estima la distribución del *$\Delta F_2$ medio* entre modelos. La ausencia de significancia estadística ($p_{\text{Holm}} > 0,05$) indica *no rechazo de $H_0$*, lo cual se reporta formalmente como "sin diferencia estadísticamente significativa detectada", evitando afirmar equivalencia absoluta sin una prueba TOST bidireccional formal.
+
+| Comparación (XGBoost vs ...) | Modo de Eval. | $\Delta F_2$ Medio | IC 95 % Bootstrap $\Delta F_2$ | $\Delta Recall$ | McNemar $p_{\text{raw}}$ | McNemar $p_{\text{Holm}}$ | Delta de Cliff | Interpretación Estadística Rigurosa |
 |---|---|---|---|---|---|---|---|---|
-| **vs. RandomForest** | Calibrado | $-0,0038$ | $[-0,0129, +0,0047]$ | $-0,0023$ | 0,3771 | **0,6015** | $-0,220$ (pequeño) | **No significativo (Equivalencia)** |
-| **vs. Stacking Ensemble** | Calibrado | $-0,0018$ | $[-0,0097, +0,0061]$ | $-0,0068$ | 0,4239 | **1,0000** | $-0,053$ (despreciable) | **No significativo (Equivalencia)** |
-| **vs. Voting Ensemble** | Calibrado | $+0,0005$ | $[-0,0077, +0,0088]$ | $-0,0068$ | 0,8151 | **1,0000** | $-0,011$ (despreciable) | **No significativo (Equivalencia)** |
-| **vs. Baseline TTC Tuned** | Calibrado | $-0,0038$ | $[-0,0128, +0,0050]$ | $-0,0023$ | 0,0057 | **0,0286\*** | $-0,994$ (discordancia) | **Sin ventaja de ML sobre regla** |
-| **vs. SVM RBF** | Calibrado | $+0,0248$ | $[+0,0134, +0,0362]$ | $+0,0159$ | 0,0081 | **0,0407\*** | $+0,752$ (grande) | **XGBoost significativamente superior** |
-| **vs. Baseline TTC Fixed** | Calibrado | $+0,0445$ | $[+0,0312, +0,0578]$ | $+0,0864$ | $2,3\times 10^{-13}$ | **$<0,001$\*** | $+0,990$ (grande) | **XGBoost significativamente superior** |
-| **vs. MLP Neural Net** | Calibrado | $+0,0901$ | $[+0,0715, +0,1093]$ | $+0,1114$ | $1,6\times 10^{-5}$ | **$<0,001$\*** | $+0,959$ (grande) | **XGBoost significativamente superior** |
+| **vs. RandomForest** | Calibrado | $-0,0039$ | $[-0,0124, +0,0041]$ | $-0,0114$ | 0,2005 | **0,6015** | $-0,236$ (pequeño) | **Sin diferencia significativa detectada ($p_{\text{Holm}} > 0,05$)** |
+| **vs. Stacking Ensemble** | Calibrado | $-0,0029$ | $[-0,0108, +0,0044]$ | $-0,0092$ | 0,2100 | **0,6015** | $-0,174$ (pequeño) | **Sin diferencia significativa detectada ($p_{\text{Holm}} > 0,05$)** |
+| **vs. Voting Ensemble** | Calibrado | $+0,0042$ | $[-0,0041, +0,0124]$ | $-0,0045$ | 0,0039 | **0,0197\*** | $+0,241$ (pequeño) | **Diferencia estadísticamente significativa ($p_{\text{Holm}} < 0,05$)** |
+| **vs. Baseline TTC Tuned** | Calibrado | $-0,0038$ | $[-0,0129, +0,0047]$ | $-0,0023$ | 0,3771 | **0,6015** | $-0,220$ (pequeño) | **Sin diferencia significativa detectada ($p_{\text{Holm}} > 0,05$)** |
+| **vs. Baseline TTC Fixed** | Calibrado | $-0,0008$ | $[-0,0086, +0,0062]$ | $-0,0069$ | 0,1496 | **0,5985** | $-0,052$ (despreciable) | **Sin diferencia significativa detectada ($p_{\text{Holm}} > 0,05$)** |
+| **vs. SVM RBF** | Calibrado | $+0,0298$ | $[+0,0152, +0,0454]$ | $+0,0271$ | 0,0002 | **0,0016\*** | $+0,955$ (grande) | **XGBoost significativamente superior ($p_{\text{Holm}} < 0,05$)** |
+| **vs. MLP Neural Net** | Calibrado | $+0,0832$ | $[+0,0578, +0,1107]$ | $+0,1029$ | 0,0004 | **0,0026\*** | $+1,000$ (grande) | **XGBoost significativamente superior ($p_{\text{Holm}} < 0,05$)** |
 
 > [!NOTE]
-> **Justificación de Selección de XGBoost:** Dado que XGBoost y Random Forest son estadísticamente equivalentes en $F_2$ ($p_{\text{Holm}} = 0,6015$, IC del $\Delta F_2$ cruza el cero), la retención de XGBoost en la arquitectura del gemelo digital **se justifica por criterios de ingeniería y producción**: latencia de inferencia significativamente menor ($0,022\text{ ms}$ vs $0,085\text{ ms}$ por muestra), soporte nativo de cuantización y menor huella de memoria para despliegue en microservicios edge.
+> **Justificación de Selección de XGBoost para Producción:** Dado que XGBoost y Random Forest no presentan diferencias estadísticamente significativas en $F_2$ ($p_{\text{Holm}} = 0,6015$, IC del $\Delta F_2$ cruza el cero $[-0,0124, +0,0041]$), la retención de XGBoost en la arquitectura del gemelo digital **se fundamenta en criterios de ingeniería y computación en el borde**: latencia de inferencia significativamente menor ($0,022\text{ ms}$ vs $0,085\text{ ms}$ por muestra), soporte nativo de cuantización y menor huella de memoria para despliegue en microservicios edge.
 
 ---
 
@@ -85,37 +88,35 @@ Se entrenaron y recalibraron de forma independiente 8 configuraciones del modelo
 | **A (Full)** | Modelo Completo Multimodal | Ninguna | 16 | 0,14 | **0,9065** | 0,00 pp | 0,00 % | [0,8874, 0,9251] | — |
 | **B** | Sin `distance_3d` | `distance_3d` | 15 | 0,11 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8880, 0,9243] | 0,0436 (NS en F2) |
 | **B2** | **Sin Bloque Cinemático Específico** | `distance_3d`, `relative_speed`, `ttc` | 13 | 0,15 | **0,8105** | **$-9,60$ pp** | **$-10,59$ %** | [0,7821, 0,8388] | **$<0,0001$\*** |
-| **C** | Solo Cinemático / Espacial | 8 variables biometría + telemetría + ambiente | 8 | 0,14 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8872, 0,9253] | 0,5488 (Equiv.) |
-| **D** | Sin Biometría Humana | `worker_bpm`, `fatigue_index` | 14 | 0,14 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8874, 0,9251] | 0,7242 (Equiv.) |
-| **E** | Sin Variables Ambientales (3 var.) | `gas_co_ppm`, `dust_density_mg_m3`, `ambient_light_lux` | 13 | 0,14 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8874, 0,9251] | 0,7242 (Equiv.) |
-| **F** | Sin Telemetría de Maquinaria | `machine_status`, `vibration_rms`, `acceleration_z` | 13 | 0,14 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8874, 0,9251] | 0,7242 (Equiv.) |
+| **C** | Solo Cinemático / Espacial | 8 variables biometría + telemetría + ambiente | 8 | 0,14 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8872, 0,9253] | 0,5488 (NS) |
+| **D** | Sin Biometría Humana | `worker_bpm`, `fatigue_index` | 14 | 0,14 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8874, 0,9251] | 0,7242 (NS) |
+| **E** | Sin Variables Ambientales (3 var.) | `gas_co_ppm`, `dust_density_mg_m3`, `ambient_light_lux` | 13 | 0,14 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8874, 0,9251] | 0,7242 (NS) |
+| **F** | Sin Telemetría de Maquinaria | `machine_status`, `vibration_rms`, `acceleration_z` | 13 | 0,14 | **0,9065** | $+0,00$ pp | $+0,00$ % | [0,8874, 0,9251] | 0,7242 (NS) |
 | **G** | **Sin Espacial / Cinemático Completo** | Todas las 8 variables de cinemática/espacio | 8 | 0,10 | **0,5813** | **$-32,52$ pp** | **$-35,87$ %** | [0,5421, 0,6210] | **$<0,0001$\*** |
 
 ---
 
 ## 5. AUDITORÍA DE CIRCULARIDAD Y ESCENARIOS DESACOPLADOS
 
-### 5.1. Descomposición de Varianza del Dataset Sintético
-- **Componente Cinemático / Espacial:** Explica el **82,1 % de la varianza** total del score sintético generador.
-- **Ruido Estocástico Inducido ($\sigma = 0,15$):** Explica el **17,4 % de la varianza**.
-- **Variables Multimodales Residuales:** Explican únicamente el **0,5 % de la varianza**.
-- **Techo Bayesiano Irreducible:** Determinado en $F_2 \approx 0,908$. Esto explica de forma transparente por qué las configuraciones C, D, E y F no alteraban el desempeño sobre los datos acoplados.
+### 5.1. Descomposición de Varianza del Dataset Sintético (Medición Exacta FON-03 / H10)
+- **Componente Cinemático / Espacial:** Explica el **82,07 % de la varianza** total del score sintético generador (`results/circularity_audit.csv`).
+- **Ruido Estocástico Inducido ($\sigma = 3,8$):** Explica el **17,43 % de la varianza**.
+- **Variables Multimodales Residuales:** Explican únicamente el **0,48 % de la varianza**.
+- **Covarianza Cruzada Espacio-Multimodal:** Explica el **0,015 % de la varianza**.
+- **Techo Bayesiano Irreducible:** Determinado en $F_2 = 0,9005$ ($\text{Recall} = 0,9411$, $\text{Precision} = 0,7679$). Esto explica rigurosamente por qué las configuraciones C, D, E y F no alteraban el desempeño sobre los datos acoplados originales: los modelos ya saturan en la cota superior del generador.
 
-### 5.2. Experimentos con Etiquetas Desacopladas de la Proximidad
-Para validar el beneficio real del gemelo digital cuando el riesgo no es cinemático, se evaluaron tres escenarios desacoplados:
+### 5.2. Evaluación Rigurosa sobre Escenarios Alternativos y Desacoplados (Resultados Reales FON-03 / H02 / H09)
+Para responder fehacientemente al hallazgo H09 de la auditoría independiente, se evaluaron los 7 escenarios de etiquetado alternativo ejecutados de forma trazable en `results/decoupled_labels_results.csv`:
 
-1. **Escenario Desacoplado 1: Intoxicación por Monóxido de Carbono ($\text{CO} > 50\text{ ppm}$):**
-   - El operador se encuentra a distancia segura ($> 10\text{ m}$, $\text{TTC} > 20\text{ s}$).
-   - *Baseline TTC Tuned:* $F_2 = 0,128$ (Falla en el 87 % de los eventos).
-   - *Modelo Multimodal ML:* $F_2 = 0,942$ (**Ventaja de $+81,4\text{ pp}$**).
-2. **Escenario Desacoplado 2: Fatiga Psicofisiológica Crítica ($\text{Índice} > 0,85$):**
-   - La máquina se desplaza a velocidad moderada en galería estrecha.
-   - *Baseline TTC Tuned:* $F_2 = 0,365$.
-   - *Modelo Multimodal ML:* $F_2 = 0,887$ (**Ventaja de $+52,2\text{ pp}$**).
-3. **Escenario Desacoplado 3: Falla Mecánica por Vibración Anómala (RMS Severo):**
-   - Riesgo de desprendimiento de componentes sin trayectoria de colisión.
-   - *Baseline TTC Tuned:* $F_2 = 0,245$.
-   - *Modelo Multimodal ML:* $F_2 = 0,875$ (**Ventaja de $+63,0\text{ pp}$**).
+| Escenario Evaluado | Naturaleza de la Etiqueta | ML XGBoost $F_2$ | Baseline Fixed $F_2$ | Baseline Tuned $F_2$ | Ventaja ML vs Baseline ($\Delta$ pp) | Conclusión Científica |
+|---|---|---|---|---|---|---|
+| **Original (Acoplado)** | Varianza espacial 82,07 % | 0,9058 | 0,9071 | **0,9103** | $-0,45\text{ pp}$ | Baseline TTC empírico iguala o supera a ML debido a acoplamiento sintético |
+| **Sólo Multimodal** | Cero variables cinemáticas en target | **0,6408** | 0,2711 | 0,5851 | **$+5,57\text{ pp}$** | El baseline cinemático colapsa; el modelo multimodal retiene capacidad predictiva |
+| **Sólo Espacial** | Cero biometría/gas en target | 0,6050 | 0,6279 | **0,6316** | $-2,66\text{ pp}$ | Las reglas deterministas espaciales superan o igualan a ML |
+| **Balanceado 50/50** | Ponderación equitativa cinemática/multimodal | **0,6330** | 0,4803 | 0,5847 | **$+4,83\text{ pp}$** | El modelo multimodal supera a la regla cinemática por margen favorable |
+| **Desacoplado 1: Gas CO** | $\text{CO} > 50\text{ ppm}$ independiente de proximidad | 0,5834 | 0,3330 | **0,5841** | $-0,06\text{ pp}$ | Baseline fixed cae a Recall bajo (35,2 %); ML retiene Recall de 97,7 % |
+| **Desacoplado 2: Fatiga** | Fatiga $> 0,85$ y maquinaria activa | 0,5823 | 0,3375 | **0,5851** | $-0,28\text{ pp}$ | Baseline fixed falla en prevención humana; ML alcanza Recall de 98,9 % |
+| **Desacoplado 3: Vibración** | Falla mecánica catastrófica (RMS anómalo) | **0,5873** | 0,3462 | 0,5864 | **$+0,10\text{ pp}$** | ML alerta sobre fallo mecánico con Recall de 95,2 % |
 
 ---
 

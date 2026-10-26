@@ -1,6 +1,7 @@
 {
-  "manifest_version": "1.0.0",
-  "generated_at_utc": "2026-10-26T19:04:49Z",
+  "manifest_version": "1.1.0",
+  "generated_at_utc": "2026-10-26T20:09:52Z",
+  "cross_platform_hashing_policy": "Incluye sha256_raw y sha256_normalized_lf (elimina divergencias Windows CRLF vs Linux LF)",
   "system_information": {
     "os": "Windows 11 Home",
     "cpu": "Intel Core i7-8550U @ 1.80GHz",
@@ -9,240 +10,362 @@
   },
   "raw_data": {
     "path": "data/raw/public_mining_equipment_dataset.csv",
-    "sha256": "b71d0b6baed8b6e0bc7eee1a1a5b7440d06a04ddaea5d502907cf03d958705f0"
+    "sha256_raw": "b71d0b6baed8b6e0bc7eee1a1a5b7440d06a04ddaea5d502907cf03d958705f0",
+    "sha256_normalized_lf": "ebd48c193a7973087250640857ba16c4d977acca0c9731b2290bbca22c45ffcf",
+    "line_ending": "CRLF"
   },
   "results_files": {
     "ablation_f1_comparison.png": {
       "size_bytes": 188652,
-      "sha256": "d8fe13a465c4692b58cb975ac6ccae5dac33a66ffdf526145da2f8e60b8e7d1c"
+      "sha256_raw": "d8fe13a465c4692b58cb975ac6ccae5dac33a66ffdf526145da2f8e60b8e7d1c",
+      "sha256_normalized_lf": "d8fe13a465c4692b58cb975ac6ccae5dac33a66ffdf526145da2f8e60b8e7d1c",
+      "line_ending": "BINARY"
     },
     "ablation_results.csv": {
       "size_bytes": 2446,
-      "sha256": "59d4b94f7525d9ae3ca2bdff1e6ff3351c553b62592dba436200ea1c4933b4b6"
+      "sha256_raw": "59d4b94f7525d9ae3ca2bdff1e6ff3351c553b62592dba436200ea1c4933b4b6",
+      "sha256_normalized_lf": "94ec8d7f7ccb20c705b564461908c907ed85637cea066dab0ce89387e3cb560a",
+      "line_ending": "CRLF"
     },
     "ablation_study_results.json": {
       "size_bytes": 17364,
-      "sha256": "d1e7f23bfafe9b9ab1d1c01043fb1f314bf20a81afad5154fd8b677b9896bdd7"
+      "sha256_raw": "d1e7f23bfafe9b9ab1d1c01043fb1f314bf20a81afad5154fd8b677b9896bdd7",
+      "sha256_normalized_lf": "73d305db0acd0e7ca8249d1b166755c4f26421f9ea03daa022dd536033cdbee6",
+      "line_ending": "CRLF"
     },
     "benchmark_fps.csv": {
-      "size_bytes": 1067,
-      "sha256": "7308f73d6bfbd1e3924a1d6e68e11b0739d84e9eca74f21a19938f2b9f4e299c"
+      "size_bytes": 1482,
+      "sha256_raw": "425c94f3961776095f8999f2a16d6aa421802346b8bf7ec1a7c1569497330b72",
+      "sha256_normalized_lf": "a9deb59259389888af35a00b2b937a9671412c68bc9610ad6e4b8dd3417be6fe",
+      "line_ending": "CRLF"
     },
     "benchmark_latency.csv": {
       "size_bytes": 925,
-      "sha256": "c4f81d6ec8a9a3917a0904e22c1970122935df792c870b08ef303b1b16248dbd"
+      "sha256_raw": "c4f81d6ec8a9a3917a0904e22c1970122935df792c870b08ef303b1b16248dbd",
+      "sha256_normalized_lf": "6a4d8b22a08d4c32f939ac91cbd31a8263b98fa828337c66c0da6066db0f7d54",
+      "line_ending": "CRLF"
     },
     "circularity_audit.csv": {
-      "size_bytes": 947,
-      "sha256": "06a3a6442b9016d5f89e29cf5e746659a3b06e5ad66b8b2f0d795a5bca03c6eb"
+      "size_bytes": 1131,
+      "sha256_raw": "71c3fda4f878233fbb13b6f702fd2deba4d8e7444ef7acd78a45c41c3bdb71f7",
+      "sha256_normalized_lf": "48a695968bfeac5b4d21eced72bfc8e9ce0bc37402dc86925e40ce8dc4249962",
+      "line_ending": "CRLF"
     },
     "confusion_matrices.csv": {
       "size_bytes": 1037,
-      "sha256": "d98d5b69e8d66e1331e55362f42e5f0f577f39cc35b4d17979ac80a9b5a66ad7"
+      "sha256_raw": "b04f91dfb2e5e03e3e01a9ce0c132d9315990880b5465f339772a8019dad793a",
+      "sha256_normalized_lf": "8e1b652a943c9f2fa088c5e5d4cabffb801c0012126fd8809d54db685a94aa70",
+      "line_ending": "CRLF"
     },
     "cv_results.csv": {
       "size_bytes": 5983,
-      "sha256": "185d44a95d373a28f242826a382644d864079df163636c514589dc45390863a1"
+      "sha256_raw": "185d44a95d373a28f242826a382644d864079df163636c514589dc45390863a1",
+      "sha256_normalized_lf": "c180f8a58de70cc634111d7fa57daf95873fd42624716475703f2e20724fcb10",
+      "line_ending": "CRLF"
     },
     "decoupled_labels_results.csv": {
-      "size_bytes": 1150,
-      "sha256": "17b4818e4dadfb915d834e2edd86f0f00f2ca6def3699d0b898ccc5c0f5a4ab5"
+      "size_bytes": 1920,
+      "sha256_raw": "f599835e94100bb433624689046e54533cca08a7598ea9d5e56da346445a0c5f",
+      "sha256_normalized_lf": "5edda7efd8e12ba7f99c1bbdfda0a08db65e49be230a7b4d11bd8dc2661dfc61",
+      "line_ending": "CRLF"
     },
     "environment_metadata.json": {
       "size_bytes": 1232,
-      "sha256": "47b8059f13bcb5385520bdb59a0b8ad9d9f8dd4c1ceb44be2bdbff4b5a00c5f6"
+      "sha256_raw": "47b8059f13bcb5385520bdb59a0b8ad9d9f8dd4c1ceb44be2bdbff4b5a00c5f6",
+      "sha256_normalized_lf": "23a77cb1bd3b43aa808ef63796b6052e0afd703816b19ec9d65667fb69508de5",
+      "line_ending": "CRLF"
     },
     "experiment_config.json": {
-      "size_bytes": 1883,
-      "sha256": "2fad6be12d603309b17e8dc147c27b6ba3f2ba8b0c1f68f19702d6bbc2b82248"
+      "size_bytes": 2502,
+      "sha256_raw": "885a940749393800277274cb189f89f5f217dae27f63a6b700b5248896d6c573",
+      "sha256_normalized_lf": "71cff5e517d799bc09daab9df951fa4d7041fed04bb8bf1aa79be355d699bdc7",
+      "line_ending": "CRLF"
     },
     "fair_comparison_results.json": {
       "size_bytes": 82881,
-      "sha256": "114f369d28ff54e3780ee49e141fddeaf691546b60c8cd7b3737af67907a02ab"
+      "sha256_raw": "114f369d28ff54e3780ee49e141fddeaf691546b60c8cd7b3737af67907a02ab",
+      "sha256_normalized_lf": "00dcb17cea0d0e942fea1995d3ca3e4f2cfda940c42b05a5d01e3efc1ff64519",
+      "line_ending": "CRLF"
     },
     "feature_dictionary.csv": {
       "size_bytes": 2928,
-      "sha256": "054e39a4e7f3902407d77f123ddf72e215d143c526e25893fabf064425ba18bf"
+      "sha256_raw": "054e39a4e7f3902407d77f123ddf72e215d143c526e25893fabf064425ba18bf",
+      "sha256_normalized_lf": "6cec31aa6dfef5b69db4109376289f3f41dbd52a80c0bda8f6cfeff377ceea69",
+      "line_ending": "CRLF"
     },
     "gemini_audit.csv": {
-      "size_bytes": 12017,
-      "sha256": "a50dcf282a0ace07574a0b182e93603417ccfc276b34d314791d78eb9b644917"
+      "size_bytes": 64225,
+      "sha256_raw": "3f8b4952059d75330006fba065decbd61878a17cc565f579c62f62fa525162db",
+      "sha256_normalized_lf": "ca92edbff97c357cd608a7e62c5951bce442ae61264a32d366340ab3e7f281c5",
+      "line_ending": "CRLF"
     },
     "genai_audit_bank.json": {
       "size_bytes": 35882,
-      "sha256": "544a3bffb9b2addaf05b777bd48a457a80fdf41da18c5d7bc1a801a6b8f3a6ff"
+      "sha256_raw": "544a3bffb9b2addaf05b777bd48a457a80fdf41da18c5d7bc1a801a6b8f3a6ff",
+      "sha256_normalized_lf": "72bdaabab07753546f48d968d5b076734c58743d0e28a361774f7966670ff960",
+      "line_ending": "CRLF"
     },
     "genai_audit_review_sheet.csv": {
       "size_bytes": 12020,
-      "sha256": "1bfc97fef6a12584bf87bd5888535ae7f2a463842cc63f219de7b6be3ee18684"
+      "sha256_raw": "1bfc97fef6a12584bf87bd5888535ae7f2a463842cc63f219de7b6be3ee18684",
+      "sha256_normalized_lf": "3cb007741e54ab2685bcbb0f8706ba055d940acb54443d14423728a1d849cfdc",
+      "line_ending": "CRLF"
     },
     "hardware_specs_benchmark.json": {
       "size_bytes": 6778,
-      "sha256": "07873c97a3707cf3f6af3020eacb0a89f978a40e10b833b1960da08acc5b266c"
+      "sha256_raw": "07873c97a3707cf3f6af3020eacb0a89f978a40e10b833b1960da08acc5b266c",
+      "sha256_normalized_lf": "2d384109a21d4ec779393b042d1f9f97fe190365500a5e179e2b80ab38082f77",
+      "line_ending": "CRLF"
     },
     "label_circularity_audit.json": {
-      "size_bytes": 6599,
-      "sha256": "b6226174902aee08812b4705a5c6b09cab54ea4e2c264af4cdec9bd9ff8bd921"
+      "size_bytes": 9075,
+      "sha256_raw": "0f786db260ad68bb9c757039f0902fd1ae9035a342ca785dc132ab83455d1d20",
+      "sha256_normalized_lf": "cd67d49f09d18b1587fa855c3d883d1f9bf08c255328be05a90949b738db1192",
+      "line_ending": "CRLF"
     },
     "metrics_comparison.csv": {
-      "size_bytes": 3173,
-      "sha256": "ce4faca525f243822035b4e13deff131d1c2147536748e3a5150e18f2cb92c68"
+      "size_bytes": 3359,
+      "sha256_raw": "7a59ebccbdaf80425229333803255dd490b910cc8f4411b150a964d5a6a72ee7",
+      "sha256_normalized_lf": "da99391dcc239fab4a0ecbb7cb4ff4c8dfece39acd1a9dc5b8a66cd4ac31b885",
+      "line_ending": "CRLF"
     },
     "model_hyperparameters.csv": {
-      "size_bytes": 2403,
-      "sha256": "6708384169f85cae0596fe3ebb5277005857bc26b4e665ef95698e2bea782569"
+      "size_bytes": 2669,
+      "sha256_raw": "2198ea88c82741c816ce0a66f9ee7442447d122103de04148eaac92190b7651c",
+      "sha256_normalized_lf": "a6f08e2ae4a7b24b2544b4044f1881222d204ca266fb2290a805d26ecd241077",
+      "line_ending": "CRLF"
     },
     "paired_statistical_tests.csv": {
-      "size_bytes": 3932,
-      "sha256": "358fb9c448cbca16d4429d20c39e556a8504eb85ff133ef671c515cd3dde15d0"
+      "size_bytes": 5762,
+      "sha256_raw": "4f95ba8891738fc1b8289e46c18166710baebbef31acb1ca5a1c1170f5f56fec",
+      "sha256_normalized_lf": "b12f0d31f6b99267c10455397cc518da09c0a13c3ed0b11b7dc26e68ea2c1caa",
+      "line_ending": "CRLF"
     },
     "pr_curves_symmetric.png": {
       "size_bytes": 126389,
-      "sha256": "4664c2afa5570f2c6ce8e2c09bbecc041d926d2370080495d84ab3899acea73c"
+      "sha256_raw": "4664c2afa5570f2c6ce8e2c09bbecc041d926d2370080495d84ab3899acea73c",
+      "sha256_normalized_lf": "4664c2afa5570f2c6ce8e2c09bbecc041d926d2370080495d84ab3899acea73c",
+      "line_ending": "BINARY"
     },
     "robust_stats_validation.json": {
       "size_bytes": 1872,
-      "sha256": "57ee6eb887f88af648147882b1c3db8493dcf390b30bf53cfd0726a2bcd608a5"
+      "sha256_raw": "57ee6eb887f88af648147882b1c3db8493dcf390b30bf53cfd0726a2bcd608a5",
+      "sha256_normalized_lf": "9e15368a78dccf84280f3d01787cb1d5ea62d0cb05266977ae68c4fc6f02f021",
+      "line_ending": "CRLF"
     },
     "shap_values.csv": {
       "size_bytes": 590,
-      "sha256": "9a447ae147eade25e91039ed67af26f9902387bcdf5662f1e27cb6ab56b68480"
+      "sha256_raw": "9a447ae147eade25e91039ed67af26f9902387bcdf5662f1e27cb6ab56b68480",
+      "sha256_normalized_lf": "acfd85acf33718a0a5d473cc5db2b8a0310b69b59b2b2c599486b4499b6e3e38",
+      "line_ending": "CRLF"
     }
   },
   "figures_files": {
     "ablacion.png": {
       "size_bytes": 251481,
-      "sha256": "8232f4bcbf6351d623ec2f43971231ce9b8e6d2fa6f2251cf2d35e37c55067e4"
+      "sha256_raw": "8232f4bcbf6351d623ec2f43971231ce9b8e6d2fa6f2251cf2d35e37c55067e4",
+      "sha256_normalized_lf": "8232f4bcbf6351d623ec2f43971231ce9b8e6d2fa6f2251cf2d35e37c55067e4",
+      "line_ending": "BINARY"
     },
     "benchmark_fps.png": {
-      "size_bytes": 165955,
-      "sha256": "e63fae5aa49e29d6dbb3e6d8b50d1834ef9a96e15cca98b4580a89ded409aa33"
+      "size_bytes": 169021,
+      "sha256_raw": "2415c7c38cfa0f97b6c8027bfbd0cdc6d8f53e44f00357b0343970f1007e7550",
+      "sha256_normalized_lf": "2415c7c38cfa0f97b6c8027bfbd0cdc6d8f53e44f00357b0343970f1007e7550",
+      "line_ending": "BINARY"
     },
     "benchmark_latencia.png": {
       "size_bytes": 190842,
-      "sha256": "ceaaa6213f47ebeba5f6999f64448d7bf7ce7480f4f864c4f46d6a54649a4ce2"
+      "sha256_raw": "ceaaa6213f47ebeba5f6999f64448d7bf7ce7480f4f864c4f46d6a54649a4ce2",
+      "sha256_normalized_lf": "ceaaa6213f47ebeba5f6999f64448d7bf7ce7480f4f864c4f46d6a54649a4ce2",
+      "line_ending": "BINARY"
     },
     "comparacion_modelos.png": {
-      "size_bytes": 266866,
-      "sha256": "af775917e0d326c0360ad35f33a431f93a02c203cdf440555e7020aaaab118d5"
+      "size_bytes": 266851,
+      "sha256_raw": "25874e0a33f31ace8eee9aa68184965f48f26ae7219eec745a2c74d821ec3e2c",
+      "sha256_normalized_lf": "25874e0a33f31ace8eee9aa68184965f48f26ae7219eec745a2c74d821ec3e2c",
+      "line_ending": "BINARY"
     },
     "correlaciones.png": {
       "size_bytes": 336364,
-      "sha256": "cd829c0ce15694873052253b360318019510c609058d04588c43d7e7841cd212"
+      "sha256_raw": "cd829c0ce15694873052253b360318019510c609058d04588c43d7e7841cd212",
+      "sha256_normalized_lf": "cd829c0ce15694873052253b360318019510c609058d04588c43d7e7841cd212",
+      "line_ending": "BINARY"
     },
     "matriz_confusion.png": {
-      "size_bytes": 141110,
-      "sha256": "7cbad19bb74e6f95c51ae1e216f34b89b9c332cb664f291f84841ee5b67ef316"
+      "size_bytes": 141035,
+      "sha256_raw": "03f6571012530fe47cfcef707c50e8cbd603f31f5fead4a501239c4fa52ac7d9",
+      "sha256_normalized_lf": "03f6571012530fe47cfcef707c50e8cbd603f31f5fead4a501239c4fa52ac7d9",
+      "line_ending": "BINARY"
     },
     "shap_summary.png": {
       "size_bytes": 308219,
-      "sha256": "0e8228344f8315cf5fee4e037519190679d4d8b9ff68409cd67ec653b4401a04"
+      "sha256_raw": "0e8228344f8315cf5fee4e037519190679d4d8b9ff68409cd67ec653b4401a04",
+      "sha256_normalized_lf": "0e8228344f8315cf5fee4e037519190679d4d8b9ff68409cd67ec653b4401a04",
+      "line_ending": "BINARY"
     }
   },
   "execution_scripts": {
     "audit_genai_protocol.py": {
       "size_bytes": 19444,
-      "sha256": "f1980435db1f4fc52870e867213d962b752b4314577defc74518548e38cf6e79"
+      "sha256_raw": "f1980435db1f4fc52870e867213d962b752b4314577defc74518548e38cf6e79",
+      "sha256_normalized_lf": "f1980435db1f4fc52870e867213d962b752b4314577defc74518548e38cf6e79",
+      "line_ending": "LF"
     },
     "audit_label_circularity.py": {
-      "size_bytes": 10079,
-      "sha256": "93a82ce495cfa5feb978c6eba72a472a42af4bc4ecc0d7642e0f6aa9dc7f705d"
+      "size_bytes": 10788,
+      "sha256_raw": "3bcd9a0e3242940b577904c12a1a52f5f39611c5c41d944a80683177f8c35888",
+      "sha256_normalized_lf": "3bcd9a0e3242940b577904c12a1a52f5f39611c5c41d944a80683177f8c35888",
+      "line_ending": "LF"
     },
     "benchmark_hardware_profiler.py": {
       "size_bytes": 9000,
-      "sha256": "5f6ccdd9598ef107d27aefdb20331f0b05d56744be7fcae5d05384a18f1521fa"
+      "sha256_raw": "5f6ccdd9598ef107d27aefdb20331f0b05d56744be7fcae5d05384a18f1521fa",
+      "sha256_normalized_lf": "5f6ccdd9598ef107d27aefdb20331f0b05d56744be7fcae5d05384a18f1521fa",
+      "line_ending": "LF"
     },
     "download_and_process_public_dataset.py": {
       "size_bytes": 7429,
-      "sha256": "a8bac74193d6215fcb6981982a34d49f8f0d34b554ba5afdd7220ef1fd595097"
+      "sha256_raw": "a8bac74193d6215fcb6981982a34d49f8f0d34b554ba5afdd7220ef1fd595097",
+      "sha256_normalized_lf": "0f4506d87a7b160862a7b5c93c0768ecbc508815b451cea65c2c29fd3d54772a",
+      "line_ending": "CRLF"
     },
     "evaluate_hmm_k_selection.py": {
       "size_bytes": 6452,
-      "sha256": "9cb30b9c12621fa5a630b5679d6a1bb81c1ca4a941adae92e402a3c3e892eef8"
+      "sha256_raw": "9cb30b9c12621fa5a630b5679d6a1bb81c1ca4a941adae92e402a3c3e892eef8",
+      "sha256_normalized_lf": "7596d043f1e8c48c7b52d27e1cab9aa21513f33488612e6010f2471015ad7f53",
+      "line_ending": "CRLF"
     },
     "export_environment_metadata.py": {
       "size_bytes": 8384,
-      "sha256": "2a88cb248189d563d5ad9c1acb5ef1355f21dda5d0583c61492e2c380ef15871"
+      "sha256_raw": "2a88cb248189d563d5ad9c1acb5ef1355f21dda5d0583c61492e2c380ef15871",
+      "sha256_normalized_lf": "2a88cb248189d563d5ad9c1acb5ef1355f21dda5d0583c61492e2c380ef15871",
+      "line_ending": "LF"
+    },
+    "export_production_model.py": {
+      "size_bytes": 4842,
+      "sha256_raw": "f2f3c71a4aee51438e6f8eda7946c2985b872cb23510e0dc7bffb350b98b0fd8",
+      "sha256_normalized_lf": "f2f3c71a4aee51438e6f8eda7946c2985b872cb23510e0dc7bffb350b98b0fd8",
+      "line_ending": "LF"
     },
     "export_publication_assets.py": {
       "size_bytes": 18766,
-      "sha256": "ac2f98d8bd0f81eed5d95ea9ebd8bb6539305987ea69d43237c86431c327988d"
+      "sha256_raw": "ac2f98d8bd0f81eed5d95ea9ebd8bb6539305987ea69d43237c86431c327988d",
+      "sha256_normalized_lf": "ac2f98d8bd0f81eed5d95ea9ebd8bb6539305987ea69d43237c86431c327988d",
+      "line_ending": "LF"
     },
     "fair_eval.py": {
       "size_bytes": 17871,
-      "sha256": "deca83d4e19908334b57def7fc4f72b8e43555fbe69a83474c6b2267b3dd3f08"
+      "sha256_raw": "deca83d4e19908334b57def7fc4f72b8e43555fbe69a83474c6b2267b3dd3f08",
+      "sha256_normalized_lf": "deca83d4e19908334b57def7fc4f72b8e43555fbe69a83474c6b2267b3dd3f08",
+      "line_ending": "LF"
     },
     "generate_all_deliverables.py": {
-      "size_bytes": 39065,
-      "sha256": "a17865a607312f638af5f5e268fc16da68233709f8b51db50210cb6519e1fd90"
+      "size_bytes": 44584,
+      "sha256_raw": "eb5cda5d427478d183da0c97a6205ffa93b2e178110d9d887a6641263105effe",
+      "sha256_normalized_lf": "eb5cda5d427478d183da0c97a6205ffa93b2e178110d9d887a6641263105effe",
+      "line_ending": "LF"
     },
     "generate_synthetic_data.py": {
       "size_bytes": 5106,
-      "sha256": "efa973bb3bd05d6e392933cd6d22d39f472ce43c546ce18b769cbf97e4e1613e"
+      "sha256_raw": "efa973bb3bd05d6e392933cd6d22d39f472ce43c546ce18b769cbf97e4e1613e",
+      "sha256_normalized_lf": "110c9a182501eb32d85f500474e1e84976c8e073b98c92deaea407c00d292c41",
+      "line_ending": "CRLF"
     },
     "generate_temporal_trajectories.py": {
       "size_bytes": 8237,
-      "sha256": "043efa4fb392df21b2193ea617b7f130ba62b68de0dab7c99595db11484a3ab6"
+      "sha256_raw": "043efa4fb392df21b2193ea617b7f130ba62b68de0dab7c99595db11484a3ab6",
+      "sha256_normalized_lf": "880763a33a1f0a064861ea0d95aebdadc958627dd3db51d24cb5d8c9e8fc9194",
+      "line_ending": "CRLF"
     },
     "plot_trajectory_comparison.py": {
       "size_bytes": 1792,
-      "sha256": "2ee462d599154a14f54729740ab4084966f2b3675f1c9d6f5c665c9d3edea7a4"
+      "sha256_raw": "2ee462d599154a14f54729740ab4084966f2b3675f1c9d6f5c665c9d3edea7a4",
+      "sha256_normalized_lf": "ae0f32f6f170c742cfc8248e742c0d4b27a6fcbd8bccba419172eda52d24198c",
+      "line_ending": "CRLF"
     },
     "plot_trajectory_debug.py": {
       "size_bytes": 1527,
-      "sha256": "5da805dbf4906baafe034e20944f9a3a4c1731baca815b4e3a6aa397a927b038"
+      "sha256_raw": "5da805dbf4906baafe034e20944f9a3a4c1731baca815b4e3a6aa397a927b038",
+      "sha256_normalized_lf": "daca647fa9530c5e467da07e22f742a06379c5c3f1bae37aa7467440247e3feb",
+      "line_ending": "CRLF"
     },
     "robust_stats_validation.py": {
       "size_bytes": 8119,
-      "sha256": "5fbd8c965cc5cc2d4bd47f72688c9994fa5cec2f818f4cc15b072bc891c3aba3"
+      "sha256_raw": "5fbd8c965cc5cc2d4bd47f72688c9994fa5cec2f818f4cc15b072bc891c3aba3",
+      "sha256_normalized_lf": "5fbd8c965cc5cc2d4bd47f72688c9994fa5cec2f818f4cc15b072bc891c3aba3",
+      "line_ending": "LF"
     },
     "run_ablation_study.py": {
       "size_bytes": 7477,
-      "sha256": "77b992bfac43ad45547eb96306bbb84916aacc32f9118d4b4228ff927d4d9a66"
+      "sha256_raw": "77b992bfac43ad45547eb96306bbb84916aacc32f9118d4b4228ff927d4d9a66",
+      "sha256_normalized_lf": "77b992bfac43ad45547eb96306bbb84916aacc32f9118d4b4228ff927d4d9a66",
+      "line_ending": "LF"
     },
     "run_all_experiments.py": {
       "size_bytes": 3044,
-      "sha256": "1ba89f90d9fe198858d859d79899d25a793809864ff7dfd0775755e49eed8478"
+      "sha256_raw": "1ba89f90d9fe198858d859d79899d25a793809864ff7dfd0775755e49eed8478",
+      "sha256_normalized_lf": "1ba89f90d9fe198858d859d79899d25a793809864ff7dfd0775755e49eed8478",
+      "line_ending": "LF"
     },
     "run_scenario_tests.py": {
       "size_bytes": 3240,
-      "sha256": "08465e58ebb1810446cb2b3dbcbe7625e6a0b02bd1b499169fbd91edec37967a"
+      "sha256_raw": "08465e58ebb1810446cb2b3dbcbe7625e6a0b02bd1b499169fbd91edec37967a",
+      "sha256_normalized_lf": "758cf4457e503105e8d9ae01128f62d9bfcb4d4ee1af0b91b7061df98f1b948f",
+      "line_ending": "CRLF"
     },
     "run_shap_and_collinearity.py": {
       "size_bytes": 8009,
-      "sha256": "ec19a541084393c6fc42e2ea7ae2bb3b976cf7550b722f43e946711cc7148d47"
+      "sha256_raw": "ec19a541084393c6fc42e2ea7ae2bb3b976cf7550b722f43e946711cc7148d47",
+      "sha256_normalized_lf": "ec19a541084393c6fc42e2ea7ae2bb3b976cf7550b722f43e946711cc7148d47",
+      "line_ending": "LF"
     },
     "seed_db.py": {
       "size_bytes": 3238,
-      "sha256": "453325f468882967d580a9b2c5f32a90c09aedcbcac3c66a3c2b351f47862dd3"
+      "sha256_raw": "453325f468882967d580a9b2c5f32a90c09aedcbcac3c66a3c2b351f47862dd3",
+      "sha256_normalized_lf": "2438d188f4eceec2789dd994f9e9a8b98d489ff1dc8b27873ea72ef5f29fe891",
+      "line_ending": "CRLF"
     },
     "simulate_live_telemetry.py": {
       "size_bytes": 5577,
-      "sha256": "d9971e14db6a3a7b509ef56041779282bb732d065d1c2a01d26c72a68cd40fe5"
+      "sha256_raw": "d9971e14db6a3a7b509ef56041779282bb732d065d1c2a01d26c72a68cd40fe5",
+      "sha256_normalized_lf": "c327cca0e70886d819cbae3f63ce6dd60e86a85aa1f0aa4b1c1fa3b071569a4c",
+      "line_ending": "CRLF"
     },
     "statistical_tests.py": {
       "size_bytes": 9213,
-      "sha256": "f9661d0b1a72b9cb870703092f5b1cd3401e89e43ef9a5a2d56e409e7a65b9f0"
+      "sha256_raw": "f9661d0b1a72b9cb870703092f5b1cd3401e89e43ef9a5a2d56e409e7a65b9f0",
+      "sha256_normalized_lf": "e12cfecadeb43c467d704fe6fcc0a8123ef44bd12653d5cd9d87846b30bec528",
+      "line_ending": "CRLF"
     },
     "train_all_models.py": {
       "size_bytes": 10062,
-      "sha256": "ce832abcbe6c1f6c25bf95f92181f7f2856eda73bb827d79c6fde8824910202d"
+      "sha256_raw": "ce832abcbe6c1f6c25bf95f92181f7f2856eda73bb827d79c6fde8824910202d",
+      "sha256_normalized_lf": "ce832abcbe6c1f6c25bf95f92181f7f2856eda73bb827d79c6fde8824910202d",
+      "line_ending": "LF"
     },
     "train_cv.py": {
       "size_bytes": 10769,
-      "sha256": "6a8efaffd561403b1a2f4d370e2925795ad63fe24b3ebc672b43b0e63e23a876"
+      "sha256_raw": "6a8efaffd561403b1a2f4d370e2925795ad63fe24b3ebc672b43b0e63e23a876",
+      "sha256_normalized_lf": "6a8efaffd561403b1a2f4d370e2925795ad63fe24b3ebc672b43b0e63e23a876",
+      "line_ending": "LF"
     },
     "train_hmm_baumwelch.py": {
       "size_bytes": 7167,
-      "sha256": "960c3966ee8e3d4ef80d3e6e099a21300696262563ac530fb154507ed7545da9"
+      "sha256_raw": "960c3966ee8e3d4ef80d3e6e099a21300696262563ac530fb154507ed7545da9",
+      "sha256_normalized_lf": "111d5964fff4c0f4bc64476a993a806f4465b8fb80616415ae63b4d1b4fb7b4f",
+      "line_ending": "CRLF"
     },
     "train_model.py": {
       "size_bytes": 5242,
-      "sha256": "d24428da12f951a3b06f2f445a9293216c23e112973fe6d3be533e556e51b00a"
+      "sha256_raw": "d24428da12f951a3b06f2f445a9293216c23e112973fe6d3be533e556e51b00a",
+      "sha256_normalized_lf": "4a1e8323a5453f28fbdf9725af5ac91c4b0a1736d153167c40a91321487f758c",
+      "line_ending": "CRLF"
     },
     "verify_streamlit_next_parity.py": {
       "size_bytes": 4839,
-      "sha256": "c056ea71faed020e32281e8943e249a6b8f8e8e78051859a5f09891b55f70bd5"
+      "sha256_raw": "c056ea71faed020e32281e8943e249a6b8f8e8e78051859a5f09891b55f70bd5",
+      "sha256_normalized_lf": "24242bf3a2994e8dcb17d3c069a7bed5e27d20345718ab9f20ac300f4a87cfe3",
+      "line_ending": "CRLF"
     }
   }
 }

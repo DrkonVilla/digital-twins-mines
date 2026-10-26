@@ -14,6 +14,6 @@ RandomForest,Calibrated_Threshold,ALTO (2),14,4,422,440
 Baseline_TTC_fixed,Deterministic_Rule,BAJO (0),884,0,16,900
 Baseline_TTC_fixed,Deterministic_Rule,MEDIO (1),541,0,119,660
 Baseline_TTC_fixed,Deterministic_Rule,ALTO (2),20,0,420,440
-Baseline_TTC_tuned,Deterministic_Rule,BAJO (0),881,0,19,900
-Baseline_TTC_tuned,Deterministic_Rule,MEDIO (1),540,0,120,660
-Baseline_TTC_tuned,Deterministic_Rule,ALTO (2),19,0,421,440
+Baseline_TTC_tuned,Deterministic_Rule,BAJO (0),887,0,13,900
+Baseline_TTC_tuned,Deterministic_Rule,MEDIO (1),555,0,105,660
+Baseline_TTC_tuned,Deterministic_Rule,ALTO (2),22,0,418,440

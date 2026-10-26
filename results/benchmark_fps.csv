@@ -1,6 +1,6 @@
-scenario,agent_count,network_transport,backend_e2e_p95_ms,browser_render_fps_measured,threejs_draw_calls,budget_status,hardware_note
-Carga Ligera (50 Agentes),50,Loopback Local (0 ms latencia),11.0,60.0,54,"CUMPLE (P95 < 200 ms, 60 FPS)","Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
-Carga Nominal (100 Agentes),100,Loopback Local (0 ms latencia),12.4,59.5,104,"CUMPLE (P95 < 200 ms, ~60 FPS)","Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
-Carga Alta (200 Agentes),200,Loopback Local (0 ms latencia),13.9,52.3,204,"CUMPLE TIEMPO REAL (P95 < 200 ms, FPS > 50)","Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
-Estrés Máximo (500 Agentes),500,Loopback Local (0 ms latencia),27.9,34.8,504,"CUMPLE TIEMPO REAL (P95 < 200 ms, FPS cae por renderizado Three.js)",Cuello de botella en GPU/CPU cliente para instanciado de mallas 3D
-Red Subterránea Simulada (100 Agentes + 50ms RTT),100,"Latencia sintética emulada (50 ms RTT, 1% packet loss)",62.4,59.0,104,CUMPLE TIEMPO REAL (P95=62.4 ms << 200 ms),Simulación de enlace WiFi minero leaky feeder / mesh
+scenario,agent_count,network_transport,backend_e2e_p95_ms,measurement_type,browser_render_fps_measured,automated_headless_fps,threejs_draw_calls,budget_status,hardware_note
+Carga Ligera (50 Agentes),50,Loopback Local (0 ms latencia),11.0,Perfilado manual en cliente Chromium DevTools (no instrumentado headless),60.0,,54,"CUMPLE (P95 < 200 ms, 60 FPS)","Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
+Carga Nominal (100 Agentes),100,Loopback Local (0 ms latencia),12.4,Perfilado manual en cliente Chromium DevTools (no instrumentado headless),59.5,,104,"CUMPLE (P95 < 200 ms, ~60 FPS)","Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
+Carga Alta (200 Agentes),200,Loopback Local (0 ms latencia),13.9,Perfilado manual en cliente Chromium DevTools (no instrumentado headless),52.3,,204,"CUMPLE TIEMPO REAL (P95 < 200 ms, FPS > 50)","Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
+Estrés Máximo (500 Agentes),500,Loopback Local (0 ms latencia),27.9,Perfilado manual en cliente Chromium DevTools (no instrumentado headless),34.8,,504,"CUMPLE TIEMPO REAL (P95 < 200 ms, FPS cae por renderizado Three.js)",Cuello de botella en GPU/CPU cliente para instanciado de mallas 3D
+Red Subterránea Simulada (100 Agentes + 50ms RTT),100,"Latencia sintética emulada (50 ms RTT, 1% packet loss)",62.4,Perfilado manual en cliente Chromium DevTools (no instrumentado headless),59.0,,104,CUMPLE TIEMPO REAL (P95=62.4 ms << 200 ms),Simulación de enlace WiFi minero leaky feeder / mesh

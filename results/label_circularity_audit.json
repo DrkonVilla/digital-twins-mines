@@ -165,12 +165,81 @@
         "ttc_threshold_s": 93.0
       },
       "xgb_minus_baseline_tuned_f2_pp": 4.832695438087264
+    },
+    "label_gas_co_scenario": {
+      "prevalence_alto": 0.22,
+      "xgboost_calibrated": {
+        "precision_alto": 0.22337662337662337,
+        "recall_alto": 0.9772727272727273,
+        "f1_alto": 0.36363636363636365,
+        "f2_alto": 0.5834464043419266
+      },
+      "baseline_fixed": {
+        "precision_alto": 0.27336860670194,
+        "recall_alto": 0.3522727272727273,
+        "f1_alto": 0.307845084409136,
+        "f2_alto": 0.3330468414267297
+      },
+      "baseline_tuned": {
+        "precision_alto": 0.2197197197197197,
+        "recall_alto": 0.9977272727272727,
+        "f1_alto": 0.3601312551271534,
+        "f2_alto": 0.5840872804683344,
+        "ttc_threshold_s": 94.0
+      },
+      "xgb_minus_baseline_tuned_f2_pp": -0.064087612640773
+    },
+    "label_operator_fatigue_scenario": {
+      "prevalence_alto": 0.22,
+      "xgboost_calibrated": {
+        "precision_alto": 0.22025316455696203,
+        "recall_alto": 0.9886363636363636,
+        "f1_alto": 0.36024844720496896,
+        "f2_alto": 0.5823293172690763
+      },
+      "baseline_fixed": {
+        "precision_alto": 0.2719449225473322,
+        "recall_alto": 0.35909090909090907,
+        "f1_alto": 0.3095004897159648,
+        "f2_alto": 0.3374626228107646
+      },
+      "baseline_tuned": {
+        "precision_alto": 0.22,
+        "recall_alto": 1.0,
+        "f1_alto": 0.36065573770491804,
+        "f2_alto": 0.5851063829787235,
+        "ttc_threshold_s": 113.0
+      },
+      "xgb_minus_baseline_tuned_f2_pp": -0.27770657096471973
+    },
+    "label_mechanical_vibration_scenario": {
+      "prevalence_alto": 0.22,
+      "xgboost_calibrated": {
+        "precision_alto": 0.2318760376314333,
+        "recall_alto": 0.9522727272727273,
+        "f1_alto": 0.3729417000445037,
+        "f2_alto": 0.5873282870759743
+      },
+      "baseline_fixed": {
+        "precision_alto": 0.29038112522686027,
+        "recall_alto": 0.36363636363636365,
+        "f1_alto": 0.3229061553985873,
+        "f2_alto": 0.34617048896581565
+      },
+      "baseline_tuned": {
+        "precision_alto": 0.22088353413654618,
+        "recall_alto": 1.0,
+        "f1_alto": 0.36184210526315785,
+        "f2_alto": 0.5863539445628998,
+        "ttc_threshold_s": 93.0
+      },
+      "xgb_minus_baseline_tuned_f2_pp": 0.09743425130744887
     }
   },
   "interpretation": [
     "risk_level es un target SINTÉTICO por diseño; cualquier modelo que alcance el techo de Bayes sólo reproduce la función generadora, no valida seguridad real.",
     "El componente espacial explica 82% de la varianza del score y comparte distance_3d/ttc/zona restringida con el baseline: la comparación ML vs baseline NO es independiente.",
     "Con etiqueta sólo-multimodal el baseline pierde capacidad y el ML se separa; con etiqueta sólo-espacial ocurre lo contrario. La conclusión 'ML supera reglas' depende de la definición de la etiqueta.",
-    "Δ F2 (XGBoost − baseline ajustado, pp) por etiqueta: label_original: -0.5, label_multimodal_only: +5.6, label_spatial_only: -2.7, label_balanced_50_50: +4.8"
+    "Δ F2 (XGBoost − baseline ajustado, pp) por etiqueta: label_original: -0.5, label_multimodal_only: +5.6, label_spatial_only: -2.7, label_balanced_50_50: +4.8, label_gas_co_scenario: -0.1, label_operator_fatigue_scenario: -0.3, label_mechanical_vibration_scenario: +0.1"
   ]
 }

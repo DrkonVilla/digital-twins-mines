@@ -15,11 +15,13 @@ class MLLoader:
         self.model = None
         self.scaler = None
         self.feature_names = [
-            "distance_3d", "ttc", "relative_speed", "worker_speed", "machine_speed",
-            "in_restricted_zone", "worker_bpm", "fatigue_index", "vibration_rms",
-            "gas_co_ppm", "dust_density_mg_m3", "ambient_light_lux"
+            "distance_3d", "worker_speed", "machine_speed", "relative_speed",
+            "direction_worker", "direction_machine", "ttc", "in_restricted_zone",
+            "machine_status", "worker_bpm", "fatigue_index", "vibration_rms",
+            "acceleration_z", "gas_co_ppm", "dust_density_mg_m3", "ambient_light_lux"
         ]
         self.class_names = ["BAJO", "MEDIO", "ALTO"]
+        self.calibrated_threshold = 0.14
         self._load_model()
         
     def _patch_pipeline(self, est):
@@ -38,6 +40,10 @@ class MLLoader:
                 est._fill_dtype = getattr(est, "_fit_dtype", float)
     
     def _load_model(self):
+        meta = self.get_metadata()
+        self.calibrated_threshold = float(meta.get("calibrated_threshold_alto", 0.14))
+        self.feature_names = meta.get("feature_names", self.feature_names)
+
         target_path = self.best_model_path if os.path.exists(self.best_model_path) else self.fallback_model_path
         if os.path.exists(target_path):
             artifact = joblib.load(target_path)
@@ -49,7 +55,7 @@ class MLLoader:
                 self.model = artifact
                 
             self._patch_pipeline(self.model)
-            print(f"Loaded ML model successfully from {target_path}")
+            print(f"Loaded ML model successfully from {target_path} (calibrated_threshold={self.calibrated_threshold})")
         else:
             print(f"Warning: ML model artifact not found at {target_path}")
 
@@ -58,12 +64,13 @@ class MLLoader:
             with open(self.meta_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         return {
-            "model_name": "Voting Classifier (Hibrido)",
-            "test_metrics": {"accuracy": 0.9469, "f1_macro": 0.9530, "auc_roc": 0.9945}
+            "model_name": "XGBoost (Calibrado)",
+            "calibrated_threshold_alto": 0.14,
+            "test_metrics": {"f2_alto": 0.9065, "recall_alto": 0.9477, "precision_alto": 0.7722}
         }
     
     def _prepare_df(self, df: pd.DataFrame) -> pd.DataFrame:
-        target_cols = list(self.scaler.feature_names_in_) if (self.scaler and hasattr(self.scaler, "feature_names_in_")) else self.feature_names
+        target_cols = self.feature_names
         defaults = {
             'distance_3d': 15.0, 'ttc': 10.0, 'relative_speed': 3.5,
             'worker_speed': 1.2, 'machine_speed': 2.3, 'in_restricted_zone': 0,
@@ -104,20 +111,26 @@ class MLLoader:
         df = self._prepare_df(df)
         
         X_eval = self.scaler.transform(df) if self.scaler else df
-        
-        prediction_idx = int(self.model.predict(X_eval)[0])
         probas = self.model.predict_proba(X_eval)[0]
         
-        risk_score = float(probas[min(prediction_idx, len(probas)-1)]) * 100
-        risk_label = self.class_names[min(prediction_idx, 2)]
+        # Regla de umbral calibrado simétrico (FON-01 / H05)
+        prob_alto = float(probas[2])
+        if prob_alto >= self.calibrated_threshold:
+            prediction_idx = 2  # ALTO
+        else:
+            prediction_idx = int(np.argmax(probas[:2]))  # BAJO o MEDIO
         
+        risk_score = round(prob_alto * 100, 2)
+        risk_label = self.class_names[prediction_idx]
         explanation = self._generate_explanation(df.iloc[0], risk_label)
         
         return {
-            "model_name": self.get_metadata().get("model_name", "RandomForest"),
+            "model_name": self.get_metadata().get("model_name", "XGBoost (Calibrado)"),
             "risk_level": risk_label,
-            "risk_score": round(risk_score, 2),
+            "risk_score": risk_score,
             "probability": float(probas[prediction_idx]),
+            "calibrated_threshold_alto": self.calibrated_threshold,
+            "decision_rule": f"ALTO si P(ALTO) >= {self.calibrated_threshold}, sino argmax(BAJO, MEDIO)",
             "justification": explanation,
             "probabilities": {name: round(float(p), 4) for name, p in zip(self.class_names, probas)}
         }

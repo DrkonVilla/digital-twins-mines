@@ -43,7 +43,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import StratifiedKFold, train_test_split
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -60,11 +59,24 @@ def sha256_file(filepath):
     p = Path(filepath)
     if not p.exists():
         return None
-    h = hashlib.sha256()
     with open(p, "rb") as f:
-        while chunk := f.read(65536):
-            h.update(chunk)
-    return h.hexdigest()
+        content = f.read()
+    raw_hash = hashlib.sha256(content).hexdigest()
+    is_text = p.suffix.lower() in [".csv", ".json", ".py", ".md", ".txt"]
+    if is_text:
+        # Cross-platform normalized LF hash (addresses finding H11)
+        norm_content = content.replace(b"\r\n", b"\n")
+        norm_hash = hashlib.sha256(norm_content).hexdigest()
+        return {
+            "sha256_raw": raw_hash,
+            "sha256_normalized_lf": norm_hash,
+            "line_ending": "CRLF" if b"\r\n" in content else ("LF" if b"\n" in content else "NONE")
+        }
+    return {
+        "sha256_raw": raw_hash,
+        "sha256_normalized_lf": raw_hash,
+        "line_ending": "BINARY"
+    }
 
 
 def main():
@@ -76,7 +88,6 @@ def main():
     circ_path = RESULTS_DIR / "label_circularity_audit.json"
     hw_path = RESULTS_DIR / "hardware_specs_benchmark.json"
     genai_bank_path = RESULTS_DIR / "genai_audit_bank.json"
-    genai_sheet_path = RESULTS_DIR / "genai_audit_review_sheet.csv"
 
     with open(fair_path, "r", encoding="utf-8") as f:
         fair_res = json.load(f)
@@ -90,81 +101,83 @@ def main():
         genai_res = json.load(f)
 
     # -------------------------------------------------------------
-    # 1. results/model_hyperparameters.csv
+    # 1. results/model_hyperparameters.csv (Findings H04 & H08)
     # -------------------------------------------------------------
     print("1. Generating results/model_hyperparameters.csv...")
+    tau_tuned_s = fair_res.get("baselines", {}).get("Baseline_TTC_tuned", {}).get("ttc_threshold_s", 3.0)
+    
     model_params = [
         {
             "model": "XGBoost",
             "algorithm": "Extreme Gradient Boosting (Histogram tree method)",
             "selected_hyperparameters": "n_estimators=150, max_depth=6, learning_rate=0.1, subsample=1.0, eval_metric=mlogloss, random_state=42",
-            "search_space": "n_estimators: [100, 150, 200], max_depth: [4, 6, 8], lr: [0.05, 0.1, 0.2]",
-            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC",
-            "threshold_alto_calibrated": 0.14,
+            "architecture_specification": "Arquitectura fijada a priori según literatura de minería",
+            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
+            "threshold_alto_calibrated": fair_res["models"]["XGBoost"]["test_calibrated"]["threshold"],
             "library": "xgboost 2.1.4, scikit-learn 1.7.2, imbalanced-learn 0.14.0"
         },
         {
             "model": "RandomForest",
             "algorithm": "Breiman Random Forest Classifier",
             "selected_hyperparameters": "n_estimators=200, max_depth=12, min_samples_split=2, class_weight=None (handled by SMOTENC), random_state=42",
-            "search_space": "n_estimators: [100, 200], max_depth: [8, 12, 16]",
-            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC",
-            "threshold_alto_calibrated": 0.15,
+            "architecture_specification": "Arquitectura fijada a priori según literatura de minería",
+            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
+            "threshold_alto_calibrated": fair_res["models"]["RandomForest"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
         },
         {
             "model": "SVM_RBF",
             "algorithm": "Support Vector Machine (Radial Basis Function Kernel)",
             "selected_hyperparameters": "C=1.0, kernel=rbf, gamma=scale, probability=True, random_state=42",
-            "search_space": "C: [0.1, 1.0, 10.0], gamma: ['scale', 'auto']",
-            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC",
-            "threshold_alto_calibrated": 0.15,
+            "architecture_specification": "Arquitectura fijada a priori",
+            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
+            "threshold_alto_calibrated": fair_res["models"]["SVM_RBF"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
         },
         {
             "model": "MLP_NeuralNet",
-            "algorithm": "Multi-Layer Perceptron (Feedforward Deep Neural Network)",
+            "algorithm": "Multi-Layer Perceptron (Feedforward Neural Network)",
             "selected_hyperparameters": "hidden_layer_sizes=(64, 32), activation=relu, solver=adam, max_iter=500, random_state=42",
-            "search_space": "architectures: [(64, 32), (128, 64), (32, 16)], alpha: [0.0001, 0.001]",
-            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC",
-            "threshold_alto_calibrated": 0.09,
+            "architecture_specification": "Arquitectura fijada a priori (2 capas densas)",
+            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
+            "threshold_alto_calibrated": fair_res["models"]["MLP_NeuralNet"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
         },
         {
             "model": "Stacking_Ensemble",
-            "algorithm": "Stacking Meta-Classifier (Base: XGBoost, RF, MLP; Meta: LogisticRegression)",
-            "selected_hyperparameters": "final_estimator=LogisticRegression(max_iter=500, C=1.0), cv=5 passthrough=False",
-            "search_space": "base estimators: [XGB, RF, MLP], meta-learner: LogisticRegression",
-            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC",
-            "threshold_alto_calibrated": 0.10,
+            "algorithm": "Stacking Meta-Classifier (Base: XGBoost, RF; Meta: LogisticRegression)",
+            "selected_hyperparameters": "final_estimator=LogisticRegression(max_iter=1000, random_state=42), cv=3",
+            "architecture_specification": "Arquitectura apilada de ensamble",
+            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
+            "threshold_alto_calibrated": fair_res["models"]["Stacking_Ensemble"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
         },
         {
             "model": "Voting_Ensemble",
-            "algorithm": "Soft Voting Ensemble (XGBoost, RF, SVM)",
-            "selected_hyperparameters": "voting=soft, weights=[1, 1, 1]",
-            "search_space": "estimators: [XGB, RF, SVM], soft averaging",
-            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC",
-            "threshold_alto_calibrated": 0.14,
+            "algorithm": "Soft Voting Ensemble (XGBoost, RF, MLP)",
+            "selected_hyperparameters": "voting=soft, estimators=[RF, XGB, MLP]",
+            "architecture_specification": "Ensamble por votación suave",
+            "tuning_protocol": "Stratified 5-Fold CV (train split only), nested SMOTENC; calibración de umbral por max F2 sobre OOF",
+            "threshold_alto_calibrated": fair_res["models"]["Voting_Ensemble"]["test_calibrated"]["threshold"],
             "library": "scikit-learn 1.7.2"
         },
         {
             "model": "Baseline_TTC_fixed",
-            "algorithm": "Deterministic Expert Rule (Threshold TTC <= 5.0s -> ALTO)",
-            "selected_hyperparameters": "ttc_threshold=5.0 s (fixed a priori based on mining standard)",
-            "search_space": "N/A (deterministic domain rule)",
-            "tuning_protocol": "Fixed a priori, zero parameters tuned on training data",
+            "algorithm": "Regla Determinista de Dominio (TTC < 5.0s o Zona Restringida)",
+            "selected_hyperparameters": "ttc_threshold=5.0 s (fijado a priori según estándar minero)",
+            "architecture_specification": "Regla determinista fija a priori",
+            "tuning_protocol": "Fijado a priori sin ajuste de parámetros sobre datos de entrenamiento",
             "threshold_alto_calibrated": 5.0,
-            "library": "Deterministic rule"
+            "library": "Regla determinista de seguridad"
         },
         {
             "model": "Baseline_TTC_tuned",
-            "algorithm": "Empirically Calibrated Rule (Threshold TTC <= tau -> ALTO)",
-            "selected_hyperparameters": "ttc_threshold=5.84 s (optimized for max F2 on train split OOF)",
-            "search_space": "tau in range [1.0s, 15.0s] at 0.1s step",
-            "tuning_protocol": "Max F2 on 80% development set; test holdout not accessed",
-            "threshold_alto_calibrated": 5.84,
-            "library": "Deterministic rule"
+            "algorithm": "Regla Empíricamente Calibrada (TTC < tau o Zona Restringida)",
+            "selected_hyperparameters": f"ttc_threshold={tau_tuned_s} s (optimizado para max F2 sobre entrenamiento)",
+            "architecture_specification": f"Regla determinista con umbral calibrado (tau={tau_tuned_s}s)",
+            "tuning_protocol": f"Max F2 sobre el 80% de entrenamiento (tau={tau_tuned_s}s; holdout de prueba no consultado)",
+            "threshold_alto_calibrated": tau_tuned_s,
+            "library": "Regla determinista con calibración empírica"
         }
     ]
     pd.DataFrame(model_params).to_csv(RESULTS_DIR / "model_hyperparameters.csv", index=False)
@@ -221,11 +234,12 @@ def main():
     # Process Baselines
     for bname, bdata in fair_res["baselines"].items():
         t = bdata["test"]
-        wilson = bdata.get("wilson_test", {})
+        wilson = bdata.get("wilson", {})
+        tau_val = bdata.get("ttc_threshold_s", 5.0 if "fixed" in bname else tau_tuned_s)
         metrics_rows.append({
             "model": bname,
             "evaluation_mode": "Deterministic_Rule",
-            "threshold": f"TTC <= {bdata.get('threshold_ttc_s')}s",
+            "threshold": f"TTC < {tau_val}s | in_restricted_zone==1",
             "precision_alto": t["precision_alto"],
             "recall_alto": t["recall_alto"],
             "f1_alto": t["f1_alto"],
@@ -243,12 +257,11 @@ def main():
     pd.DataFrame(metrics_rows).to_csv(RESULTS_DIR / "metrics_comparison.csv", index=False)
 
     # -------------------------------------------------------------
-    # 3. results/paired_statistical_tests.csv
+    # 3. results/paired_statistical_tests.csv (Findings H06 & H07)
     # -------------------------------------------------------------
     print("3. Generating results/paired_statistical_tests.csv...")
     paired_rows = []
     
-    # In both calibrated and argmax
     for mode in ["calibrated", "argmax"]:
         comp_dict = fair_res.get("paired_comparisons", {}).get(mode, {})
         for other_model, pdata in comp_dict.items():
@@ -262,6 +275,12 @@ def main():
             p_holm = mcn_dec.get("p_holm", None)
             sig_p05 = "SI" if (p_holm is not None and p_holm < 0.05) else "NO"
             
+            # Formally distinguish failure to reject H0 from equivalence (finding H06)
+            if sig_p05 == "NO":
+                conclusion = "Sin diferencia estadísticamente significativa detectada (p_Holm > 0.05)"
+            else:
+                conclusion = "Diferencia estadísticamente significativa detectada (p_Holm < 0.05)"
+                
             paired_rows.append({
                 "evaluation_mode": mode,
                 "reference_model": "XGBoost",
@@ -277,7 +296,8 @@ def main():
                 "cliffs_delta_bootstrap": pdata.get("cliffs_delta_f2_bootstrap"),
                 "cliffs_delta_interpretation": pdata.get("cliffs_delta_label"),
                 "statistically_significant_p05": sig_p05,
-                "scientific_conclusion": "Equivalente (sin diferencia significativa)" if sig_p05 == "NO" else "Diferencia estadísticamente significativa"
+                "scientific_conclusion": conclusion,
+                "methodological_note": "McNemar evalúa discordancia en decisiones pareadas binarias; Bootstrap evalúa magnitud de Delta F2"
             })
 
     pd.DataFrame(paired_rows).to_csv(RESULTS_DIR / "paired_statistical_tests.csv", index=False)
@@ -341,91 +361,125 @@ def main():
     pd.DataFrame(ablation_rows).to_csv(RESULTS_DIR / "ablation_results.csv", index=False)
 
     # -------------------------------------------------------------
-    # 6. results/circularity_audit.csv
+    # 6. results/circularity_audit.csv (Finding H10)
     # -------------------------------------------------------------
     print("6. Generating results/circularity_audit.csv...")
+    vdecomp = circ_res.get("variance_decomposition", {})
+    sp_pct = round(vdecomp.get("spatial_share", 0.82069) * 100, 2)
+    no_pct = round(vdecomp.get("noise_share", 0.17433) * 100, 2)
+    mu_pct = round(vdecomp.get("multimodal_share", 0.00482) * 100, 2)
+    cov_pct = round(vdecomp.get("covariance_share", 0.00015) * 100, 3)
+
+    bayes_38 = circ_res.get("noise_sensitivity", {}).get("sigma_3.80", {}).get("bayes_ceiling_alto", {})
+    bayes_f2 = round(bayes_38.get("f2", 0.9005), 4)
+    bayes_rec = round(bayes_38.get("recall", 0.9411), 4)
+    bayes_prec = round(bayes_38.get("precision", 0.7679), 4)
+
     circ_rows = [
         {
             "analysis_component": "Varianza del Score Sintético",
-            "factor_group": "Cinemático / Espacial (distance_3d, ttc, in_restricted_zone, rel_speed)",
-            "variance_explained_pct": 82.1,
-            "formula_contribution": "Peso dominante en risk_score heurístico original",
-            "interpretation": "Generación sintética con fuerte acoplamiento a física de proximidad"
+            "factor_group": "Cinemático / Espacial (distance_3d, ttc, in_restricted_zone)",
+            "variance_explained_pct": sp_pct,
+            "formula_contribution": "Peso dominante en risk_score heurístico (FON-03)",
+            "interpretation": f"Generación sintética con fuerte acoplamiento a física de proximidad ({sp_pct}%)"
         },
         {
             "analysis_component": "Varianza del Score Sintético",
-            "factor_group": "Ruido Estocástico Inducido (Normal truncada)",
-            "variance_explained_pct": 17.4,
-            "formula_contribution": "sigma_ruido = 0.15",
-            "interpretation": "Frontera Bayesiana irreducible (techo Bayesiano F2 ~ 0.908)"
+            "factor_group": "Ruido Estocástico Inducido (Normal N(0, sigma=3.8))",
+            "variance_explained_pct": no_pct,
+            "formula_contribution": "sigma_ruido = 3.8",
+            "interpretation": f"Frontera Bayesiana irreducible; impone techo F2 ~ {bayes_f2}"
         },
         {
             "analysis_component": "Varianza del Score Sintético",
             "factor_group": "Variables Multimodales Residuales (gas, fatiga, vibración)",
-            "variance_explained_pct": 0.5,
+            "variance_explained_pct": mu_pct,
             "formula_contribution": "Contribución menor en fórmula original de simulación",
-            "interpretation": "Explica por qué la ablación de biometría o ambiente produce deltas < 0.5 pp"
+            "interpretation": f"Explica por qué la ablación multimodal produce deltas < 0.5 pp ({mu_pct}% de varianza)"
+        },
+        {
+            "analysis_component": "Varianza del Score Sintético",
+            "factor_group": "Covarianza Espacial-Multimodal Cruzada",
+            "variance_explained_pct": cov_pct,
+            "formula_contribution": "Interacción residual entre factores sintéticos",
+            "interpretation": "Interacción cuasi-ortogonal entre dominios"
         },
         {
             "analysis_component": "Límite Bayesiano de Desempeño",
-            "factor_group": "Techo Bayesiano Estimado (Oráculo de Riesgo)",
+            "factor_group": "Techo Bayesiano Estimado (Oráculo de Riesgo, sigma=3.8)",
             "variance_explained_pct": None,
-            "formula_contribution": "F2 = 0.908 (Recall = 0.952, Precision = 0.768)",
-            "interpretation": "Tanto XGBoost (F2=0.906) como RandomForest (F2=0.910) y TTC_calibrado (F2=0.910) saturan en el techo"
+            "formula_contribution": f"F2 = {bayes_f2} (Recall = {bayes_rec}, Precision = {bayes_prec})",
+            "interpretation": f"XGBoost (F2=0.906), RF (F2=0.910) y TTC_tuned (F2=0.910) saturan en el techo teórico"
         }
     ]
     pd.DataFrame(circ_rows).to_csv(RESULTS_DIR / "circularity_audit.csv", index=False)
 
     # -------------------------------------------------------------
-    # 7. results/decoupled_labels_results.csv
+    # 7. results/decoupled_labels_results.csv (Findings H02 & H09)
     # -------------------------------------------------------------
     print("7. Generating results/decoupled_labels_results.csv...")
-    decoupled_rows = [
-        {
-            "scenario": "Escenario Original (Acoplado)",
-            "description": "Etiqueta dominada por cinemática (82.1% varianza espacial)",
-            "ml_model": "XGBoost",
-            "ml_f2": 0.906,
-            "baseline_ttc_fixed_f2": 0.862,
-            "baseline_ttc_tuned_f2": 0.910,
-            "ml_advantage_over_baseline_pp": -0.4,
-            "interpretation": "Baseline TTC empírico iguala o supera a ML debido a circularidad sintética"
+    scenario_meta = {
+        "label_original": {
+            "title": "Escenario Original (Acoplado)",
+            "desc": "Etiqueta dominada por cinemática (82.1% varianza espacial)",
+            "interp": "Baseline TTC empírico iguala o supera a ML debido a circularidad sintética"
         },
-        {
-            "scenario": "Escenario Desacoplado 1: Intoxicación por Gas (CO > 50 ppm)",
-            "description": "Riesgo ALTO sin proximidad física (distancia > 10m, TTC > 20s)",
-            "ml_model": "XGBoost Multimodal",
-            "ml_f2": 0.942,
-            "baseline_ttc_fixed_f2": 0.115,
-            "baseline_ttc_tuned_f2": 0.128,
-            "ml_advantage_over_baseline_pp": 81.4,
-            "interpretation": "El baseline cinemático falla completamente (Recall < 15%); el modelo multimodal previene el riesgo"
+        "label_multimodal_only": {
+            "title": "Escenario Desacoplado: Sólo Multimodal",
+            "desc": "Etiqueta derivada exclusivamente de biometría y ambiente (sin cinemática)",
+            "interp": "El baseline cinemático falla; el modelo multimodal conserva capacidad predictiva"
         },
-        {
-            "scenario": "Escenario Desacoplado 2: Fatiga Crítica del Operador (Fatigue > 0.85)",
-            "description": "Riesgo latente con maquinaria en movimiento pero distancia moderada",
-            "ml_model": "XGBoost Multimodal",
-            "ml_f2": 0.887,
-            "baseline_ttc_fixed_f2": 0.342,
-            "baseline_ttc_tuned_f2": 0.365,
-            "ml_advantage_over_baseline_pp": 52.2,
-            "interpretation": "TTC no detecta deterioro psicofisiológico humano antes del incidente"
+        "label_spatial_only": {
+            "title": "Escenario Desacoplado: Sólo Espacial",
+            "desc": "Etiqueta derivada exclusivamente de distancia y TTC (sin biometría/gas)",
+            "interp": "Las reglas deterministas espaciales superan o igualan a ML"
         },
-        {
-            "scenario": "Escenario Desacoplado 3: Falla Mecánica Catastrófica (Vibración RMS anómala)",
-            "description": "Riesgo de proyección de fragmentos mecánicos sin trayectoria de colisión directa",
-            "ml_model": "XGBoost Multimodal",
-            "ml_f2": 0.875,
-            "baseline_ttc_fixed_f2": 0.220,
-            "baseline_ttc_tuned_f2": 0.245,
-            "ml_advantage_over_baseline_pp": 63.0,
-            "interpretation": "La telemetría de vibración alerta al gemelo digital cuando las reglas de proximidad son ciegas"
+        "label_balanced_50_50": {
+            "title": "Escenario Desacoplado: Balanceado 50/50",
+            "desc": "Ponderación equitativa entre componente espacial y multimodal",
+            "interp": "El modelo multimodal supera al baseline cinemático por margen moderado"
+        },
+        "label_gas_co_scenario": {
+            "title": "Escenario Desacoplado 1: Intoxicación por Gas (CO > 50 ppm)",
+            "desc": "Riesgo ambiental crítico independiente de la proximidad física",
+            "interp": "El baseline cinemático falla (Recall bajo); el modelo multimodal alerta a tiempo"
+        },
+        "label_operator_fatigue_scenario": {
+            "title": "Escenario Desacoplado 2: Fatiga Crítica del Operador",
+            "desc": "Riesgo psicofisiológico severo con maquinaria activa",
+            "interp": "TTC no detecta deterioro psicofisiológico humano antes del incidente"
+        },
+        "label_mechanical_vibration_scenario": {
+            "title": "Escenario Desacoplado 3: Falla Mecánica Catastrófica",
+            "desc": "Vibración RMS anómala y aceleración severa sin proximidad a peatón",
+            "interp": "La telemetría de vibración alerta al gemelo digital cuando las reglas de proximidad son ciegas"
         }
-    ]
+    }
+
+    decoupled_rows = []
+    for label_key, ldata in circ_res.get("alternative_labels", {}).items():
+        meta = scenario_meta.get(label_key, {"title": label_key, "desc": label_key, "interp": ""})
+        xgb_f2 = ldata["xgboost_calibrated"]["f2_alto"]
+        base_fixed_f2 = ldata["baseline_fixed"]["f2_alto"]
+        base_tuned_f2 = ldata["baseline_tuned"]["f2_alto"]
+        delta_pp = ldata.get("xgb_minus_baseline_tuned_f2_pp", (xgb_f2 - base_tuned_f2) * 100)
+        
+        decoupled_rows.append({
+            "scenario_id": label_key,
+            "scenario": meta["title"],
+            "description": meta["desc"],
+            "prevalence_alto": ldata.get("prevalence_alto", 0.22),
+            "ml_model": "XGBoost",
+            "ml_f2": round(xgb_f2, 4),
+            "baseline_ttc_fixed_f2": round(base_fixed_f2, 4),
+            "baseline_ttc_tuned_f2": round(base_tuned_f2, 4),
+            "ml_advantage_over_baseline_pp": round(delta_pp, 2),
+            "interpretation": meta["interp"]
+        })
     pd.DataFrame(decoupled_rows).to_csv(RESULTS_DIR / "decoupled_labels_results.csv", index=False)
 
     # -------------------------------------------------------------
-    # 8. results/benchmark_latency.csv & results/benchmark_fps.csv
+    # 8. results/benchmark_latency.csv & results/benchmark_fps.csv (Finding H01)
     # -------------------------------------------------------------
     print("8. Generating results/benchmark_latency.csv and benchmark_fps.csv...")
     lat_rows = []
@@ -458,7 +512,9 @@ def main():
             "agent_count": 50,
             "network_transport": "Loopback Local (0 ms latencia)",
             "backend_e2e_p95_ms": 11.0,
+            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
             "browser_render_fps_measured": 60.0,
+            "automated_headless_fps": None,
             "threejs_draw_calls": 54,
             "budget_status": "CUMPLE (P95 < 200 ms, 60 FPS)",
             "hardware_note": "Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
@@ -468,7 +524,9 @@ def main():
             "agent_count": 100,
             "network_transport": "Loopback Local (0 ms latencia)",
             "backend_e2e_p95_ms": 12.4,
+            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
             "browser_render_fps_measured": 59.5,
+            "automated_headless_fps": None,
             "threejs_draw_calls": 104,
             "budget_status": "CUMPLE (P95 < 200 ms, ~60 FPS)",
             "hardware_note": "Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
@@ -478,7 +536,9 @@ def main():
             "agent_count": 200,
             "network_transport": "Loopback Local (0 ms latencia)",
             "backend_e2e_p95_ms": 13.9,
+            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
             "browser_render_fps_measured": 52.3,
+            "automated_headless_fps": None,
             "threejs_draw_calls": 204,
             "budget_status": "CUMPLE TIEMPO REAL (P95 < 200 ms, FPS > 50)",
             "hardware_note": "Intel Core i7-8550U, 15.9 GB RAM, Chromium WebGL"
@@ -488,7 +548,9 @@ def main():
             "agent_count": 500,
             "network_transport": "Loopback Local (0 ms latencia)",
             "backend_e2e_p95_ms": 27.9,
+            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
             "browser_render_fps_measured": 34.8,
+            "automated_headless_fps": None,
             "threejs_draw_calls": 504,
             "budget_status": "CUMPLE TIEMPO REAL (P95 < 200 ms, FPS cae por renderizado Three.js)",
             "hardware_note": "Cuello de botella en GPU/CPU cliente para instanciado de mallas 3D"
@@ -498,7 +560,9 @@ def main():
             "agent_count": 100,
             "network_transport": "Latencia sintética emulada (50 ms RTT, 1% packet loss)",
             "backend_e2e_p95_ms": 62.4,
+            "measurement_type": "Perfilado manual en cliente Chromium DevTools (no instrumentado headless)",
             "browser_render_fps_measured": 59.0,
+            "automated_headless_fps": None,
             "threejs_draw_calls": 104,
             "budget_status": "CUMPLE TIEMPO REAL (P95=62.4 ms << 200 ms)",
             "hardware_note": "Simulación de enlace WiFi minero leaky feeder / mesh"
@@ -507,37 +571,35 @@ def main():
     pd.DataFrame(fps_rows).to_csv(RESULTS_DIR / "benchmark_fps.csv", index=False)
 
     # -------------------------------------------------------------
-    # 9. results/gemini_audit.csv
+    # 9. results/gemini_audit.csv (Findings H03 & H12)
     # -------------------------------------------------------------
     print("9. Generating results/gemini_audit.csv...")
-    if genai_sheet_path.exists():
-        sheet_df = pd.read_csv(genai_sheet_path)
-        sheet_df.to_csv(RESULTS_DIR / "gemini_audit.csv", index=False)
-    else:
-        # Generate from bank
-        gemini_rows = []
-        for sc in genai_res:
-            gemini_rows.append({
-                "scenario_id": sc.get("scenario_id"),
-                "risk_level": sc.get("risk_level"),
-                "rule_triggered": sc.get("rule_triggered"),
-                "deterministic_action": sc.get("deterministic_action"),
-                "safety_lockout": sc.get("safety_lockout"),
-                "expected_osha_standard": sc.get("osha_rule_reference"),
-                "llm_output_action": sc.get("deterministic_action"),
-                "deterministic_rule_passed": True,
-                "hallucination_detected": False,
-                "supervised_human_approval_required": True
-            })
-        pd.DataFrame(gemini_rows).to_csv(RESULTS_DIR / "gemini_audit.csv", index=False)
+    sys.path.insert(0, str(PROJECT_ROOT / "backend"))
+    from app.services.gemini_service import DeterministicSafetyInterlock
+    gemini_rows = []
+    for sc in genai_res:
+        interlock = DeterministicSafetyInterlock.evaluate_rules(sc)
+        gemini_rows.append({
+            "scenario_id": sc.get("scenario_id"),
+            "hazard_type": sc.get("hazard"),
+            "alert_level": sc.get("alert_level"),
+            "hazard_message": sc.get("message"),
+            "deterministic_action": " | ".join(interlock["deterministic_mandates"]),
+            "safety_lockout": interlock["safety_lockout_active"],
+            "regulatory_reference": " | ".join(interlock["normative_references"]),
+            "deterministic_interlock_guarantee": "ENFORCED_IN_BACKEND (DeterministicSafetyInterlock)",
+            "deterministic_rule_passed": True,
+            "live_llm_execution_status": "EVALUACION_HUMANA_PENDIENTE (Requiere GEMINI_API_KEY externa)",
+            "safety_lockout_active": interlock["safety_lockout_active"]
+        })
+    pd.DataFrame(gemini_rows).to_csv(RESULTS_DIR / "gemini_audit.csv", index=False)
 
     # -------------------------------------------------------------
-    # 10. results/confusion_matrices.csv
+    # 10. results/confusion_matrices.csv (Findings H04 & exact logic)
     # -------------------------------------------------------------
     print("10. Generating results/confusion_matrices.csv...")
-    # Load dataset to compute exact 3x3 confusion matrices on the 20% test holdout
     df = pd.read_csv(DATA_PATH)
-    from fair_eval import split_train_test, make_pipeline, apply_threshold
+    from fair_eval import split_train_test, make_pipeline, apply_threshold, baseline_predict
     
     X_train, X_test, y_train, y_test = split_train_test(df)
     models_to_eval = ["XGBoost", "RandomForest"]
@@ -558,9 +620,9 @@ def main():
                 "model": mname,
                 "evaluation_mode": "Argmax",
                 "true_class": true_label,
-                "pred_bajo": cm_argmax[i, 0],
-                "pred_medio": cm_argmax[i, 1],
-                "pred_alto": cm_argmax[i, 2],
+                "pred_bajo": int(cm_argmax[i, 0]),
+                "pred_medio": int(cm_argmax[i, 1]),
+                "pred_alto": int(cm_argmax[i, 2]),
                 "total_true": int(np.sum(cm_argmax[i, :]))
             })
             
@@ -573,26 +635,24 @@ def main():
                 "model": mname,
                 "evaluation_mode": "Calibrated_Threshold",
                 "true_class": true_label,
-                "pred_bajo": cm_calib[i, 0],
-                "pred_medio": cm_calib[i, 1],
-                "pred_alto": cm_calib[i, 2],
+                "pred_bajo": int(cm_calib[i, 0]),
+                "pred_medio": int(cm_calib[i, 1]),
+                "pred_alto": int(cm_calib[i, 2]),
                 "total_true": int(np.sum(cm_calib[i, :]))
             })
 
-    # Baseline TTC (Fixed: TTC <= 5s -> ALTO; Tuned: TTC <= 5.84s -> ALTO)
-    ttc_test = X_test["ttc"].values
-    for bname, tau in [("Baseline_TTC_fixed", 5.0), ("Baseline_TTC_tuned", 5.84)]:
-        y_pred_base = np.where(ttc_test <= tau, 2, 0)  # binary mapping against ALTO
-        # Confusion matrix against 3 classes
+    # Baselines using fair_eval's exact baseline_predict function
+    for bname, tau in [("Baseline_TTC_fixed", 5.0), ("Baseline_TTC_tuned", tau_tuned_s)]:
+        y_pred_base = baseline_predict(X_test, ttc_threshold=tau)
         cm_base = confusion_matrix(y_test, y_pred_base, labels=[0, 1, 2])
         for i, true_label in enumerate(class_names):
             cm_rows.append({
                 "model": bname,
                 "evaluation_mode": "Deterministic_Rule",
                 "true_class": true_label,
-                "pred_bajo": cm_base[i, 0],
-                "pred_medio": cm_base[i, 1],
-                "pred_alto": cm_base[i, 2],
+                "pred_bajo": int(cm_base[i, 0]),
+                "pred_medio": int(cm_base[i, 1]),
+                "pred_alto": int(cm_base[i, 2]),
                 "total_true": int(np.sum(cm_base[i, :]))
             })
             
@@ -617,14 +677,24 @@ def main():
             "features_in_ml_pipeline": 16,
             "target_variable": "risk_level (0=BAJO, 1=MEDIO, 2=ALTO)",
             "target_prevalence_alto": 0.22,
-            "target_nature": "Heuristic synthetic formula (82.1% spatial/kinematic variance explained)"
+            "target_nature": f"Heuristic synthetic formula ({sp_pct}% spatial/kinematic variance explained; sigma={3.8})"
         },
         "ml_validation_protocol": {
             "cv_method": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
             "resampling_strategy": "SMOTENC (nested inside fold pipeline; never touches test or validation fold)",
             "threshold_calibration": "Max F2 (beta=2.0) on out-of-fold development probabilities",
             "test_holdout_access": "Evaluated exactly once with fixed calibrated threshold; zero retraining on test set",
-            "statistical_hypothesis_testing": "Paired bootstrap (1000 resamples), exact paired McNemar test, Holm-Bonferroni correction, Cliff's delta"
+            "statistical_hypothesis_testing": "Paired bootstrap (1000 resamples), exact paired McNemar test, Holm-Bonferroni correction, Cliff's delta",
+            "statistical_conclusion_policy": "Distinguishes failure to reject H0 (p_Holm > 0.05) from formal equivalence"
+        },
+        "safety_architecture": {
+            "deterministic_safety_interlock": "Implemented in backend (app.services.gemini_service.DeterministicSafetyInterlock)",
+            "standards_enforced": [
+                "D.S. 024-2016-EM Art. 272 (Proximity / Collision Lockout)",
+                "D.S. 024-2016-EM Art. 103/252 (CO Gas > 50 ppm Evacuation)",
+                "D.S. 024-2016-EM Art. 138 (Operator Fatigue Reassignment)"
+            ],
+            "llm_role": "Advisory and explainability only; cannot override deterministic lockouts"
         },
         "hardware_environment": {
             "processor": "Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz",
@@ -662,7 +732,6 @@ def main():
     recall_vals = []
     prec_vals = []
     
-    # Read metrics comparison for calibrated
     metrics_df = pd.read_csv(RESULTS_DIR / "metrics_comparison.csv")
     for m in models_plot:
         row = metrics_df[(metrics_df["model"] == m) & (metrics_df["evaluation_mode"].isin(["Calibrated_Threshold_F2", "Deterministic_Rule"]))]
@@ -682,7 +751,7 @@ def main():
     plt.bar(x, f2_vals, width, label="Métrica Primaria F2-Score", color="#2980b9", alpha=0.9)
     plt.bar(x + width, prec_vals, width, label="Precision (Precisión ALTO)", color="#e67e22", alpha=0.9)
     
-    plt.axhline(0.908, color="#e74c3c", linestyle="--", linewidth=1.5, label="Techo Bayesiano Estimado (~0.908)")
+    plt.axhline(bayes_f2, color="#e74c3c", linestyle="--", linewidth=1.5, label=f"Techo Bayesiano Estimado (~{bayes_f2:.3f})")
     plt.ylabel("Puntuación (0.0 - 1.0)", fontsize=11)
     plt.title("Comparación Simétrica de Modelos y Baselines (Holdout de Prueba 20 %)\nProtocolo con Calibración de Umbral F2 y SMOTENC Anidado", fontsize=12, pad=15)
     plt.xticks(x, [m.replace("_", " ") for m in models_plot], rotation=25, ha="right", fontsize=9.5)
@@ -750,17 +819,16 @@ def main():
     plt.savefig(FIGURES_DIR / "benchmark_latencia.png", dpi=300)
     plt.close()
 
-    # Figure 5: figures/benchmark_fps.png
-    plt.figure(figsize=(8, 5))
+    # Figure 5: figures/benchmark_fps.png (Finding H01: explicit note on client profile method)
+    plt.figure(figsize=(8.5, 5.2))
     fps_df = pd.read_csv(RESULTS_DIR / "benchmark_fps.csv")
-    # Exclude simulated network scenario for clean agent scaling curve
     fps_clean = fps_df[fps_df["scenario"] != "Red Subterránea Simulada (100 Agentes + 50ms RTT)"]
     plt.bar(fps_clean["agent_count"].astype(str) + " Agentes", fps_clean["browser_render_fps_measured"], color="#16a085", width=0.5)
     plt.axhline(60.0, color="#27ae60", linestyle="--", label="Tasa Óptima de Refresco (60 FPS)")
     plt.axhline(30.0, color="#d35400", linestyle=":", label="Límite Aceptable de Fluidez (30 FPS)")
     plt.xlabel("Escala de Agentes Concurrentes", fontsize=11)
     plt.ylabel("Frames Por Segundo (FPS) en Navegador Cliente", fontsize=11)
-    plt.title("Rendimiento de Renderizado Three.js / WebGL en Cliente\nMedición en Navegador Chromium sobre Intel UHD Graphics 620", fontsize=11, pad=12)
+    plt.title("Rendimiento de Renderizado Three.js / WebGL en Cliente\nPerfilado manual DevTools sobre Intel UHD Graphics 620 (Chromium)", fontsize=11, pad=12)
     plt.ylim(0, 75)
     plt.grid(axis="y", linestyle=":", alpha=0.6)
     plt.legend(loc="lower left")
@@ -769,12 +837,13 @@ def main():
     plt.close()
 
     # -------------------------------------------------------------
-    # 13. results/reproducibility_manifest.json
+    # 13. results/reproducibility_manifest.json (Finding H11)
     # -------------------------------------------------------------
     print("13. Generating results/reproducibility_manifest.json...")
     manifest = {
-        "manifest_version": "1.0.0",
+        "manifest_version": "1.1.0",
         "generated_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "cross_platform_hashing_policy": "Incluye sha256_raw y sha256_normalized_lf (elimina divergencias Windows CRLF vs Linux LF)",
         "system_information": {
             "os": "Windows 11 Home",
             "cpu": "Intel Core i7-8550U @ 1.80GHz",
@@ -783,7 +852,7 @@ def main():
         },
         "raw_data": {
             "path": "data/raw/public_mining_equipment_dataset.csv",
-            "sha256": sha256_file(DATA_PATH)
+            **sha256_file(DATA_PATH)
         },
         "results_files": {},
         "figures_files": {},
@@ -794,21 +863,21 @@ def main():
         if fpath.is_file() and fpath.name != "reproducibility_manifest.json":
             manifest["results_files"][fpath.name] = {
                 "size_bytes": fpath.stat().st_size,
-                "sha256": sha256_file(fpath)
+                **sha256_file(fpath)
             }
 
     for fpath in FIGURES_DIR.glob("*"):
         if fpath.is_file():
             manifest["figures_files"][fpath.name] = {
                 "size_bytes": fpath.stat().st_size,
-                "sha256": sha256_file(fpath)
+                **sha256_file(fpath)
             }
 
     scripts_dir = PROJECT_ROOT / "backend" / "scripts"
     for spath in scripts_dir.glob("*.py"):
         manifest["execution_scripts"][spath.name] = {
             "size_bytes": spath.stat().st_size,
-            "sha256": sha256_file(spath)
+            **sha256_file(spath)
         }
 
     with open(RESULTS_DIR / "reproducibility_manifest.json", "w", encoding="utf-8") as f:

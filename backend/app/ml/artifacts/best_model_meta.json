@@ -1,123 +1,53 @@
 {
-  "model_name": "RandomForest",
-  "champion_rank": 1.0,
-  "timestamp": "2026-09-05 20:39:13",
-  "best_params": {
-    "n_estimators": 200,
-    "max_depth": 12
+  "model_name": "XGBoost (Calibrado)",
+  "algorithm": "XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1)",
+  "timestamp_utc": "2026-10-26T19:46:19.580462+00:00",
+  "n_features": 16,
+  "feature_names": [
+    "distance_3d",
+    "worker_speed",
+    "machine_speed",
+    "relative_speed",
+    "direction_worker",
+    "direction_machine",
+    "ttc",
+    "in_restricted_zone",
+    "machine_status",
+    "worker_bpm",
+    "fatigue_index",
+    "vibration_rms",
+    "acceleration_z",
+    "gas_co_ppm",
+    "dust_density_mg_m3",
+    "ambient_light_lux"
+  ],
+  "categorical_features": [
+    "direction_worker",
+    "direction_machine",
+    "in_restricted_zone",
+    "machine_status"
+  ],
+  "numerical_features": [
+    "distance_3d",
+    "worker_speed",
+    "machine_speed",
+    "relative_speed",
+    "ttc",
+    "worker_bpm",
+    "fatigue_index",
+    "vibration_rms",
+    "acceleration_z",
+    "gas_co_ppm",
+    "dust_density_mg_m3",
+    "ambient_light_lux"
+  ],
+  "calibrated_threshold_alto": 0.18,
+  "decision_rule": "Predice ALTO (2) si P(ALTO) >= 0.18, sino argmax(BAJO, MEDIO)",
+  "test_holdout_metrics": {
+    "f2_alto": 0.9057180270624182,
+    "recall_alto": 0.9431818181818182,
+    "precision_alto": 0.7815442561205274,
+    "f1_alto": 0.8547888774459321
   },
-  "test_metrics": {
-    "accuracy": 0.9985,
-    "f1_macro": 0.9981774957445556,
-    "precision_macro": 0.9975903614457832,
-    "recall_macro": 0.998774517943847,
-    "auc_roc": 0.9999976964642636,
-    "confusion_matrix": [
-      [
-        960,
-        2,
-        0
-      ],
-      [
-        0,
-        412,
-        0
-      ],
-      [
-        0,
-        1,
-        625
-      ]
-    ]
-  },
-  "statistical_tests": {
-    "friedman_stat": 19.040000000000006,
-    "friedman_p": 0.0007718488689673323,
-    "nemenyi_cd": 2.728,
-    "wilcoxon_p": 0.36689,
-    "ranked_models": [
-      {
-        "model_name": "RandomForest",
-        "rank": 1.0,
-        "mean_accuracy": 0.9984999999999999,
-        "mean_f1": 0.9981633471726088
-      },
-      {
-        "model_name": "Stacking_Ensemble",
-        "rank": 2.0,
-        "mean_accuracy": 0.9977499999999999,
-        "mean_f1": 0.9972715656660498
-      },
-      {
-        "model_name": "Voting_Ensemble",
-        "rank": 3.4,
-        "mean_accuracy": 0.9961249999999999,
-        "mean_f1": 0.9953174878598201
-      },
-      {
-        "model_name": "XGBoost",
-        "rank": 3.6,
-        "mean_accuracy": 0.9949999999999999,
-        "mean_f1": 0.9939546639996472
-      },
-      {
-        "model_name": "MLP_NeuralNet",
-        "rank": 5.0,
-        "mean_accuracy": 0.9721249999999999,
-        "mean_f1": 0.9674997949926805
-      }
-    ],
-    "pairwise_hypothesis_tests": [
-      {
-        "comparacion": "RandomForest vs XGBoost",
-        "diff_media_f1": 0.0012,
-        "t_statistic": 1.02,
-        "w_stat": 6.0,
-        "p_value": 0.36689,
-        "decision_h0": "No rechazar H0"
-      },
-      {
-        "comparacion": "RandomForest vs MLP_NeuralNet",
-        "diff_media_f1": 0.0523,
-        "t_statistic": 26.4,
-        "w_stat": 0.0,
-        "p_value": 1e-05,
-        "decision_h0": "Rechazar H0"
-      },
-      {
-        "comparacion": "RandomForest vs Stacking_Ensemble",
-        "diff_media_f1": 0.0013,
-        "t_statistic": 2.03,
-        "w_stat": 2.0,
-        "p_value": 0.11187,
-        "decision_h0": "No rechazar H0"
-      },
-      {
-        "comparacion": "RandomForest vs Voting_Ensemble",
-        "diff_media_f1": 0.0018,
-        "t_statistic": 3.35,
-        "w_stat": 0.0,
-        "p_value": 0.02864,
-        "decision_h0": "Rechazar H0"
-      }
-    ]
-  },
-  "business_multicriteria_evaluation": {
-    "weights": {
-      "rendimiento_predictivo": 0.40,
-      "latencia_inferencia": 0.25,
-      "interpretabilidad_xai": 0.20,
-      "mantenibilidad_despliegue": 0.15
-    },
-    "champion_score": 97.45,
-    "champion_name": "RandomForest",
-    "justification": "Arquitectura óptima para despliegue minero subterráneo: máximo F1-Score (0.9982), latencia de respuesta sub-milisegundo (0.05ms) y total explicabilidad en auditorías de seguridad ocupacional.",
-    "ranking": [
-      { "model": "RandomForest", "score": 97.45, "rank": 1 },
-      { "model": "XGBoost", "score": 94.82, "rank": 2 },
-      { "model": "Voting_Ensemble", "score": 91.15, "rank": 3 },
-      { "model": "Stacking_Ensemble", "score": 86.40, "rank": 4 },
-      { "model": "MLP_NeuralNet", "score": 75.20, "rank": 5 }
-    ]
-  }
+  "scientific_reference": "Protocolo simetrico con calibracion en OOF (M-11 Acta Montanistica Slovaca 2026)"
 }
