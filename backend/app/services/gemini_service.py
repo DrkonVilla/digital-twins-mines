@@ -135,11 +135,14 @@ class DeterministicSafetyInterlock:
         regulations = []
         lockout_engaged = False
 
+        # Verificación estricta de negación en texto libre ("no hay gas", "0 ppm", "sin presencia")
+        is_gas_negated = bool(re.search(r"\b(no hay|sin presencia|ausencia de|libre de|cero ppm|0 ppm|0\.0 ppm|normal)\b", msg))
+
         # Regla 1: Proximidad Crítica / Zona Restringida / Colisión (D.S. 024-2016-EM Art. 272/274)
         is_proximity_hazard = (
             hazard in ["colision_proximidad", "zona_restringida", "punto_ciego_retroceso"]
-            or any(w in msg for w in ["zona restringida", "in_restricted_zone", "colisión", "colision", "atropello", "punto ciego"])
-            or bool(re.search(r"\b(ttc|distancia|proximidad)\b", msg))
+            or (hazard in ["", "unknown"] and any(w in msg for w in ["zona restringida", "in_restricted_zone", "colisión", "colision", "atropello", "punto ciego"]))
+            or (hazard in ["", "unknown"] and bool(re.search(r"\b(ttc|distancia|proximidad)\b", msg)))
         )
         if is_proximity_hazard and level in ["ALTO", "CRITICO"]:
             lockout_engaged = True
@@ -148,11 +151,11 @@ class DeterministicSafetyInterlock:
             regulations.append("D.S. 024-2016-EM Art. 272 / Art. 274 (Zonas de Exclusión)")
 
         # Regla 2: Gases Asfixiantes / Tóxicos (Monóxido de Carbono CO) (Art. 103/252)
-        # Uso estricto de \b para evitar falsos positivos con "colisión", "correcto", etc.
+        # Prioridad a campo estructurado; texto libre descartado si hay negación explícita
         is_gas_hazard = (
             hazard in ["gas_co", "gas", "combinado_gas_fatiga"]
             or "co" in gases
-            or bool(re.search(r"\b(co|gas|gases|monóxido|monoxido|ppm)\b", msg))
+            or (not is_gas_negated and (hazard in ["", "unknown", "gas_co", "combinado_gas_fatiga"]) and bool(re.search(r"\b(co|monóxido|monoxido|ppm)\b", msg)))
         )
         if is_gas_hazard and level in ["MEDIO", "ALTO", "CRITICO"]:
             lockout_engaged = True
@@ -163,7 +166,7 @@ class DeterministicSafetyInterlock:
         # Regla 3: Fatiga Crítica del Personal (Art. 138)
         is_fatigue_hazard = (
             hazard in ["fatiga_operador", "combinado_gas_fatiga"]
-            or bool(re.search(r"\b(fatiga|bpm|somnolencia|cardíaco|cardiaco|sueño)\b", msg))
+            or (hazard in ["", "unknown"] and bool(re.search(r"\b(fatiga|bpm|somnolencia|cardíaco|cardiaco|sueño)\b", msg)))
         )
         if is_fatigue_hazard and level in ["MEDIO", "ALTO", "CRITICO"]:
             actions.append("RELEVO OBLIGATORIO DE TURNO: Suspensión preventiva de operación manual de maquinaria pesada.")
@@ -172,12 +175,32 @@ class DeterministicSafetyInterlock:
         # Regla 4: Falla Mecánica Catastrófica (Art. 367/368)
         is_mech_hazard = (
             hazard in ["falla_maquina", "falla_mecanica"]
-            or bool(re.search(r"\b(vibración|vibracion|falla mecánica|falla mecanica|temperatura motor)\b", msg))
+            or (hazard in ["", "unknown"] and bool(re.search(r"\b(vibración|vibracion|falla mecánica|falla mecanica|temperatura motor)\b", msg)))
         )
         if is_mech_hazard and level in ["ALTO", "CRITICO"]:
             lockout_engaged = True
             actions.append("PARADA DE MOTOR Y BLOQUEO LOTO: Prohibición de arranque hasta inspección mecánica certificada.")
             regulations.append("D.S. 024-2016-EM Art. 367 / Art. 368 (Mantenimiento Mecánico y LOTO)")
+
+        # Regla 5: Polvo en Suspensión y Baja Visibilidad (D.S. 024-2016-EM Art. 104/105 y Art. 272)
+        is_dust_hazard = (
+            hazard in ["polvo_visibilidad", "polvo", "visibilidad"]
+            or (hazard in ["", "unknown"] and bool(re.search(r"\b(polvo|visibilidad|mg/m3|lux)\b", msg)))
+        )
+        if is_dust_hazard:
+            if level == "CRITICO":
+                lockout_engaged = True
+                actions.append("SUSPENSIÓN TEMPORAL DE MANIOBRAS DE TRÁNSITO: Detención preventiva de circulación vehicular por visibilidad nula (Art. 104 / Art. 272 D.S. 024-2016-EM).")
+                actions.append("ACTIVACIÓN INMEDIATA DE SISTEMAS DE SUPRESIÓN DE POLVO (NEBULIZADORES / ASPERSORES) Y MÁXIMA VENTILACIÓN AUXILIAR (Art. 105).")
+                regulations.append("D.S. 024-2016-EM Art. 104 / Art. 105 (Control de Polvo y Ventilación)")
+                regulations.append("D.S. 024-2016-EM Art. 272 (Seguridad en Vías de Tránsito Subterráneo)")
+            elif level == "ALTO":
+                actions.append("REDUCCIÓN PREVENTIVA DE VELOCIDAD A 10 KM/H Y ENCENDIDO DE FAROS DE PENETRACIÓN DE POLVO (Art. 272).")
+                actions.append("ACTIVACIÓN DE ASPERSORES DE AGUA Y SISTEMA DE VENTILACIÓN AUXILIAR (Art. 105).")
+                regulations.append("D.S. 024-2016-EM Art. 104 / Art. 105 (Control de Polvo y Ventilación)")
+            elif level == "MEDIO":
+                actions.append("Monitoreo continuo de material particulado y verificación de distanciamiento preventivo de 5 metros en galería.")
+                regulations.append("Procedimiento Escrito de Trabajo Seguro (PETS) - Control de Polvo")
 
         if not actions:
             actions.append("Monitoreo visual continuo y verificación de distanciamiento mínimo de 3 metros en galería.")

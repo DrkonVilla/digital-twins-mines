@@ -478,10 +478,22 @@ def main():
     decoupled_rows = []
     for label_key, ldata in circ_res.get("alternative_labels", {}).items():
         meta = scenario_meta.get(label_key, {"title": label_key, "desc": label_key, "interp": ""})
-        xgb_f2 = ldata["xgboost_calibrated"]["f2_alto"]
-        base_fixed_f2 = ldata["baseline_fixed"]["f2_alto"]
-        base_tuned_f2 = ldata["baseline_tuned"]["f2_alto"]
-        delta_pp = ldata.get("xgb_minus_baseline_tuned_f2_pp", (xgb_f2 - base_tuned_f2) * 100)
+        xgb_m = ldata.get("xgboost_calibrated", {})
+        xgb_f2 = xgb_m.get("f2_alto", 0.0)
+        xgb_prec = xgb_m.get("precision_alto", 0.0)
+        xgb_rec = xgb_m.get("recall_alto", 0.0)
+        xgb_spec = xgb_m.get("specificity_alto", 0.0)
+        xgb_fpr = xgb_m.get("false_positive_rate_alto", 0.0)
+        
+        base_fixed_f2 = ldata.get("baseline_fixed", {}).get("f2_alto", 0.0)
+        base_tuned_f2 = ldata.get("baseline_tuned", {}).get("f2_alto", 0.0)
+        base_always_f2 = ldata.get("baseline_always_alto", {}).get("f2_alto", 0.5851)
+        
+        delta_tuned_pp = ldata.get("xgb_minus_baseline_tuned_f2_pp", (xgb_f2 - base_tuned_f2) * 100)
+        delta_always_pp = ldata.get("xgb_minus_always_alto_f2_pp", (xgb_f2 - base_always_f2) * 100)
+        
+        cm = xgb_m.get("confusion_matrix_2x2", {})
+        cm_str = f"TN={cm.get('tn', 0)}, FP={cm.get('fp', 0)}, FN={cm.get('fn', 0)}, TP={cm.get('tp', 0)}"
         
         decoupled_rows.append({
             "scenario_id": label_key,
@@ -490,10 +502,17 @@ def main():
             "prevalence_alto": ldata.get("prevalence_alto", 0.22),
             "ml_model": "XGBoost",
             "ml_f2": round(xgb_f2, 4),
+            "ml_precision": round(xgb_prec, 4),
+            "ml_recall": round(xgb_rec, 4),
+            "ml_specificity": round(xgb_spec, 4),
+            "ml_false_positive_rate": round(xgb_fpr, 4),
             "baseline_ttc_fixed_f2": round(base_fixed_f2, 4),
             "baseline_ttc_tuned_f2": round(base_tuned_f2, 4),
-            "ml_advantage_over_baseline_pp": round(delta_pp, 2),
-            "interpretation": meta["interp"]
+            "baseline_always_alto_f2": round(base_always_f2, 4),
+            "ml_advantage_over_tuned_pp": round(delta_tuned_pp, 2),
+            "ml_advantage_over_always_alto_pp": round(delta_always_pp, 2),
+            "confusion_matrix_2x2": cm_str,
+            "scientific_interpretation": meta["interp"]
         })
     pd.DataFrame(decoupled_rows).to_csv(RESULTS_DIR / "decoupled_labels_results.csv", index=False)
 
@@ -562,31 +581,68 @@ def main():
         mandates_str = " | ".join(interlock["deterministic_mandates"])
         regs_str = " | ".join(interlock["normative_references"])
         
-        # Rigorous scenario expectation test (Differential Audit 773554b)
-        expectation_met = True
+        # Comprehensive, fail-by-default expectation test covering ALL 8 hazards (Audit da81d5f P1)
+        expectation_met = False
+        
         if hazard in ["colision_proximidad", "zona_restringida", "punto_ciego_retroceso"]:
             if level in ["ALTO", "CRITICO"]:
-                if not interlock["safety_lockout_active"] or "PARADA DE EMERGENCIA" not in mandates_str:
-                    expectation_met = False
-            # Proximity collision alert must NOT trigger gas evacuation
-            if "EVACUACIÓN" in mandates_str or "252" in regs_str:
-                expectation_met = False
+                has_stop = "PARADA DE EMERGENCIA" in mandates_str and "272" in regs_str
+                no_gas = "EVACUACIÓN" not in mandates_str and "252" not in regs_str
+                lockout_ok = interlock["safety_lockout_active"] is True
+                expectation_met = has_stop and no_gas and lockout_ok
+            else:  # MEDIO
+                no_gas = "EVACUACIÓN" not in mandates_str
+                no_stop = "PARADA DE EMERGENCIA" not in mandates_str
+                lockout_ok = interlock["safety_lockout_active"] is False
+                expectation_met = no_gas and no_stop and lockout_ok
+                
         elif hazard == "gas_co":
-            if "EVACUACIÓN" not in mandates_str or "252" not in regs_str:
-                expectation_met = False
-            # Pure gas alert must NOT trigger proximity stop
-            if "PARADA DE EMERGENCIA INMEDIATA: Desconexión" in mandates_str:
-                expectation_met = False
+            has_evac = "EVACUACIÓN" in mandates_str and "252" in regs_str and "VENTILACIÓN" in mandates_str
+            no_proximity_stop = "PARADA DE EMERGENCIA INMEDIATA: Desconexión" not in mandates_str
+            lockout_ok = interlock["safety_lockout_active"] is True
+            expectation_met = has_evac and no_proximity_stop and lockout_ok
+            
         elif hazard == "fatiga_operador":
-            if "RELEVO OBLIGATORIO" not in mandates_str or "138" not in regs_str:
-                expectation_met = False
+            has_relief = "RELEVO OBLIGATORIO" in mandates_str and "138" in regs_str
+            no_gas = "EVACUACIÓN" not in mandates_str
+            no_proximity_stop = "PARADA DE EMERGENCIA INMEDIATA: Desconexión" not in mandates_str
+            lockout_ok = interlock["safety_lockout_active"] is False
+            expectation_met = has_relief and no_gas and no_proximity_stop and lockout_ok
+            
         elif hazard == "falla_maquina":
             if level in ["ALTO", "CRITICO"]:
-                if "BLOQUEO LOTO" not in mandates_str:
-                    expectation_met = False
-            else:
-                if "BLOQUEO LOTO" in mandates_str:
-                    expectation_met = False
+                has_loto = "BLOQUEO LOTO" in mandates_str and "367" in regs_str
+                lockout_ok = interlock["safety_lockout_active"] is True
+                expectation_met = has_loto and lockout_ok
+            else:  # MEDIO
+                no_loto = "BLOQUEO LOTO" not in mandates_str
+                lockout_ok = interlock["safety_lockout_active"] is False
+                expectation_met = no_loto and lockout_ok
+                
+        elif hazard == "polvo_visibilidad":
+            no_gas = "EVACUACIÓN" not in mandates_str
+            no_collision_stop = "PARADA DE EMERGENCIA INMEDIATA: Desconexión" not in mandates_str
+            if level == "CRITICO":
+                has_suspension = "SUSPENSIÓN TEMPORAL DE MANIOBRAS" in mandates_str and "SUPRESIÓN DE POLVO" in mandates_str
+                has_regs = "104" in regs_str and "105" in regs_str
+                lockout_ok = interlock["safety_lockout_active"] is True
+                expectation_met = has_suspension and has_regs and no_gas and no_collision_stop and lockout_ok
+            elif level == "ALTO":
+                has_speed_red = "REDUCCIÓN PREVENTIVA DE VELOCIDAD" in mandates_str and "ASPERSORES" in mandates_str
+                has_regs = "104" in regs_str and "105" in regs_str
+                lockout_ok = interlock["safety_lockout_active"] is False
+                expectation_met = has_speed_red and has_regs and no_gas and no_collision_stop and lockout_ok
+            else:  # MEDIO
+                has_pets = "Monitoreo continuo" in mandates_str and "PETS" in regs_str
+                lockout_ok = interlock["safety_lockout_active"] is False
+                expectation_met = has_pets and no_gas and no_collision_stop and lockout_ok
+                
+        elif hazard == "combinado_gas_fatiga":
+            # Multi-hazard: MUST satisfy both gas evacuation AND fatigue relief
+            has_evac = "EVACUACIÓN" in mandates_str and "252" in regs_str
+            has_relief = "RELEVO OBLIGATORIO" in mandates_str and "138" in regs_str
+            lockout_ok = interlock["safety_lockout_active"] is True
+            expectation_met = has_evac and has_relief and lockout_ok
 
         gemini_rows.append({
             "scenario_id": sc.get("scenario_id"),

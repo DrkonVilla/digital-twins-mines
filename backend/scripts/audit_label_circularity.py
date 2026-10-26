@@ -25,7 +25,7 @@ import sys
 import numpy as np
 import pandas as pd
 from scipy import stats
-from sklearn.metrics import cohen_kappa_score
+from sklearn.metrics import cohen_kappa_score, confusion_matrix, precision_score, recall_score
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -74,6 +74,29 @@ def expected_cuts(det, sigma, draws=30, seed=0):
     return float(np.mean(lo)), float(np.mean(hi))
 
 
+def detailed_alto_metrics(y_true, pred):
+    """Calcula métricas detalladas para la clase ALTO: precision, recall, specificity, FPR y matriz de confusión 2x2."""
+    yb = (np.asarray(y_true) == fe.HIGH_CLASS).astype(int)
+    pb = (np.asarray(pred) == fe.HIGH_CLASS).astype(int)
+    cm = confusion_matrix(yb, pb, labels=[0, 1])
+    tn, fp, fn, tp = cm.ravel()
+    prec = precision_score(yb, pb, zero_division=0)
+    rec = recall_score(yb, pb, zero_division=0)
+    spec = float(tn / (tn + fp)) if (tn + fp) > 0 else 0.0
+    fpr = float(fp / (fp + tn)) if (fp + tn) > 0 else 0.0
+    f1 = float(fe.fbeta(prec, rec, 1.0))
+    f2 = float(fe.fbeta(prec, rec, 2.0))
+    return {
+        "precision_alto": float(prec),
+        "recall_alto": float(rec),
+        "specificity_alto": spec,
+        "false_positive_rate_alto": fpr,
+        "f1_alto": f1,
+        "f2_alto": f2,
+        "confusion_matrix_2x2": {"tn": int(tn), "fp": int(fp), "fn": int(fn), "tp": int(tp)}
+    }
+
+
 def labels_from_score(score):
     a, b = np.percentile(score, [P_LOW, P_HIGH])
     y = np.zeros(len(score), dtype=int)
@@ -83,22 +106,37 @@ def labels_from_score(score):
 
 
 def evaluate_on_label(df, y, tag, features=fe.FEATURES):
-    """XGBoost simétrico (OOF 3 pliegues + umbral F2) vs baseline justo sobre una etiqueta dada."""
+    """XGBoost simétrico vs baseline TTC y baseline trivial siempre-ALTO (Audit da81d5f P1)."""
     X = df[features]
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=fe.RANDOM_STATE)
     skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=fe.RANDOM_STATE)
     oof, _ = fe.oof_evaluate("XGBoost", Xtr, ytr, skf, features=features)
     thr, _ = fe.find_f2_threshold(ytr, oof[:, fe.HIGH_CLASS])
     proba, _, _ = fe.fit_predict_proba("XGBoost", Xtr, ytr, Xte, features=features)
-    ml = fe.alto_metrics(yte, fe.apply_threshold(proba, thr))
-    fixed = fe.alto_metrics(yte, fe.baseline_predict(Xte, fe.BASELINE_TTC_S))
+
+    pred_ml = fe.apply_threshold(proba, thr)
+    pred_fixed = fe.baseline_predict(Xte, fe.BASELINE_TTC_S)
     t_b, _ = fe.tune_baseline_ttc(Xtr, ytr)
-    tuned = fe.alto_metrics(yte, fe.baseline_predict(Xte, t_b))
-    print(f"   [{tag}] XGB F2={ml['f2_alto']:.3f} | baseline fijo F2={fixed['f2_alto']:.3f} | "
-          f"baseline ajustado F2={tuned['f2_alto']:.3f}", flush=True)
-    return {"xgboost_calibrated": ml, "baseline_fixed": fixed,
-            "baseline_tuned": {**tuned, "ttc_threshold_s": t_b},
-            "xgb_minus_baseline_tuned_f2_pp": float((ml["f2_alto"] - tuned["f2_alto"]) * 100)}
+    pred_tuned = fe.baseline_predict(Xte, t_b)
+    pred_always_alto = np.full_like(yte, fill_value=fe.HIGH_CLASS)
+
+    ml = detailed_alto_metrics(yte, pred_ml)
+    fixed = detailed_alto_metrics(yte, pred_fixed)
+    tuned = detailed_alto_metrics(yte, pred_tuned)
+    always_alto = detailed_alto_metrics(yte, pred_always_alto)
+
+    print(f"   [{tag}] XGB F2={ml['f2_alto']:.3f} (Prec={ml['precision_alto']:.3f}, Rec={ml['recall_alto']:.3f}, Spec={ml['specificity_alto']:.3f}) | "
+          f"TTC fijo F2={fixed['f2_alto']:.3f} | TTC ajustado F2={tuned['f2_alto']:.3f} | "
+          f"Siempre-ALTO F2={always_alto['f2_alto']:.3f}", flush=True)
+
+    return {
+        "xgboost_calibrated": {**ml, "calibrated_threshold": thr},
+        "baseline_fixed": fixed,
+        "baseline_tuned": {**tuned, "ttc_threshold_s": t_b},
+        "baseline_always_alto": always_alto,
+        "xgb_minus_baseline_tuned_f2_pp": float((ml["f2_alto"] - tuned["f2_alto"]) * 100),
+        "xgb_minus_always_alto_f2_pp": float((ml["f2_alto"] - always_alto["f2_alto"]) * 100)
+    }
 
 
 def run_audit(run_alt_labels=True):

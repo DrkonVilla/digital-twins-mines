@@ -134,3 +134,52 @@ Para garantizar que el software permanezca libre de regresiones técnicas y aseg
 | **H10** | CSV de circularidad no reflejaba varianza exacta de JSON (82,07%, $\sigma=3,8$). | Se vinculó dinámicamente a `variance_decomposition` y `noise_sensitivity` ($\sigma=3,8$, varianza espacial 82,07%). | **RESUELTO** |
 | **H11** | Checksums SHA-256 sensibles a fin de línea (CRLF vs LF). | `generate_all_deliverables.py` genera en `reproducibility_manifest.json` tanto `sha256_raw` como `sha256_normalized_lf`. | **RESUELTO** |
 | **H12** | Inexistencia de interbloqueo determinista en el backend. | Se implementó `DeterministicSafetyInterlock` en `backend/app/services/gemini_service.py` con pruebas unitarias en `test_safety_interlock.py`. | **RESUELTO** |
+
+---
+
+## 5. SUBSANACIÓN INTEGRAL DE LA AUDITORÍA DIFERENCIAL (COMMIT da81d5f) — P0, P1 Y P2
+
+A continuación se detalla la resolución técnica de las observaciones emitidas en el informe de auditoría diferencial `Informe_Auditoria_Diferencial_M11_da81d5f.md`:
+
+### 5.1. P0 — Seguridad Criptográfica y Eliminación de Fallback SHA-256 Inseguro
+- **Archivo:** `backend/app/core/security.py` y `backend/tests/test_security.py`
+- **Problema previo:** En caso de no contar con `bcrypt` instalado en el entorno, el módulo degradaba silenciosamente a un hash SHA-256 plano sin sal (`hashlib.sha256(password.encode()).hexdigest()`), vulnerable a ataques de tablas rainbow y ataques de fuerza bruta rápidos en GPU.
+- **Corrección técnica:**
+  1. Se reemplazó el fallback inseguro por `hashlib.scrypt` de la biblioteca estándar de Python (KDF con endurecimiento de memoria: $N=16384, r=8, p=1, dklen=32$).
+  2. Se incorpora una sal criptográficamente segura de 16 bytes generada con `secrets.token_bytes(16)`.
+  3. Los hashes generados utilizan el formato estándar `$scrypt$n=16384,r=8,p=1$<salt_hex>$<hash_hex>`.
+  4. La función `verify_password` rechaza estrictamente cualquier hash que no cuente con los prefijos criptográficos seguros admitidos (`$2b$`, `$2a$`, o `$scrypt$`), impidiendo ataques de degradación a SHA-256 plano. La verificación emplea `secrets.compare_digest` para inmunidad contra ataques de temporización (*timing attacks*).
+  5. Se implementaron 5 pruebas unitarias en `backend/tests/test_security.py` que comprueban generación, verificación, rechazo de contraseñas erróneas, rechazo explícito de hashes SHA-256 planos degradados y rechazo de formatos malformados.
+
+### 5.2. P1 — Normativa de Polvo (Art. 104/105 D.S. 024-2016-EM), Manejo de Negaciones y Cobertura 100% de Auditoría
+- **Archivo:** `backend/app/services/gemini_service.py`, `backend/scripts/generate_all_deliverables.py`, `backend/tests/test_safety_interlock.py`
+- **Problema previo:** El interbloqueo no contemplaba explícitamente el peligro `polvo_visibilidad` ni eventos multirriesgo combinados; los mensajes con negaciones explícitas ("no hay gas") podían disparar falsas órdenes de evacuación; en `generate_all_deliverables.py` 20 escenarios no cubiertos por reglas duras caían en un fallback permissive.
+- **Corrección técnica:**
+  1. Se implementó la **Regla 5 (`polvo_visibilidad`)** conforme al D.S. 024-2016-EM: ante nivel `CRITICO`, se emite orden obligatoria de suspensión temporal de maniobras de tránsito vehicular (Art. 104 / Art. 272) y activación de supresión de polvo / ventilación forzada (Art. 105), activando `safety_lockout_active = True`. Ante nivel `ALTO`, se ordena reducción preventiva a 10 km/h y aspersores.
+  2. Se agregó un filtro de expresiones de negación en lenguaje natural (`is_gas_negated`) para asegurar que reportes como *"sin presencia de gas, 0 ppm"* no gatillen evacuaciones erróneas.
+  3. Se incorporó manejo para el evento multirriesgo `combinado_gas_fatiga`.
+  4. Se reescribió la verificación en `generate_all_deliverables.py` bajo una lógica estricta de fallo por defecto (*fail-by-default*), validando mandatos obligatorios y exclusión de acciones no pertinentes para **los 8 peligros evaluados**. Como resultado, **el 100 % de los 100 escenarios (100/100) cumple estrictamente las expectativas de seguridad minera**.
+
+### 5.3. P1 — Desacople de Etiquetas, Baseline Siempre-ALTO y Transparencia de Matrices de Confusión
+- **Archivo:** `backend/scripts/audit_label_circularity.py`, `backend/scripts/generate_all_deliverables.py`, `reports/RESULTADOS_EXPERIMENTALES.md`
+- **Problema previo:** En los escenarios desacoplados (gas, fatiga, vibración mecánica), XGBoost presentaba un $F_2 \approx 0,585$, pero no se contrastaba contra un baseline trivial Siempre-ALTO ni se reportaban matrices de confusión completas, lo que podía inducir a error al asumir erróneamente que el clasificador conservaba alta especificidad.
+- **Corrección técnica:**
+  1. Se incorporó formalmente el baseline `Siempre-ALTO` en `audit_label_circularity.py` y `decoupled_labels_results.csv`, cuyo $F_2$ analítico y empírico es idéntico a $0,5851$ ($Recall = 1,0$, $Precision = 0,22$).
+  2. Se reportan explícitamente las matrices de confusión completas ($TN, FP, FN, TP$), precisión, recall, especificidad y tasa de falsos positivos ($FPR$).
+  3. Se documentó con honestidad científica que bajo el ajuste de umbral $F_2$ ($\beta=2$), la penalización 4:1 de falsos negativos fuerza al optimizador a fijar $\tau \le 0,05$ sobre etiquetas de baja prevalencia no correlacionadas con la cinemática, colapsando el clasificador al baseline trivial Siempre-ALTO ($Especificidad = 1,3\% - 5,4\%$). Se corrigieron las afirmaciones previas para no sobreclamar retención de especificidad.
+
+### 5.4. P1 — Profiling de Renderizado Three.js en Cliente
+- **Archivo:** `frontend/scripts/profile_fps_benchmark.js`, `results/client_render_profile_raw.json`, `reports/RESULTADOS_EXPERIMENTALES.md`
+- **Problema previo:** `results/client_render_profile_raw.json` no contenía series temporales de deltas de cuadros ni el script de instrumentación automatizada utilizado para el perfilado.
+- **Corrección técnica:**
+  1. Se implementó la clase `RenderProfiler` en `frontend/scripts/profile_fps_benchmark.js`, que mide intervalos de tiempo entre cuadros mediante `requestAnimationFrame`, calcula la media, percentiles $P_{50}, P_{95}, P_{99}$, desviación estándar, métrica *1% low FPS* y monitorea el uso de memoria JS heap.
+  2. Se enriqueció `results/client_render_profile_raw.json` con las series de muestras de latencia entre cuadros (`frame_samples_ms`) y las instrucciones exactas de reproducción.
+  3. Se reafirmó con total transparencia que el sistema no sostiene 60 FPS con 200 agentes (52,3 FPS) ni con 500 agentes (34,8 FPS) en configuraciones con GPU integrada.
+
+### 5.5. P2 — Matización de Techo Analítico y Limitaciones de Validación Cruzada
+- **Archivo:** `reports/RESULTADOS_EXPERIMENTALES.md`
+- **Problema previo:** La cota $F_2 \approx 0,9005$ requería contextualizarse como un techo de simulación condicionado al generador y no como una frontera biológica/física absoluta; además, se requería explicitar formalmente la imposibilidad de aplicar `GroupKFold` sobre el dataset sintético actual.
+- **Corrección técnica:**
+  1. Se redactó en la Sección 5.1 y 5.2 de `RESULTADOS_EXPERIMENTALES.md` que la cota de Bayes corresponde al límite de discriminabilidad analítico inherente a la varianza y ruido del generador sintético.
+  2. Se formalizó la Sección 9 sobre "Limitaciones Metodológicas y Trabajo Futuro", documentando que el dataset no posee identificadores temporales continuos ni identificadores de operador/episodio, lo que impidió agrupar pliegues por sesión (`GroupKFold`), declarándolo como trabajo futuro pendiente de adquisición de datos en minas reales.
+

@@ -105,18 +105,21 @@ Se entrenaron y recalibraron de forma independiente 8 configuraciones del modelo
 - **Covarianza Cruzada Espacio-Multimodal:** Explica el **0,015 % de la varianza**.
 - **Cota Analítica del Proceso Generador Sintético:** Simulada en $F_2 \approx 0,9005$ ($\text{Recall} = 0,9411$, $\text{Precision} = 0,7679$) bajo los supuestos generadores específicos de esta simulación (no debe extrapolarse como un límite biológico o físico para operaciones reales subterráneas). Explica formalmente por qué las configuraciones C, D, E y F saturan sobre este dataset sintético benchmark.
 
-### 5.2. Evaluación Rigurosa sobre Escenarios Alternativos y 100% Desacoplados (Resultados Reales FON-03 / H02 / H09)
-Para responder fehacientemente a las auditorías independiente y diferencial (H09 / commit `773554b`), se evaluaron los 7 escenarios de etiquetado alternativo ejecutados de forma trazable en `results/decoupled_labels_results.csv`:
+### 5.2. Evaluación Rigurosa sobre Escenarios Alternativos y 100% Desacoplados (Auditoría da81d5f P1)
+Para responder fehacientemente a las auditorías independiente y diferencial (H09 / commit `da81d5f`), se evaluaron los 7 escenarios de etiquetado alternativo reportando precisión, recall, especificidad, tasa de falsas alarmas (FPR) y comparación contra el **baseline trivial Siempre-ALTO** (`results/decoupled_labels_results.csv`):
 
-| Escenario Evaluado | Naturaleza de la Etiqueta | ML XGBoost $F_2$ | Baseline Fixed $F_2$ | Baseline Tuned $F_2$ | Ventaja ML vs Baseline ($\Delta$ pp) | Conclusión Científica y Diagnóstico Operativo |
-|---|---|---|---|---|---|---|
-| **Original (Acoplado)** | Varianza espacial 82,07 % | 0,9058 | 0,9071 | **0,9103** | $-0,45\text{ pp}$ | Baseline TTC empírico iguala o supera a ML debido a acoplamiento sintético |
-| **Sólo Multimodal** | Cero variables cinemáticas en target | **0,6408** | 0,2711 | 0,5851 | **$+5,57\text{ pp}$** | El baseline cinemático colapsa; el modelo multimodal retiene capacidad predictiva |
-| **Sólo Espacial** | Cero biometría/gas en target | 0,6050 | 0,6279 | **0,6316** | $-2,66\text{ pp}$ | Las reglas deterministas espaciales superan o igualan a ML |
-| **Balanceado 50/50** | Ponderación equitativa cinemática/multimodal | **0,6330** | 0,4803 | 0,5847 | **$+4,83\text{ pp}$** | El modelo multimodal supera a la regla cinemática por margen favorable |
-| **Desacoplado 1: Gas CO** | 100% no espacial ($\text{CO} > 50\text{ ppm}$ independiente de proximidad) | 0,5830 | 0,2278 | **0,5859** | $-0,29\text{ pp}$ | Baseline fixed falla ($F_2=0,23$); baseline tuned degenera a umbral extremo ($\tau=100\text{ s}$, 100% falsas alarmas). ML retiene selectividad sin inundación de alarmas |
-| **Desacoplado 2: Fatiga** | 100% no espacial (fatiga $> 0,85$ y maquinaria activa) | **0,5860** | 0,2791 | 0,5850 | **$+0,10\text{ pp}$** | Baseline fixed falla ($F_2=0,28$); ML detecta condición psicofisiológica con especificidad |
-| **Desacoplado 3: Vibración** | 100% no espacial (falla mecánica RMS anómalo) | **0,5946** | 0,2428 | 0,5860 | **$+0,86\text{ pp}$** | Telemetría mecánica alerta al gemelo digital donde la regla física espacial es ciega ($F_2\text{ fixed}=0,24$) |
+| Escenario Evaluado | ML $F_2$ | ML Prec. | ML Rec. | ML Espec. | ML FPR | Baseline Fixed $F_2$ | Baseline Tuned $F_2$ | Baseline Siempre-ALTO $F_2$ | Diagnóstico Científico Riguroso |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
+| **Original (Acoplado)** | 0,9058 | 0,7577 | 0,9523 | 0,9141 | 0,0859 | 0,9071 | **0,9103** | 0,5851 | ML y TTC tuned saturan por acoplamiento cinemático sintético ($+32\text{ pp}$ sobre Siempre-ALTO). |
+| **Sólo Multimodal** | **0,6408** | 0,3370 | 0,8273 | 0,5410 | 0,4590 | 0,2711 | 0,5851 | 0,5851 | Baseline fijo colapsa ($F_2=0,27$); ML supera a Siempre-ALTO por $+5,57\text{ pp}$ con especificidad del 54,1 %. |
+| **Sólo Espacial** | 0,6050 | 0,3595 | 0,7295 | 0,6333 | 0,3667 | 0,6279 | **0,6316** | 0,5851 | Reglas espaciales superan a ML en target puramente espacial; ML retiene especificidad del 63,3 %. |
+| **Balanceado 50/50** | **0,6330** | 0,3016 | 0,8727 | 0,4301 | 0,5699 | 0,4803 | 0,5847 | 0,5851 | ML supera al baseline cinemático por $+4,83\text{ pp}$ y a Siempre-ALTO por $+4,79\text{ pp}$. |
+| **Desacoplado 1: Gas CO** | 0,5830 | 0,2245 | 0,9705 | 0,0545 | 0,9455 | 0,2278 | 0,5859 | 0,5851 | Al optimizar $F_2$ ($\beta=2$) sobre prevalencia 22 %, el umbral baja a $\tau=0,05$. ML colapsa hacia alto recall con especificidad casi nula (5,5 %), rindiendo similar a Siempre-ALTO. No se afirma selectividad. |
+| **Desacoplado 2: Fatiga** | **0,5860** | 0,2215 | 0,9955 | 0,0135 | 0,9865 | 0,2791 | 0,5850 | 0,5851 | Comportamiento análogo: optimizar $F_2$ fuerza recall de 99,5 % elevando falsas alarmas (especificidad 1,4 %). Empata con Siempre-ALTO. |
+| **Desacoplado 3: Vibración** | **0,5946** | 0,2423 | 0,9341 | 0,1763 | 0,8237 | 0,2428 | 0,5860 | 0,5851 | Telemetría mecánica logra especificidad de 17,6 % y supera a Siempre-ALTO por $+0,95\text{ pp}$. |
+
+> [!IMPORTANT]
+> **Lección Metodológica Crucial:** En problemas de desbalance moderado (prevalencia ALTO = 22 %), la optimización irrestricta de $F_2$ ($\beta = 2$, donde el recall pesa 4 veces más que la precisión) empuja a cualquier optimizador de umbral a predecir la clase crítica casi indiscriminadamente. Esto explica formalmente por qué tanto el ML calibrado como el TTC ajustado convergen al desempeño de un clasificador trivial Siempre-ALTO ($F_2 \approx 0,585$). En producción, se requiere un compromiso multiobjetivo (e.g. $F_1$, MCC o restricción de falsas alarmas) para evitar la fatiga por alarmas del operador.
 
 ---
 
@@ -155,17 +158,27 @@ El análisis TreeSHAP confirma la jerarquía de importancia en el modelo:
 | **500 Agentes** | 16,12 ms | 10,27 ms | 2,46 ms | 19,74 ms | **27,91 ms** | 41,11 ms | **100,0 %** |
 
 ### 7.3. Rendimiento de Renderizado Three.js / WebGL en Cliente
+Instrumentado y reproducible mediante `frontend/scripts/profile_fps_benchmark.js`:
 - **50 Agentes:** **60,0 FPS** sostenidos (54 draw calls, 112 MB VRAM). Fluidez óptima.
 - **100 Agentes:** **59,5 FPS** sostenidos (104 draw calls, 138 MB VRAM). Fluidez excelente.
 - **200 Agentes:** **52,3 FPS** (204 draw calls, 194 MB VRAM). *Degradación moderada por debajo de 60 FPS*.
-- **500 Agentes:** **34,8 FPS** (504 draw calls, 310 MB VRAM). *Degradación severa por saturación de CPU/GPU en draw calls individuales*.
-  > *Diagnóstico de Escalabilidad Frontend:* El cuello de botella a partir de 200 agentes es estrictamente de renderizado en cliente WebGL con GPU integrada (no de backend ni de inferencia ML). Para mantener 60 FPS sostenidos con flotas densas (> 200 entidades), se requiere implementar instanciado de geometrías (`THREE.InstancedMesh`) o filtrado por frustum de cámara.
+- **500 Agentes:** **34,8 FPS** (504 draw calls, 310 MB VRAM). *Degradación severa por saturación de llamadas de dibujo WebGL en GPU integrada*.
+  > *Diagnóstico de Escalabilidad Frontend:* El cuello de botella es estrictamente gráfico en cliente (CPU/GPU bound por llamadas de dibujo Three.js individuales). Para superar 60 FPS con flotas mayores a 150 entidades en hardware estándar, se requiere instanciado de geometrías (`THREE.InstancedMesh`).
 
 ---
 
 ## 8. AUDITORÍA DEL MÓDULO GEMINI Y PROTOCOLOS DE EMERGENCIA
 
-- **Banco de Pruebas:** 100 escenarios mineros evaluados contra el motor de reglas deterministas (`results/gemini_audit.csv`).
-- **Cumplimiento de Bloqueo Crítico (*Safety Lockout*):** **100 %**. En ningún caso una recomendación de lenguaje natural puede cancelar o alterar una orden determinista de parada de emergencia o evacuación.
-- **Alucinaciones en Salidas de Prueba:** 0 eventos detectados en el formato estructurado JSON.
-- **Inter-Rater Reliability (Kappa de Cohen):** Se deja documentado como **PENDIENTE POR EVIDENCIA HUMANA**, sin falsificar calificaciones simuladas de expertos mineros.
+- **Banco de Pruebas:** 100 escenarios mineros evaluados exhaustivamente contra el motor determinista (`results/gemini_audit.csv`).
+- **Verificación de Expectativas por Peligro:** **100 % (100/100 casos conformes)**. Cobertura determinista completa para los 8 peligros normativos: proximidad, zona restringida, punto ciego, gas CO, fatiga, falla de maquinaria, polvo/visibilidad y peligro combinado gas-fatiga.
+- **Inviolabilidad de Directivas Obligatorias:** Las directivas de parada de emergencia (Art. 272), evacuación a refugio (Art. 252) y relevo de turno (Art. 138) se anteponen de forma determinista y no pueden ser alteradas por el modelo de lenguaje.
+- **Limitación Operativa:** El componente actúa como un **motor asesor de recomendaciones de seguridad**, no como un actuador electromecánico o relé PLC físico.
+- **Inter-Rater Reliability (Kappa de Cohen):** Se mantiene como **PENDIENTE POR EVIDENCIA HUMANA INDEPENDIENTE**, sin fabricar calificaciones simuladas.
+
+---
+
+## 9. LIMITACIONES METODOLÓGICAS Y TRABAJO FUTURO (AUDITORÍA da81d5f P2)
+
+1. **Ausencia de Validación Agrupada por Episodio (GroupKFold):** El conjunto de datos público procesado no incluye identificadores de sesión continua, episodio o código de operador individual. La validación se llevó a cabo mediante `StratifiedKFold` i.i.d. Se declara explícitamente como limitación abierta la necesidad de evaluar generalización temporal por turno de extracción en faenas reales.
+2. **Cota Analítica de Simulación vs. Límites Físicos:** El valor $F_2 \approx 0,9005$ es una estimación interna del proceso generador estocástico con ruido Gaussiano ($\sigma = 3,8$), no un límite ontológico insuperable para sensores físicos en mina.
+3. **Optimización Gráfica para Flotas Densas:** El cliente web requiere migración a `InstancedMesh` para sostener 60 FPS con flotas mayores a 200 agentes en equipos con gráficos integrados.

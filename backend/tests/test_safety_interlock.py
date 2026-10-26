@@ -88,3 +88,52 @@ def test_pure_gas_alert_does_not_trigger_collision_stop():
     # MUST NOT trigger proximity exclusion zone stop
     assert not any("PARADA DE EMERGENCIA INMEDIATA: Desconexión" in m for m in res["deterministic_mandates"])
     assert not any("272" in r for r in res["normative_references"])
+
+
+def test_negation_gas_message_does_not_trigger_evacuation():
+    """Verifies that explicit negation like 'No hay gas ... 0 ppm' does NOT trigger evacuation (Audit da81d5f P1)."""
+    alert = {
+        "alert_level": "ALTO",
+        "message": "No hay gas en la labor, concentración normal (0 ppm CO)",
+        "worker_id": 6,
+        "machine_id": 1,
+    }
+    res = DeterministicSafetyInterlock.evaluate_rules(alert)
+    assert not any("EVACUACIÓN" in m for m in res["deterministic_mandates"])
+    assert not any("252" in r for r in res["normative_references"])
+
+
+def test_critical_dust_hazard_triggers_suspension_and_lockout():
+    """Verifies that critical dust (15 mg/m3, 5 lux) triggers transit suspension and lockout (Audit da81d5f P1)."""
+    alert = {
+        "alert_level": "CRITICO",
+        "hazard": "polvo_visibilidad",
+        "message": "Polvo en suspensión severo de 15 mg/m3 y visibilidad nula (5 lux) en frente de carguío",
+        "worker_id": 7,
+        "machine_id": 1,
+    }
+    res = DeterministicSafetyInterlock.evaluate_rules(alert)
+    assert res["safety_lockout_active"] is True
+    assert any("SUSPENSIÓN TEMPORAL DE MANIOBRAS" in m for m in res["deterministic_mandates"])
+    assert any("SUPRESIÓN DE POLVO" in m for m in res["deterministic_mandates"])
+    assert any("104" in r for r in res["normative_references"])
+    assert any("105" in r for r in res["normative_references"])
+    # MUST NOT falsely trigger gas evacuation
+    assert not any("EVACUACIÓN" in m for m in res["deterministic_mandates"])
+
+
+def test_combined_gas_fatiga_triggers_both_mandates():
+    """Verifies that combined gas + fatigue alert triggers both evacuation and fatigue relief (Audit da81d5f P1)."""
+    alert = {
+        "alert_level": "CRITICO",
+        "hazard": "combinado_gas_fatiga",
+        "message": "CO de 99 ppm y fatiga 0.72 en operador de ScoopTram",
+        "worker_id": 8,
+        "machine_id": 1,
+    }
+    res = DeterministicSafetyInterlock.evaluate_rules(alert)
+    assert res["safety_lockout_active"] is True
+    assert any("EVACUACIÓN" in m for m in res["deterministic_mandates"])
+    assert any("RELEVO OBLIGATORIO" in m for m in res["deterministic_mandates"])
+    assert any("252" in r for r in res["normative_references"])
+    assert any("138" in r for r in res["normative_references"])

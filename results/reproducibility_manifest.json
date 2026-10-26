@@ -1,6 +1,6 @@
 {
   "manifest_version": "1.2.0",
-  "generated_at_utc": "2026-10-26T20:51:54Z",
+  "generated_at_utc": "2026-10-26T21:42:41Z",
   "cross_platform_hashing_policy": "Incluye sha256_raw y sha256_normalized_lf (elimina divergencias Windows CRLF vs Linux LF)",
   "system_information": {
     "os": "Windows 11 Home",
@@ -52,9 +52,9 @@
       "line_ending": "CRLF"
     },
     "client_render_profile_raw.json": {
-      "size_bytes": 2960,
-      "sha256_raw": "83dab05749485470b5f7e5aebf8886e419bb63f62f53afd5ad7ded222825966e",
-      "sha256_normalized_lf": "83dab05749485470b5f7e5aebf8886e419bb63f62f53afd5ad7ded222825966e",
+      "size_bytes": 4555,
+      "sha256_raw": "f0283697ced5e4a04c9a29d40ef1b47550cbf15de3410d0d0ef25d8bcb8ccbcd",
+      "sha256_normalized_lf": "f0283697ced5e4a04c9a29d40ef1b47550cbf15de3410d0d0ef25d8bcb8ccbcd",
       "line_ending": "LF"
     },
     "confusion_matrices.csv": {
@@ -70,9 +70,9 @@
       "line_ending": "CRLF"
     },
     "decoupled_labels_results.csv": {
-      "size_bytes": 2072,
-      "sha256_raw": "742129392e76769b31b9d759e77412945e81636e355f220527bb7ee5f7cf3296",
-      "sha256_normalized_lf": "ab583e4348ddc836ca0b09b944b3f70b4c259a43c51f42d4a14b8d8cfc19d2a3",
+      "size_bytes": 2724,
+      "sha256_raw": "c723b070e589bec11025c9ba6815f26d7d551d1e82fc0d93073107c75a8f8655",
+      "sha256_normalized_lf": "11d5c7c3926c9df37ae96f1732f52c5510951d9c3aebae9dadfc74b9f83f0b03",
       "line_ending": "CRLF"
     },
     "environment_metadata.json": {
@@ -83,8 +83,8 @@
     },
     "experiment_config.json": {
       "size_bytes": 2784,
-      "sha256_raw": "2fd68a4693a97464de4ae8f8a2be16aec0d7f548f2094ff386533f87b4ce8aa1",
-      "sha256_normalized_lf": "e6d1b60ba302f70633e1c9211404cdb0217175cb442f80e7233181011489909c",
+      "sha256_raw": "e49ba39cf722074fb44cc21c425b7b2d14c034391b076a531dcc9d017de397de",
+      "sha256_normalized_lf": "f17272e046a496dd7cf4aafb46bf6b6d1025594f282fdfa5ff852095811109d1",
       "line_ending": "CRLF"
     },
     "fair_comparison_results.json": {
@@ -100,9 +100,9 @@
       "line_ending": "CRLF"
     },
     "gemini_audit.csv": {
-      "size_bytes": 52428,
-      "sha256_raw": "1769f5913031c60c23bf482756a56946b2ebda5d76738499d5f9f1e7a24d7ee9",
-      "sha256_normalized_lf": "b8418abd2620dc97e8741344eb47ebac5ea6c9b08b5b22020cfeecae409840a0",
+      "size_bytes": 54568,
+      "sha256_raw": "3664153019ed4ec72a499fc500795e1da4a302f8937cad2d3d51730ca979943c",
+      "sha256_normalized_lf": "85f94fc062aeef161f71b2551f77bec78bbfd619dff28f1ffa889c9b54a2fa27",
       "line_ending": "CRLF"
     },
     "genai_audit_bank.json": {
@@ -124,9 +124,9 @@
       "line_ending": "CRLF"
     },
     "label_circularity_audit.json": {
-      "size_bytes": 9092,
-      "sha256_raw": "1a3bf0c806917748ef4e469434f328b704d4ff4dba0f55658165f48aeddf97af",
-      "sha256_normalized_lf": "43b84c486ff45695ad9ed4c37fcab74bd22bb3977455483d9b47018eae73ab71",
+      "size_bytes": 17530,
+      "sha256_raw": "0ce06926ec1576497f13fca9c7fcbf689699162af707ebe21f2ee7e0caa3bd07",
+      "sha256_normalized_lf": "c6607501fa39593b3057e7fcadbafdff4f9677df975a8f80e1eb0a10cc8ce8ab",
       "line_ending": "CRLF"
     },
     "metrics_comparison.csv": {
@@ -218,9 +218,9 @@
       "line_ending": "LF"
     },
     "audit_label_circularity.py": {
-      "size_bytes": 10763,
-      "sha256_raw": "57242d9ce99cc8f5afb3cc8fc619928421dc3b44dc926a6f58c4286c72aa3bb5",
-      "sha256_normalized_lf": "57242d9ce99cc8f5afb3cc8fc619928421dc3b44dc926a6f58c4286c72aa3bb5",
+      "size_bytes": 12342,
+      "sha256_raw": "a7258e289da8ea7587b28c6cd48d87732605718baa4cc613e4c8a852290d6aed",
+      "sha256_normalized_lf": "a7258e289da8ea7587b28c6cd48d87732605718baa4cc613e4c8a852290d6aed",
       "line_ending": "LF"
     },
     "benchmark_hardware_profiler.py": {
@@ -266,9 +266,9 @@
       "line_ending": "LF"
     },
     "generate_all_deliverables.py": {
-      "size_bytes": 46721,
-      "sha256_raw": "6ddaa7d58e745c18ec2c31206b1323bbc385ca4920269a2add44a5daa04e6ba5",
-      "sha256_normalized_lf": "6ddaa7d58e745c18ec2c31206b1323bbc385ca4920269a2add44a5daa04e6ba5",
+      "size_bytes": 50437,
+      "sha256_raw": "3c957f0c8cab867f24dc74425654435fa34a0d3a729501d3a0c56d5551840dbc",
+      "sha256_normalized_lf": "3c957f0c8cab867f24dc74425654435fa34a0d3a729501d3a0c56d5551840dbc",
       "line_ending": "LF"
     },
     "generate_synthetic_data.py": {

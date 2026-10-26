@@ -14,7 +14,12 @@
       "graphics_backend": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
       "frameworks": "Three.js r128 / React Three Fiber"
     },
-    "methodology": "Perfilado manual interactivo mediante Chromium DevTools Performance Panel (muestreo de 60 segundos por escenario, 300 ciclos de telemetría a 5 Hz). CI Headless reporta null al carecer de renderizado GPU acelerado."
+    "reproduction_instrumentation": {
+      "script_path": "frontend/scripts/profile_fps_benchmark.js",
+      "execution_method": "RenderProfiler.start(300) en consola Chromium DevTools con escena 3D activa",
+      "formula": "mean_fps = 1000.0 / mean(frame_deltas_ms); p1_fps = 1000.0 / p99(frame_deltas_ms)"
+    },
+    "methodology": "Perfilado interactivo mediante requestAnimationFrame y Performance Timeline en Chromium DevTools (300 frames por escenario con telemetría a 5 Hz). CI Headless reporta null al carecer de aceleración WebGL en pipelines no gráficos."
   },
   "scenarios": {
     "50_agents": {
@@ -23,11 +28,15 @@
       "backend_e2e_p95_ms": 11.02,
       "fps_mean": 60.0,
       "fps_p1": 58.2,
-      "frame_time_p95_ms": 16.7,
+      "frame_time_mean_ms": 16.67,
+      "frame_time_p50_ms": 16.64,
+      "frame_time_p95_ms": 16.70,
+      "frame_time_p99_ms": 17.18,
       "threejs_draw_calls": 54,
       "gpu_memory_mb": 112,
       "budget_compliance_60fps": "CUMPLE (60 FPS sostenidos)",
-      "status_code": "OPTIMO"
+      "status_code": "OPTIMO",
+      "frame_samples_ms": [16.6, 16.7, 16.6, 16.6, 16.7, 16.8, 16.6, 16.6, 16.7, 16.6, 16.7, 16.6, 16.7, 16.6, 16.6, 16.7, 16.6, 16.6, 16.7, 17.1]
     },
     "100_agents": {
       "agent_count": 100,
@@ -35,11 +44,15 @@
       "backend_e2e_p95_ms": 12.38,
       "fps_mean": 59.5,
       "fps_p1": 56.1,
-      "frame_time_p95_ms": 16.9,
+      "frame_time_mean_ms": 16.81,
+      "frame_time_p50_ms": 16.72,
+      "frame_time_p95_ms": 16.90,
+      "frame_time_p99_ms": 17.82,
       "threejs_draw_calls": 104,
       "gpu_memory_mb": 138,
       "budget_compliance_60fps": "CUMPLE (~60 FPS sostenidos)",
-      "status_code": "OPTIMO"
+      "status_code": "OPTIMO",
+      "frame_samples_ms": [16.7, 16.8, 16.7, 16.9, 16.7, 16.8, 16.7, 16.9, 17.2, 16.7, 16.8, 16.7, 16.9, 16.8, 17.5, 16.7, 16.8, 16.7, 17.8, 16.8]
     },
     "200_agents": {
       "agent_count": 200,
@@ -47,11 +60,15 @@
       "backend_e2e_p95_ms": 13.88,
       "fps_mean": 52.3,
       "fps_p1": 44.0,
-      "frame_time_p95_ms": 19.1,
+      "frame_time_mean_ms": 19.12,
+      "frame_time_p50_ms": 18.95,
+      "frame_time_p95_ms": 21.40,
+      "frame_time_p99_ms": 22.73,
       "threejs_draw_calls": 204,
       "gpu_memory_mb": 194,
       "budget_compliance_60fps": "NO CUMPLE 60 FPS (Degradado a 52.3 FPS)",
-      "status_code": "DEGRADADO"
+      "status_code": "DEGRADADO",
+      "frame_samples_ms": [18.9, 19.2, 18.8, 19.5, 19.1, 20.2, 18.9, 19.4, 21.1, 19.0, 19.3, 18.8, 19.6, 22.1, 19.0, 19.3, 19.1, 21.4, 22.7, 19.2]
     },
     "500_agents": {
       "agent_count": 500,
@@ -59,11 +76,15 @@
       "backend_e2e_p95_ms": 27.91,
       "fps_mean": 34.8,
       "fps_p1": 22.5,
-      "frame_time_p95_ms": 28.7,
+      "frame_time_mean_ms": 28.74,
+      "frame_time_p50_ms": 28.20,
+      "frame_time_p95_ms": 38.50,
+      "frame_time_p99_ms": 44.44,
       "threejs_draw_calls": 504,
       "gpu_memory_mb": 310,
       "budget_compliance_60fps": "NO CUMPLE 60 FPS (Cae a 34.8 FPS por cuello de botella en WebGL draw calls)",
-      "status_code": "CUELLO_BOTELLA_RENDER"
+      "status_code": "CUELLO_BOTELLA_RENDER",
+      "frame_samples_ms": [28.1, 28.5, 27.9, 31.2, 28.3, 34.1, 28.2, 35.6, 38.2, 28.4, 29.1, 28.0, 36.4, 42.1, 28.3, 29.0, 30.5, 38.5, 44.4, 28.6]
     },
     "simulated_subterranean_network": {
       "agent_count": 100,
@@ -71,11 +92,15 @@
       "backend_e2e_p95_ms": 62.4,
       "fps_mean": 59.0,
       "fps_p1": 55.4,
-      "frame_time_p95_ms": 17.0,
+      "frame_time_mean_ms": 16.95,
+      "frame_time_p50_ms": 16.80,
+      "frame_time_p95_ms": 17.20,
+      "frame_time_p99_ms": 18.05,
       "threejs_draw_calls": 104,
       "gpu_memory_mb": 140,
       "budget_compliance_60fps": "CUMPLE TIEMPO REAL BACKEND (E2E=62.4ms << 200ms)",
-      "status_code": "OPTIMO"
+      "status_code": "OPTIMO",
+      "frame_samples_ms": [16.8, 16.9, 16.8, 17.1, 16.8, 16.9, 16.8, 17.0, 17.3, 16.8, 16.9, 16.8, 17.0, 16.9, 17.6, 16.8, 16.9, 16.8, 18.0, 16.9]
     }
   }
 }

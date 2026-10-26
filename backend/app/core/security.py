@@ -9,38 +9,80 @@ from jose import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import hashlib
+import secrets
 
 from app.core.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
+SCRYPT_N = 16384
+SCRYPT_R = 8
+SCRYPT_P = 1
+SCRYPT_KEY_LEN = 32
+
+
+def _scrypt_hash(password_bytes: bytes, salt_bytes: bytes) -> bytes:
+    """Computes memory-hard scrypt KDF (NIST/OWASP recommended)."""
+    return hashlib.scrypt(
+        password_bytes,
+        salt=salt_bytes,
+        n=SCRYPT_N,
+        r=SCRYPT_R,
+        p=SCRYPT_P,
+        dklen=SCRYPT_KEY_LEN
+    )
+
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    if bcrypt is not None:
+    """Verifies a password against a bcrypt or scrypt hash. Rejects insecure plain hashes."""
+    if not isinstance(plain_password, str) or not isinstance(hashed_password, str):
+        return False
+    
+    plain_bytes = plain_password.encode('utf-8')
+    
+    # 1. Bcrypt Hash Format ($2b$ or $2a$)
+    if hashed_password.startswith(("$2b$", "$2a$", "$2y$")):
+        if bcrypt is not None:
+            try:
+                return bcrypt.checkpw(plain_bytes, hashed_password.encode('utf-8'))
+            except Exception:
+                return False
+        else:
+            # Cannot safely verify a bcrypt hash without the bcrypt algorithm
+            return False
+            
+    # 2. Scrypt Hash Format ($scrypt$n=16384,r=8,p=1$<salt_hex>$<hash_hex>)
+    if hashed_password.startswith("$scrypt$"):
         try:
-            if isinstance(plain_password, str):
-                plain_password_bytes = plain_password.encode('utf-8')
-            else:
-                plain_password_bytes = plain_password
-            if isinstance(hashed_password, str):
-                hashed_password_bytes = hashed_password.encode('utf-8')
-            else:
-                hashed_password_bytes = hashed_password
-            return bcrypt.checkpw(plain_password_bytes, hashed_password_bytes)
+            parts = hashed_password.split("$")
+            # Expected format: ['', 'scrypt', 'params', 'salt_hex', 'hash_hex']
+            if len(parts) != 5:
+                return False
+            salt = bytes.fromhex(parts[3])
+            expected_hash = bytes.fromhex(parts[4])
+            computed_hash = _scrypt_hash(plain_bytes, salt)
+            return secrets.compare_digest(computed_hash, expected_hash)
         except Exception:
             return False
-    else:
-        # Fallback for environments where compiled bcrypt C-extension is not installed
-        return hashlib.sha256(plain_password.encode('utf-8')).hexdigest() == hashed_password
+
+    # 3. Explicitly reject any insecure downgrade (e.g. plain sha256 or md5)
+    return False
+
 
 def get_password_hash(password: str) -> str:
+    """Generates a secure password hash using bcrypt if available, or scrypt KDF with random salt."""
+    if not isinstance(password, str):
+        raise TypeError("Password must be a string")
+        
+    password_bytes = password.encode('utf-8')
+    
     if bcrypt is not None:
-        if isinstance(password, str):
-            password_bytes = password.encode('utf-8')
-        else:
-            password_bytes = password
         return bcrypt.hashpw(password_bytes, bcrypt.gensalt()).decode('utf-8')
-    else:
-        return hashlib.sha256(password.encode('utf-8')).hexdigest()
+    
+    # Cryptographically secure scrypt KDF fallback using Python standard library
+    salt = secrets.token_bytes(16)
+    hash_bytes = _scrypt_hash(password_bytes, salt)
+    return f"$scrypt$n={SCRYPT_N},r={SCRYPT_R},p={SCRYPT_P}${salt.hex()}${hash_bytes.hex()}"
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
