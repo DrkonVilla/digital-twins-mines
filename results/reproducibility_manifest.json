@@ -1,6 +1,6 @@
 {
   "manifest_version": "1.2.0",
-  "generated_at_utc": "2026-10-26T21:42:41Z",
+  "generated_at_utc": "2026-11-02T18:35:19Z",
   "cross_platform_hashing_policy": "Incluye sha256_raw y sha256_normalized_lf (elimina divergencias Windows CRLF vs Linux LF)",
   "system_information": {
     "os": "Windows 11 Home",
@@ -82,9 +82,9 @@
       "line_ending": "CRLF"
     },
     "experiment_config.json": {
-      "size_bytes": 2784,
-      "sha256_raw": "e49ba39cf722074fb44cc21c425b7b2d14c034391b076a531dcc9d017de397de",
-      "sha256_normalized_lf": "f17272e046a496dd7cf4aafb46bf6b6d1025594f282fdfa5ff852095811109d1",
+      "size_bytes": 2913,
+      "sha256_raw": "a356db98c09a88e27a818a4dc53da6c02ddb965e1b905ec8c3dd0b9508a7b557",
+      "sha256_normalized_lf": "6804e801466fb7683f99b74dccedd538f7712bf9ae35017aae135ee841439d5c",
       "line_ending": "CRLF"
     },
     "fair_comparison_results.json": {
@@ -100,9 +100,9 @@
       "line_ending": "CRLF"
     },
     "gemini_audit.csv": {
-      "size_bytes": 54568,
-      "sha256_raw": "3664153019ed4ec72a499fc500795e1da4a302f8937cad2d3d51730ca979943c",
-      "sha256_normalized_lf": "85f94fc062aeef161f71b2551f77bec78bbfd619dff28f1ffa889c9b54a2fa27",
+      "size_bytes": 69407,
+      "sha256_raw": "75bedefed012580213e28e11eafaddf0703972b170934118c52bc13d2d899ff6",
+      "sha256_normalized_lf": "ed9d0f5279361126b0c3a98574cc61ed367cfbdac38c764d0d1b5c1cce3ea647",
       "line_ending": "CRLF"
     },
     "genai_audit_bank.json": {
@@ -266,10 +266,10 @@
       "line_ending": "LF"
     },
     "generate_all_deliverables.py": {
-      "size_bytes": 50437,
-      "sha256_raw": "3c957f0c8cab867f24dc74425654435fa34a0d3a729501d3a0c56d5551840dbc",
-      "sha256_normalized_lf": "3c957f0c8cab867f24dc74425654435fa34a0d3a729501d3a0c56d5551840dbc",
-      "line_ending": "LF"
+      "size_bytes": 52646,
+      "sha256_raw": "fb1a885c5bf4d32491f0294bd7213612cb9cf667a29f3586788f8c4556e6a4cc",
+      "sha256_normalized_lf": "ef97a9f89b0a0e84648a2db506f0f8df716bb8108d7a35719c839e2f0fca4934",
+      "line_ending": "CRLF"
     },
     "generate_synthetic_data.py": {
       "size_bytes": 5106,
