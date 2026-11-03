@@ -11,61 +11,43 @@ __pycache__/
 *.so
 .Python
 env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-/lib/
-/lib64/
-!frontend/src/lib/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 venv/
 .venv/
 
-# IDEs
+# IDEs & OS
 .idea/
 .vscode/
 *.swp
 *.swo
-
-# Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Database
-*.sqlite3
-*.db
-
-# Logs
-logs/
-*.log
-
-# Output reports
-reports_output/
-backend/reports_output/
-
-# OS
 .DS_Store
 Thumbs.db
 
-# Artículos, Entregables y Documentación Word
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Databases & Runtime Logs
+*.sqlite3
+*.db
+m11_db.db
+logs/
+*.log
+
+# Output reports & temporary scratch
+reports_output/
+backend/reports_output/
+scratch/
+_scratch/
+_drafts_archive/
+
+# Borradores Word y Entregables Locales
 Artículo/
 Articulo/
-Artículo_Corregido/
-Articulo_Corregido/
+Artículo_*/
+Articulo_*/
+Anticulo*/
 Codigo_Fuente_Word/
 Entregables/
 generate_word_source_code.py
 *.docx
-
